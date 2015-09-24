@@ -1,0 +1,6 @@
+[submodule "Externals"]
+	path = Externals
+	url = https://github.com/jebreimo/Ytest.git
+[submodule "Externals/Ytest"]
+	path = Externals/Ytest
+	url = https://jebreimo@github.com/jebreimo/Ytest.git
