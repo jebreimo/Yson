@@ -13,7 +13,7 @@
 namespace Yson
 {
     JsonValue::JsonValue()
-        : m_Type(Null)
+        : m_Type(NULL_VALUE)
     {
         m_Value.integer = 0;
     }
@@ -23,84 +23,84 @@ namespace Yson
     {
         switch (type)
         {
-        case Object:
+        case OBJECT:
             m_Value.object = new std::map<std::string, JsonValue>();
             break;
-        case Array:
+        case ARRAY:
             m_Value.array = new std::vector<JsonValue>();
             break;
-        case String:
+        case STRING:
             m_Value.string = new std::string();
             break;
-        case Real:
+        case REAL:
             m_Value.real = 0;
             break;
-        case Integer:
-        case Null:
+        case INTEGER:
+        case NULL_VALUE:
             m_Value.integer = 0;
             break;
-        case Boolean:
+        case BOOLEAN:
             m_Value.boolean = false;
             break;
         }
     }
 
     JsonValue::JsonValue(const std::map<std::string, JsonValue>& object)
-        : m_Type(Object)
+        : m_Type(OBJECT)
     {
         m_Value.object = new std::map<std::string, JsonValue>(object);
     }
 
     JsonValue::JsonValue(const std::vector<JsonValue>& array)
-        : m_Type(Array)
+        : m_Type(ARRAY)
     {
         m_Value.array = new std::vector<JsonValue>(array);
     }
 
     JsonValue::JsonValue(const std::string& string)
-        : m_Type(String)
+        : m_Type(STRING)
     {
         m_Value.string = new std::string(string);
     }
 
     JsonValue::JsonValue(const char* string)
-        : m_Type(String)
+        : m_Type(STRING)
     {
         m_Value.string = new std::string(string);
     }
 
     JsonValue::JsonValue(double real)
-        : m_Type(Real)
+        : m_Type(REAL)
     {
         m_Value.real = real;
     }
 
     JsonValue::JsonValue(int32_t integer)
-        : m_Type(Integer)
+        : m_Type(INTEGER)
     {
         m_Value.integer = (int64_t)integer;
     }
 
     JsonValue::JsonValue(int64_t integer)
-        : m_Type(Integer)
+        : m_Type(INTEGER)
     {
         m_Value.integer = (int64_t)integer;
     }
 
     JsonValue::JsonValue(uint32_t integer)
-        : m_Type(Integer)
+        : m_Type(INTEGER)
     {
         m_Value.integer = (int64_t)integer;
     }
 
     JsonValue::JsonValue(uint64_t integer)
-        : m_Type(Integer)
+        : m_Type(INTEGER)
     {
         m_Value.integer = (int64_t)integer;
     }
 
     JsonValue::JsonValue(bool boolean)
-        : m_Type(Boolean)
+        : m_Type(BOOLEAN)
     {
         m_Value.boolean = boolean;
     }
@@ -112,13 +112,13 @@ namespace Yson
                       "JsonValue requires that doubles and pointers are 64-bit or less.");
         switch (m_Type)
         {
-        case Object:
+        case OBJECT:
             m_Value.object = new JsonObject(rhs.object());
             break;
-        case Array:
+        case ARRAY:
             m_Value.array = new JsonArray(rhs.array());
             break;
-        case String:
+        case STRING:
             m_Value.string = new std::string(rhs.string());
             break;
         default:
@@ -133,7 +133,7 @@ namespace Yson
         static_assert(sizeof(Value) == sizeof(int64_t),
                       "JsonValue requires that doubles and pointers are 64-bit or less.");
         m_Value.integer = rhs.m_Value.integer;
-        rhs.m_Type = Null;
+        rhs.m_Type = NULL_VALUE;
         rhs.m_Value.object = nullptr;
     }
 
@@ -141,9 +141,9 @@ namespace Yson
     {
         switch (m_Type)
         {
-        case Object: delete m_Value.object; break;
-        case Array: delete m_Value.array; break;
-        case String: delete m_Value.string; break;
+        case OBJECT: delete m_Value.object; break;
+        case ARRAY: delete m_Value.array; break;
+        case STRING: delete m_Value.string; break;
         default: break;
         }
     }
@@ -164,7 +164,7 @@ namespace Yson
         m_Type = rhs.m_Type;
         m_Value.integer = rhs.m_Value.integer;
         rhs.m_Value.object = nullptr;
-        rhs.m_Type = Null;
+        rhs.m_Type = NULL_VALUE;
         return *this;
     }
 
@@ -175,44 +175,44 @@ namespace Yson
 
     const std::map<std::string, JsonValue>& JsonValue::object() const
     {
-        if (m_Type != Object)
+        if (m_Type != OBJECT)
             throw JsonValueError("This JsonValue doesn't contain an object.");
         return *m_Value.object;
     }
 
     std::map<std::string, JsonValue>& JsonValue::object()
     {
-        if (m_Type != Object)
+        if (m_Type != OBJECT)
             throw JsonValueError("This JsonValue doesn't contain an object.");
         return *m_Value.object;
     }
 
     const std::vector<JsonValue>& JsonValue::array() const
     {
-        if (m_Type != Array)
+        if (m_Type != ARRAY)
             throw JsonValueError("This JsonValue doesn't contain an array.");
         return *m_Value.array;
     }
 
     std::vector<JsonValue>& JsonValue::array()
     {
-        if (m_Type != Array)
+        if (m_Type != ARRAY)
             throw JsonValueError("This JsonValue doesn't contain an array.");
         return *m_Value.array;
     }
 
     const std::string& JsonValue::string() const
     {
-        if (m_Type != String)
+        if (m_Type != STRING)
             throw JsonValueError("This JsonValue doesn't contain an string.");
         return *m_Value.string;
     }
 
     double JsonValue::real() const
     {
-        if (m_Type == Real)
+        if (m_Type == REAL)
             return m_Value.real;
-        else if (m_Type == Integer)
+        else if (m_Type == INTEGER)
             return (double)m_Value.integer;
         else
             throw JsonValueError("This JsonValue doesn't contain a real.");
@@ -220,11 +220,11 @@ namespace Yson
 
     int64_t JsonValue::integer() const
     {
-        if (m_Type == Integer)
+        if (m_Type == INTEGER)
         {
             return m_Value.integer;
         }
-        else if (m_Type == Real)
+        else if (m_Type == REAL)
         {
             double i;
             double f = std::modf(m_Value.real, &i);
@@ -238,7 +238,7 @@ namespace Yson
 
     bool JsonValue::boolean() const
     {
-        if (m_Type != Boolean)
+        if (m_Type != BOOLEAN)
             throw JsonValueError("This JsonValue doesn't contain a boolean.");
         return false;
     }

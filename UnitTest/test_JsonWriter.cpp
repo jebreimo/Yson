@@ -1,24 +1,27 @@
-#include "JEBIO/Json/JsonWriter.hpp"
+#include "../Yson/JsonWriter.hpp"
 
 #include <sstream>
-#include <JEBTest/JEBTest.hpp>
+#include "../Externals/Ytest/Ytest.hpp"
 
-using namespace JEBIO::Json;
-
-static void test_SimpleObject()
+namespace
 {
-    std::stringstream ss;
-    JsonWriter writer(ss);
-    writer.beginObject();
-    writer.setValueName("name");
-    writer.beginObject();
-    writer.endObject();
-    writer.endObject();
-    std::string expected = "\
+    using namespace Yson;
+
+    static void test_SimpleObject()
+    {
+        std::stringstream ss;
+        JsonWriter writer(ss);
+        writer.beginObject();
+        writer.setValueName("name");
+        writer.beginObject();
+        writer.endObject();
+        writer.endObject();
+        std::string expected = "\
 {\n\
   \"name\": {}\n\
 }";
-    JT_EQUAL(ss.str(), expected);
-}
+        Y_EQUAL(ss.str(), expected);
+    }
 
-JT_TEST(test_SimpleObject);
+    Y_TEST(test_SimpleObject);
+}

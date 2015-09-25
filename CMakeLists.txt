@@ -36,6 +36,8 @@ set(SOURCE_FILES
     Yson/JsonWriter.cpp
     )
 
+add_subdirectory(Externals)
+
 add_library(
     ${PROJECT_NAME} SHARED
     ${PUBLIC_HEADERS}
@@ -51,8 +53,10 @@ set_target_properties(
 
 target_link_libraries(${PROJECT_NAME} ${YSTRING_LIBRARY})
 
-# set(CTEST_OUTPUT_ON_FAILURE 1)
-# add_subdirectory(UnitTest)
+if (HAS_YTEST)
+     set(CTEST_OUTPUT_ON_FAILURE 1)
+     add_subdirectory(UnitTest)
+endif(HAS_YTEST)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 install(FILES ${PUBLIC_HEADERS}

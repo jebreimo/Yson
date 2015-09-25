@@ -28,7 +28,7 @@ namespace Yson
           m_BufferEnd(NULL),
           m_TokenStart(NULL),
           m_TokenEnd(NULL),
-          m_TokenType(InvalidToken)
+          m_TokenType(INVALID_TOKEN)
     {
     }
 
@@ -41,7 +41,7 @@ namespace Yson
     void JsonTokenizer::next()
     {
         m_TokenStart = m_TokenEnd;
-        if (!m_InternalBuffer.empty() && m_TokenType == EndOfBuffer)
+        if (!m_InternalBuffer.empty() && m_TokenType == END_OF_BUFFER)
         {
             m_TokenType = completeCurrentToken();
         }
@@ -97,7 +97,7 @@ namespace Yson
     void JsonTokenizer::reset()
     {
         m_TokenStart = m_TokenEnd = m_BufferStart;
-        m_TokenType = InvalidToken;
+        m_TokenType = INVALID_TOKEN;
         m_InternalBuffer.clear();
     }
 
@@ -127,16 +127,16 @@ namespace Yson
     {
         JsonTokenizer::TokenType tokenType = determineCommentType(
                 m_InternalBuffer.begin(), m_InternalBuffer.end());
-        if (tokenType == EndOfBuffer)
+        if (tokenType == END_OF_BUFFER)
         {
             tokenType = determineCommentType(m_TokenStart, m_BufferEnd, true);
-            if (tokenType == Comment || tokenType == BlockComment)
+            if (tokenType == COMMENT || tokenType == BLOCK_COMMENT)
                 ++m_TokenEnd;
         }
 
-        if (tokenType == Comment)
+        if (tokenType == COMMENT)
             return findEndOfLineComment();
-        else if (tokenType == BlockComment)
+        else if (tokenType == BLOCK_COMMENT)
             return findEndOfBlockComment(endsWithStar());
         else
             return findEndOfValue();
@@ -146,22 +146,22 @@ namespace Yson
     {
         JsonTokenizer::TokenType tokenType = determineStringType(
                 m_InternalBuffer.begin(), m_InternalBuffer.end());
-        if (tokenType == EndOfBuffer)
+        if (tokenType == END_OF_BUFFER)
         {
             tokenType = determineStringType(m_TokenStart, m_BufferEnd,
                                             m_InternalBuffer.size(),
                                             endOfFile());
-            if (tokenType == BlockString)
+            if (tokenType == BLOCK_STRING)
                 m_TokenEnd = m_TokenStart + (3 - m_InternalBuffer.size());
-        else if (tokenType == String && endOfFile())
-            return String;
+        else if (tokenType == STRING && endOfFile())
+            return STRING;
         }
 
-        if (tokenType == String)
+        if (tokenType == STRING)
         {
             return findEndOfString(endsWithEscape());
         }
-        else if (tokenType != BlockString)
+        else if (tokenType != BLOCK_STRING)
         {
             return tokenType;
         }
@@ -185,7 +185,7 @@ namespace Yson
     JsonTokenizer::TokenType JsonTokenizer::nextToken()
     {
         if (m_TokenStart == m_BufferEnd)
-            return EndOfBuffer;
+            return END_OF_BUFFER;
         switch (*m_TokenStart)
         {
         case ' ':
@@ -194,18 +194,18 @@ namespace Yson
         case '\r':
         case '\n':
             return nextNewlineToken();
-        case '[': SINGLECHAR_TOKEN(ArrayStart);
-        case ']': SINGLECHAR_TOKEN(ArrayEnd);
-        case '{': SINGLECHAR_TOKEN(ObjectStart);
-        case '}': SINGLECHAR_TOKEN(ObjectEnd);
-        case ':': SINGLECHAR_TOKEN(Colon);
-        case ',': SINGLECHAR_TOKEN(Comma);
+        case '[': SINGLECHAR_TOKEN(ARRAY_START);
+        case ']': SINGLECHAR_TOKEN(ARRAY_END);
+        case '{': SINGLECHAR_TOKEN(OBJECT_START);
+        case '}': SINGLECHAR_TOKEN(OBJECT_END);
+        case ':': SINGLECHAR_TOKEN(COLON);
+        case ',': SINGLECHAR_TOKEN(COMMA);
         case '"': return nextStringToken();
         case '/': return nextCommentToken();
         default:
             return nextValueToken();
         }
-        return InvalidToken;
+        return INVALID_TOKEN;
     }
 
     JsonTokenizer::TokenType JsonTokenizer::nextCommentToken()
@@ -214,19 +214,19 @@ namespace Yson
         assert(*m_TokenStart == '/');
 
         TokenType tokenType = determineCommentType(m_TokenStart, m_BufferEnd, false);
-        if (tokenType == Value)
+        if (tokenType == VALUE)
             return nextValueToken();
-        else if (tokenType == EndOfBuffer)
+        else if (tokenType == END_OF_BUFFER)
           ++m_TokenEnd;
         else
           m_TokenEnd += 2;
 
-        if (tokenType == Comment)
+        if (tokenType == COMMENT)
             tokenType = findEndOfLineComment();
         else
             tokenType = findEndOfBlockComment(false);
 
-        if (tokenType == EndOfBuffer)
+        if (tokenType == END_OF_BUFFER)
             appendTokenToInternalBuffer();
         return tokenType;
     }
@@ -234,7 +234,7 @@ namespace Yson
     JsonTokenizer::TokenType JsonTokenizer::nextNewlineToken()
     {
         TokenType tokenType = findEndOfNewline(false);
-        if (tokenType == EndOfBuffer)
+        if (tokenType == END_OF_BUFFER)
             appendTokenToInternalBuffer();
         return tokenType;
     }
@@ -243,12 +243,12 @@ namespace Yson
     {
         JsonTokenizer::TokenType tokenType = determineStringType(
                 m_TokenStart, m_BufferEnd, 0, endOfFile());
-        if (tokenType == BlockString)
+        if (tokenType == BLOCK_STRING)
         {
             m_TokenEnd = m_TokenStart + 3;
             tokenType = findEndOfBlockString(0, false);
         }
-        else if (tokenType == String)
+        else if (tokenType == STRING)
         {
             m_TokenEnd = m_TokenStart + 1;
             tokenType = findEndOfString(false);
@@ -258,7 +258,7 @@ namespace Yson
             m_TokenEnd = m_BufferEnd;
         }
 
-        if (tokenType == EndOfBuffer)
+        if (tokenType == END_OF_BUFFER)
             appendTokenToInternalBuffer();
 
         return tokenType;
@@ -268,7 +268,7 @@ namespace Yson
     {
         m_TokenEnd = m_TokenStart + 1;
         TokenType type = findEndOfValue();
-        if (type == EndOfBuffer)
+        if (type == END_OF_BUFFER)
             appendTokenToInternalBuffer();
         return type;
     }
@@ -289,13 +289,13 @@ namespace Yson
             else if (quotes < 3)
                 quotes = 0;
             else
-                return BlockString;
+                return BLOCK_STRING;
             ++m_TokenEnd;
         }
         if (endOfFile())
-            return quotes >= 3 ? BlockString : InvalidToken;
+            return quotes >= 3 ? BLOCK_STRING : INVALID_TOKEN;
         else
-            return EndOfBuffer;
+            return END_OF_BUFFER;
     }
 
     JsonTokenizer::TokenType JsonTokenizer::findEndOfBlockComment(bool precededByStar)
@@ -305,12 +305,12 @@ namespace Yson
             if (*m_TokenEnd == '/' && precededByStar)
             {
                 ++m_TokenEnd;
-                return BlockComment;
+                return BLOCK_COMMENT;
             }
             precededByStar = *m_TokenEnd == '*';
             ++m_TokenEnd;
         }
-        return endOfFile() ? InvalidToken : EndOfBuffer;
+        return endOfFile() ? INVALID_TOKEN : END_OF_BUFFER;
     }
 
     JsonTokenizer::TokenType JsonTokenizer::findEndOfLineComment()
@@ -318,10 +318,10 @@ namespace Yson
         while (m_TokenEnd != m_BufferEnd)
         {
             if (*m_TokenEnd == '\r' || *m_TokenEnd == '\n')
-                return Comment;
+                return COMMENT;
             ++m_TokenEnd;
         }
-        return endOfFile() ? Comment : EndOfBuffer;
+        return endOfFile() ? COMMENT : END_OF_BUFFER;
     }
 
     JsonTokenizer::TokenType JsonTokenizer::findEndOfNewline(bool precededByCr)
@@ -336,17 +336,17 @@ namespace Yson
             if (*m_TokenEnd == '\n')
             {
                 ++m_TokenEnd;
-                return Newline;
+                return NEWLINE;
             }
             else if (precededByCr)
             {
-                return Newline;
+                return NEWLINE;
             }
 
             precededByCr = true;
             ++m_TokenEnd;
         }
-        return endOfFile() ? Newline : EndOfBuffer;
+        return endOfFile() ? NEWLINE : END_OF_BUFFER;
     }
 
     JsonTokenizer::TokenType JsonTokenizer::findEndOfString(bool escapeFirst)
@@ -357,7 +357,7 @@ namespace Yson
             if (*m_TokenEnd < 0x20)
             {
                 if (*m_TokenEnd == '\n')
-                    return InvalidToken;
+                    return INVALID_TOKEN;
                 else
                     valid = false;
             }
@@ -368,7 +368,7 @@ namespace Yson
             else if (*m_TokenEnd == '"')
             {
                 ++m_TokenEnd;
-                return valid ? String : InvalidToken;
+                return valid ? STRING : INVALID_TOKEN;
             }
             else if (*m_TokenEnd == '\\')
             {
@@ -377,7 +377,7 @@ namespace Yson
 
             ++m_TokenEnd;
         }
-        return endOfFile() ? InvalidToken : EndOfBuffer;
+        return endOfFile() ? INVALID_TOKEN : END_OF_BUFFER;
     }
 
     JsonTokenizer::TokenType JsonTokenizer::findEndOfValue()
@@ -393,11 +393,11 @@ namespace Yson
             case ',':
             case ']':
             case '}':
-                return Value;
+                return VALUE;
             }
             ++m_TokenEnd;
         }
-        return endOfFile() ? Value : EndOfBuffer;
+        return endOfFile() ? VALUE : END_OF_BUFFER;
     }
 
     JsonTokenizer::TokenType JsonTokenizer::findEndOfWhitespace()
@@ -405,10 +405,10 @@ namespace Yson
         while (m_TokenEnd != m_BufferEnd)
         {
             if (*m_TokenEnd != ' ' && *m_TokenEnd != '\t')
-                return Whitespace;
+                return WHITESPACE;
             ++m_TokenEnd;
         }
-        return Whitespace;
+        return WHITESPACE;
     }
 
     bool JsonTokenizer::endsWithEscape() const
@@ -471,17 +471,17 @@ namespace Yson
         }
 
         if (quotes >= 3)
-            return JsonTokenizer::BlockString;
+            return JsonTokenizer::BLOCK_STRING;
         else if (beg != end)
             // Ignores on purpose the case where quotes is 0. This function won't
             // be called unless *beg is '"' or precedingQuotes > 0.
-            return JsonTokenizer::String;
+            return JsonTokenizer::STRING;
         else if (!endOfFile)
-            return JsonTokenizer::EndOfBuffer;
+            return JsonTokenizer::END_OF_BUFFER;
         else if (quotes == 2)
-            return JsonTokenizer::String;
+            return JsonTokenizer::STRING;
         else
-            return JsonTokenizer::InvalidToken;
+            return JsonTokenizer::INVALID_TOKEN;
     }
 
     template <typename BiIt>
@@ -491,15 +491,15 @@ namespace Yson
         while (beg != end)
         {
             if (*beg == '*' && precededBySlash)
-                return JsonTokenizer::BlockComment;
+                return JsonTokenizer::BLOCK_COMMENT;
             else if (*beg != '/')
-                return JsonTokenizer::Value;
+                return JsonTokenizer::VALUE;
             else if (precededBySlash)
-                return JsonTokenizer::Comment;
+                return JsonTokenizer::COMMENT;
             else
                 precededBySlash = true;
             ++beg;
         }
-        return JsonTokenizer::EndOfBuffer;
+        return JsonTokenizer::END_OF_BUFFER;
     }
 }

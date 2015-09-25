@@ -209,25 +209,25 @@ namespace Yson
     {
         switch (jsonValue.type())
         {
-        case JsonValue::Object:
+        case JsonValue::OBJECT:
             write(*this, jsonValue.object(), formatting);
             break;
-        case JsonValue::Array:
+        case JsonValue::ARRAY:
             write(*this, jsonValue.array(), formatting);
             break;
-        case JsonValue::String:
+        case JsonValue::STRING:
             value(jsonValue.string());
             break;
-        case JsonValue::Real:
+        case JsonValue::REAL:
             value(jsonValue.real());
             break;
-        case JsonValue::Integer:
+        case JsonValue::INTEGER:
             value(jsonValue.integer());
             break;
-        case JsonValue::Boolean:
+        case JsonValue::BOOLEAN:
             value(jsonValue.boolean());
             break;
-        case JsonValue::Null:
+        case JsonValue::NULL_VALUE:
         default:
             value();
             break;

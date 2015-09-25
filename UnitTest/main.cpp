@@ -5,6 +5,6 @@
  * This file is distributed under the BSD License.
  * License text is included with the source distribution.
  */
-#include <JEBTest/JEBTest.hpp>
+#include "../Externals/Ytest/Ytest.hpp"
 
-JT_CONSOLE_MAIN()
+Y_CONSOLE_MAIN()

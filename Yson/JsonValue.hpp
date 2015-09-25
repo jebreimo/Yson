@@ -24,14 +24,14 @@ namespace Yson
     public:
         enum Type
         {
-            Object,
-            Array,
+            OBJECT,
+            ARRAY,
 
-            String,
-            Real,
-            Integer,
-            Boolean,
-            Null
+            STRING,
+            REAL,
+            INTEGER,
+            BOOLEAN,
+            NULL_VALUE
         };
 
         JsonValue();

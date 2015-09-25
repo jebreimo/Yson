@@ -17,22 +17,22 @@ namespace Yson
     public:
         enum TokenType
         {
-            InvalidToken,
-            InvalidCharacter,
-            ArrayStart,
-            ArrayEnd,
-            ObjectStart,
-            ObjectEnd,
-            Colon,
-            Comma,
-            String,
-            Value,
-            EndOfBuffer,
-            BlockString,
-            Comment, ///< A line comment, i.e. one that starts with //.
-            BlockComment, ///< A comment that starts with /* and ends with */.
-            Whitespace,
-            Newline
+            INVALID_TOKEN,
+            INVALID_CHARACTER,
+            ARRAY_START,
+            ARRAY_END,
+            OBJECT_START,
+            OBJECT_END,
+            COLON,
+            COMMA,
+            STRING,
+            VALUE,
+            END_OF_BUFFER,
+            BLOCK_STRING,
+            COMMENT, ///< A line comment, i.e. one that starts with //.
+            BLOCK_COMMENT, ///< A comment that starts with /* and ends with */.
+            WHITESPACE,
+            NEWLINE
         };
 
         JsonTokenizer();

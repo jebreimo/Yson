@@ -1,8 +1,8 @@
-#include "JEBIO/Json/JsonValue.hpp"
+#include "../Yson/JsonValue.hpp"
 
-#include <JEBTest/JEBTest.hpp>
+#include "../Externals/Ytest/Ytest.hpp"
 
-using namespace JEBIO::Json;
+using namespace Yson;
 
 class ExpectedValues
 {
@@ -36,48 +36,48 @@ static void testValue(const JsonValue& value,
                       JsonValue::Type type,
                       const ExpectedValues& expected)
 {
-    JT_EQUAL(value.type(), type);
+    Y_EQUAL(value.type(), type);
     if (expected.hasValue(ExpectedValues::Real))
     {
-        JT_EQUAL(value.real(), expected.real());
+        Y_EQUAL(value.real(), expected.real());
     }
     else
     {
-        JT_THROWS(value.real(), JsonValueError);
+        Y_THROWS(value.real(), JsonValueError);
     }
     if (expected.hasValue(ExpectedValues::Boolean))
     {
-        JT_EQUAL(value.boolean(), expected.boolean());
+        Y_EQUAL(value.boolean(), expected.boolean());
     }
     else
     {
-        JT_THROWS(value.boolean(), JsonValueError);
+        Y_THROWS(value.boolean(), JsonValueError);
     }
     if (expected.hasValue(ExpectedValues::String))
     {
-        JT_EQUAL(value.string(), expected.string());
+        Y_EQUAL(value.string(), expected.string());
     }
     else
     {
-        JT_THROWS(value.string(), JsonValueError);
+        Y_THROWS(value.string(), JsonValueError);
     }
     if (expected.hasValue(ExpectedValues::Integer))
     {
-        JT_EQUAL(value.integer(), expected.integer());
+        Y_EQUAL(value.integer(), expected.integer());
     }
     else
     {
-        JT_THROWS(value.integer(), JsonValueError);
+        Y_THROWS(value.integer(), JsonValueError);
     }
-    JT_THROWS(value.object(), JsonValueError);
-    JT_THROWS(value.array(), JsonValueError);
+    Y_THROWS(value.object(), JsonValueError);
+    Y_THROWS(value.array(), JsonValueError);
 }
 
 static void test_Null()
 {
     JsonValue value;
     ExpectedValues expected;
-    testValue(value, JsonValue::Null, expected);
+    testValue(value, JsonValue::NULL_VALUE, expected);
 }
 
 static void test_String()
@@ -85,7 +85,7 @@ static void test_String()
     JsonValue value("text");
     ExpectedValues expected;
     expected.setString("text");
-    testValue(value, JsonValue::String, expected);
+    testValue(value, JsonValue::STRING, expected);
 }
 
 static void test_Integer()
@@ -94,7 +94,7 @@ static void test_Integer()
     ExpectedValues expected;
     expected.setInteger(100);
     expected.setReal(100);
-    testValue(value, JsonValue::Integer, expected);
+    testValue(value, JsonValue::INTEGER, expected);
 }
 
 static void test_IntegralReal()
@@ -103,7 +103,7 @@ static void test_IntegralReal()
     ExpectedValues expected;
     expected.setInteger(100);
     expected.setReal(100);
-    testValue(value, JsonValue::Real, expected);
+    testValue(value, JsonValue::REAL, expected);
 }
 
 static void test_FractionalReal()
@@ -111,7 +111,7 @@ static void test_FractionalReal()
     JsonValue value(100.5);
     ExpectedValues expected;
     expected.setReal(100.5);
-    testValue(value, JsonValue::Real, expected);
+    testValue(value, JsonValue::REAL, expected);
 }
 
 static void test_Boolean()
@@ -119,12 +119,12 @@ static void test_Boolean()
     JsonValue value(false);
     ExpectedValues expected;
     expected.setBoolean(false);
-    testValue(value, JsonValue::Boolean, expected);
+    testValue(value, JsonValue::BOOLEAN, expected);
 }
 
-JT_TEST(test_Null,
-        test_String,
-        test_Integer,
-        test_IntegralReal,
-        test_FractionalReal,
-        test_Boolean);
+Y_TEST(test_Null,
+       test_String,
+       test_Integer,
+       test_IntegralReal,
+       test_FractionalReal,
+       test_Boolean);
