@@ -165,13 +165,13 @@ namespace
     }
 
     std::string json1 = "\
-    {\n\
-        \"text\": \"A value with\\n\\\"escaped characters\\\"\",\n\
-        \"list\": [12, 12.10],\r\n\
-        \"true bool\": true,\n\
-        \"false bool\": false,\n\
-        \"null\": null\n\
-    }";
+{\n\
+    \"text\": \"A value with\\n\\\"escaped characters\\\"\",\n\
+    \"list\": [12, 12.10],\r\n\
+    \"true bool\": true,\n\
+    \"false bool\": false,\n\
+    \"null\": null\n\
+}";
 
     void testNextToken(JsonTokenizer& tokenizer,
                        JsonTokenizer::TokenType type,
