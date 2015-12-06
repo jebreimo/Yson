@@ -7,9 +7,9 @@ namespace
     using namespace Yson;
 
     void testNextToken(JsonTokenizer& tokenizer,
-                              const std::string& input,
-                              JsonTokenizer::TokenType expectedType,
-                              const std::string& expectedToken)
+                       const std::string& input,
+                       JsonTokenizer::TokenType expectedType,
+                       const std::string& expectedToken)
     {
         tokenizer.setBuffer(&input[0], input.size());
         Y_ASSERT(tokenizer.hasNext());
@@ -19,17 +19,17 @@ namespace
     }
 
     void testNextToken(const std::string& input,
-                              JsonTokenizer::TokenType expectedType,
-                              const std::string& expectedToken)
+                       JsonTokenizer::TokenType expectedType,
+                       const std::string& expectedToken)
     {
         JsonTokenizer tokenizer;
         Y_CALL(testNextToken(tokenizer, input, expectedType, expectedToken));
     }
 
     void testNextToken(const std::string& input1,
-                              const std::string& input2,
-                              JsonTokenizer::TokenType expectedType,
-                              const std::string& expectedToken)
+                       const std::string& input2,
+                       JsonTokenizer::TokenType expectedType,
+                       const std::string& expectedToken)
     {
         JsonTokenizer tokenizer;
         Y_CALL(testNextToken(tokenizer, input1, JsonTokenizer::END_OF_BUFFER, input1));
@@ -37,10 +37,10 @@ namespace
     }
 
     void testNextToken(const std::string& input1,
-                              const std::string& input2,
-                              const std::string& input3,
-                              JsonTokenizer::TokenType expectedType,
-                              const std::string& expectedToken)
+                       const std::string& input2,
+                       const std::string& input3,
+                       JsonTokenizer::TokenType expectedType,
+                       const std::string& expectedToken)
     {
         JsonTokenizer tokenizer;
         Y_CALL(testNextToken(tokenizer, input1, JsonTokenizer::END_OF_BUFFER, input1));
@@ -126,15 +126,21 @@ namespace
         Y_CALL(testNextToken("//", "", JsonTokenizer::COMMENT, "//"));
         Y_CALL(testNextToken("//\n", JsonTokenizer::COMMENT, "//"));
         Y_CALL(testNextToken("//\r", JsonTokenizer::COMMENT, "//"));
-        Y_CALL(testNextToken("// 12 { } [ ] \"\"\n", JsonTokenizer::COMMENT, "// 12 { } [ ] \"\""));
+        Y_CALL(testNextToken("// 12 { } [ ] \"\"\n", JsonTokenizer::COMMENT,
+                             "// 12 { } [ ] \"\""));
 
         Y_CALL(testNextToken("*/ ", JsonTokenizer::VALUE, "*/"));
         Y_CALL(testNextToken("*/", "", JsonTokenizer::VALUE, "*/"));
-        Y_CALL(testNextToken("/* \n*/", JsonTokenizer::BLOCK_COMMENT, "/* \n*/"));
-        Y_CALL(testNextToken("/* ", " * / */", JsonTokenizer::BLOCK_COMMENT, "/*  * / */"));
-        Y_CALL(testNextToken("/* ", " /* // */", JsonTokenizer::BLOCK_COMMENT, "/*  /* // */"));
-        Y_CALL(testNextToken("/* ", " /* // */*/", JsonTokenizer::BLOCK_COMMENT, "/*  /* // */"));
-        Y_CALL(testNextToken("/* ", "", JsonTokenizer::INVALID_TOKEN, "/* "));
+        Y_CALL(testNextToken("/* \n*/", JsonTokenizer::BLOCK_COMMENT,
+                             "/* \n*/"));
+        Y_CALL(testNextToken("/* ", " * / */", JsonTokenizer::BLOCK_COMMENT,
+                             "/*  * / */"));
+        Y_CALL(testNextToken("/* ", " /* // */", JsonTokenizer::BLOCK_COMMENT,
+                             "/*  /* // */"));
+        Y_CALL(testNextToken("/* ", " /* // */*/", JsonTokenizer::BLOCK_COMMENT,
+                             "/*  /* // */"));
+        Y_CALL(testNextToken("/* ", "", JsonTokenizer::INVALID_TOKEN,
+                             "/* "));
     }
 
     void test_WhitespaceTokens()
@@ -156,10 +162,10 @@ namespace
 
     void test_StructureTokens()
     {
-        Y_CALL(testStructureToken("{", JsonTokenizer::OBJECT_START));
-        Y_CALL(testStructureToken("}", JsonTokenizer::OBJECT_END));
-        Y_CALL(testStructureToken("[", JsonTokenizer::ARRAY_START));
-        Y_CALL(testStructureToken("]", JsonTokenizer::ARRAY_END));
+        Y_CALL(testStructureToken("{", JsonTokenizer::START_OBJECT));
+        Y_CALL(testStructureToken("}", JsonTokenizer::END_OBJECT));
+        Y_CALL(testStructureToken("[", JsonTokenizer::START_ARRAY));
+        Y_CALL(testStructureToken("]", JsonTokenizer::END_ARRAY));
         Y_CALL(testStructureToken(":", JsonTokenizer::COLON));
         Y_CALL(testStructureToken(",", JsonTokenizer::COMMA));
     }
@@ -181,37 +187,34 @@ namespace
         tokenizer.next();
         Y_EQUAL(tokenizer.tokenType(), type);
         Y_EQUAL(tokenizer.token(), token);
-        // Y_EQUAL(tokenizer.lineNo(), lineNo);
-        // Y_EQUAL(tokenizer.columnNo(), colNo);
-        const char *start, *end;
-        tokenizer.getToken(start, end);
-        Y_EQUAL(std::string(start, end), token);
+        auto range = tokenizer.rawToken();
+        Y_EQUAL(std::string(range.first, range.second), token);
     }
 
     void test_SingleBuffer()
     {
         JsonTokenizer tokenizer;
         tokenizer.setBuffer(json1.c_str(), json1.length());
-        Y_CALL(testNextToken(tokenizer, JsonTokenizer::OBJECT_START, "{"));
+        Y_CALL(testNextToken(tokenizer, JsonTokenizer::START_OBJECT, "{"));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::NEWLINE, "\n"));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::WHITESPACE, "    "));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::STRING, "\"text\""));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::COLON, ":"));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::WHITESPACE, " "));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::STRING,
-                            "\"A value with\\n\\\"escaped characters\\\"\""));
+                             "\"A value with\\n\\\"escaped characters\\\"\""));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::COMMA, ","));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::NEWLINE, "\n"));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::WHITESPACE, "    "));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::STRING, "\"list\""));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::COLON, ":"));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::WHITESPACE, " "));
-        Y_CALL(testNextToken(tokenizer, JsonTokenizer::ARRAY_START, "["));
+        Y_CALL(testNextToken(tokenizer, JsonTokenizer::START_ARRAY, "["));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::VALUE, "12"));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::COMMA, ","));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::WHITESPACE, " "));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::VALUE, "12.10"));
-        Y_CALL(testNextToken(tokenizer, JsonTokenizer::ARRAY_END, "]"));
+        Y_CALL(testNextToken(tokenizer, JsonTokenizer::END_ARRAY, "]"));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::COMMA, ","));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::NEWLINE, "\r\n"));
     }
@@ -221,7 +224,7 @@ namespace
         size_t splits[] = {28};
         JsonTokenizer tokenizer;
         tokenizer.setBuffer(json1.c_str(), splits[0]);
-        Y_CALL(testNextToken(tokenizer, JsonTokenizer::OBJECT_START, "{"));
+        Y_CALL(testNextToken(tokenizer, JsonTokenizer::START_OBJECT, "{"));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::NEWLINE, "\n"));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::WHITESPACE, "    "));
         Y_CALL(testNextToken(tokenizer, JsonTokenizer::STRING, "\"text\""));

@@ -17,22 +17,21 @@ namespace Yson
     public:
         enum TokenType
         {
-            INVALID_TOKEN,
-            INVALID_CHARACTER,
-            ARRAY_START,
-            ARRAY_END,
-            OBJECT_START,
-            OBJECT_END,
-            COLON,
-            COMMA,
-            STRING,
-            VALUE,
-            END_OF_BUFFER,
-            BLOCK_STRING,
-            COMMENT, ///< A line comment, i.e. one that starts with //.
-            BLOCK_COMMENT, ///< A comment that starts with /* and ends with */.
-            WHITESPACE,
-            NEWLINE
+            INVALID_TOKEN = 0,
+            START_ARRAY = '[',
+            END_ARRAY = ']',
+            START_OBJECT = '{',
+            END_OBJECT = '}',
+            COLON = ':',
+            COMMA = ',',
+            STRING = 's',
+            VALUE = 'v',
+            END_OF_BUFFER = 'E',
+            BLOCK_STRING = '"',
+            COMMENT = '/', ///< A line comment, i.e. one that starts with //.
+            BLOCK_COMMENT = '*', ///< A comment that starts with /* and ends with */.
+            WHITESPACE = ' ',
+            NEWLINE = 'n'
         };
 
         JsonTokenizer();
@@ -46,7 +45,8 @@ namespace Yson
         size_t bufferSize() const;
 
         std::string token() const;
-        void getToken(const char*& start, const char*& end) const;
+
+        std::pair<const char*, const char*> rawToken() const;
 
         void reset();
     private:
@@ -76,8 +76,6 @@ namespace Yson
         const char* m_TokenStart;
         const char* m_TokenEnd;
         TokenType m_TokenType;
-        // size_t m_LineNo;
-        // size_t m_ColumnNo;
         std::vector<char> m_InternalBuffer;
     };
 }

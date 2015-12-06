@@ -16,7 +16,7 @@
 namespace Yson
 {
     class JsonValue;
-    typedef std::map<std::string, JsonValue> JsonObject;
+    typedef std::vector<std::pair<std::string, JsonValue>> JsonObject;
     typedef std::vector<JsonValue> JsonArray;
 
     class JsonValue

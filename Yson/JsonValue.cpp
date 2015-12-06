@@ -24,13 +24,13 @@ namespace Yson
         switch (type)
         {
         case OBJECT:
-            m_Value.object = new std::map<std::string, JsonValue>();
+            m_Value.object = new JsonObject;
             break;
         case ARRAY:
-            m_Value.array = new std::vector<JsonValue>();
+            m_Value.array = new JsonArray;
             break;
         case STRING:
-            m_Value.string = new std::string();
+            m_Value.string = new std::string;
             break;
         case REAL:
             m_Value.real = 0;
@@ -45,16 +45,16 @@ namespace Yson
         }
     }
 
-    JsonValue::JsonValue(const std::map<std::string, JsonValue>& object)
+    JsonValue::JsonValue(const JsonObject& object)
         : m_Type(OBJECT)
     {
-        m_Value.object = new std::map<std::string, JsonValue>(object);
+        m_Value.object = new JsonObject;
     }
 
-    JsonValue::JsonValue(const std::vector<JsonValue>& array)
+    JsonValue::JsonValue(const JsonArray& array)
         : m_Type(ARRAY)
     {
-        m_Value.array = new std::vector<JsonValue>(array);
+        m_Value.array = new JsonArray;
     }
 
     JsonValue::JsonValue(const std::string& string)
@@ -173,28 +173,28 @@ namespace Yson
         return m_Type;
     }
 
-    const std::map<std::string, JsonValue>& JsonValue::object() const
+    const JsonObject& JsonValue::object() const
     {
         if (m_Type != OBJECT)
             throw JsonValueError("This JsonValue doesn't contain an object.");
         return *m_Value.object;
     }
 
-    std::map<std::string, JsonValue>& JsonValue::object()
+    JsonObject& JsonValue::object()
     {
         if (m_Type != OBJECT)
             throw JsonValueError("This JsonValue doesn't contain an object.");
         return *m_Value.object;
     }
 
-    const std::vector<JsonValue>& JsonValue::array() const
+    const JsonArray& JsonValue::array() const
     {
         if (m_Type != ARRAY)
             throw JsonValueError("This JsonValue doesn't contain an array.");
         return *m_Value.array;
     }
 
-    std::vector<JsonValue>& JsonValue::array()
+    JsonArray& JsonValue::array()
     {
         if (m_Type != ARRAY)
             throw JsonValueError("This JsonValue doesn't contain an array.");

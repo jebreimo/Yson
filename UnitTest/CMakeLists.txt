@@ -15,7 +15,7 @@ set(SOURCE_FILES
     test_JsonTokenizer.cpp
     test_JsonValue.cpp
     test_JsonWriter.cpp
-    )
+    test_GetValueType.cpp test_JsonReader.cpp.cpp)
 
 add_executable(${PROJECT_NAME}
                ${SOURCE_FILES})

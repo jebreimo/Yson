@@ -18,7 +18,7 @@ namespace Yson
     namespace
     {
         void write(JsonWriter& writer,
-                   const std::map<std::string, JsonValue>& object,
+                   const JsonObject& object,
                    JsonWriter::Formatting formatting);
         void write(JsonWriter& writer,
                    const std::vector<JsonValue>& array,
@@ -300,7 +300,7 @@ namespace Yson
     namespace
     {
         void write(JsonWriter& writer,
-                   const std::map<std::string, JsonValue>& object,
+                   const JsonObject& object,
                    JsonWriter::Formatting formatting)
         {
             writer.beginObject(formatting);

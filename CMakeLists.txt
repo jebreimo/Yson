@@ -24,16 +24,28 @@ find_package(Ystring REQUIRED)
 include_directories(${YSTRING_INCLUDE_DIR})
 
 set(PUBLIC_HEADERS
+    Yson/JsonReader.hpp
     Yson/JsonTokenizer.hpp
     Yson/JsonValue.hpp
     Yson/JsonValueError.hpp
     Yson/JsonWriter.hpp
+    Yson/TextReader.hpp
+    Yson/TextFileReader.hpp
     )
 
 set(SOURCE_FILES
+    Yson/JsonReader.cpp
     Yson/JsonTokenizer.cpp
     Yson/JsonValue.cpp
     Yson/JsonWriter.cpp
+    Yson/TextReader.cpp
+    Yson/TextFileReader.cpp
+    Yson/JsonReaderException.cpp
+    Yson/JsonReaderException.hpp
+    Yson/GetValueType.cpp
+    Yson/GetValueType.hpp
+    Yson/ParseInteger.cpp
+    Yson/ParseInteger.hpp
     )
 
 add_subdirectory(Externals)
@@ -57,6 +69,8 @@ if (HAS_YTEST)
      set(CTEST_OUTPUT_ON_FAILURE 1)
      add_subdirectory(UnitTest)
 endif(HAS_YTEST)
+
+add_subdirectory(Miscellaneous)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 install(FILES ${PUBLIC_HEADERS}

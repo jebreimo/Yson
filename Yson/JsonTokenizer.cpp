@@ -7,7 +7,6 @@
 //****************************************************************************
 #include "JsonTokenizer.hpp"
 
-//#include <algorithm>
 #include <cassert>
 #include <functional>
 
@@ -16,9 +15,9 @@ namespace Yson
     using namespace std::placeholders;
 
     template <typename BiIt>
-    JsonTokenizer::TokenType determineCommentType(BiIt beg, BiIt end,
-                                                  size_t precededBySlash = false);
-    template <typename BiIt>
+    JsonTokenizer::TokenType determineCommentType(
+            BiIt beg, BiIt end, size_t precededBySlash = false);
+    template<typename BiIt>
     JsonTokenizer::TokenType determineStringType(BiIt beg, BiIt end,
                                                  size_t precedingQuotes = 0,
                                                  bool endOfFile = false);
@@ -29,8 +28,7 @@ namespace Yson
           m_TokenStart(NULL),
           m_TokenEnd(NULL),
           m_TokenType(INVALID_TOKEN)
-    {
-    }
+    {}
 
     bool JsonTokenizer::hasNext() const
     {
@@ -75,22 +73,21 @@ namespace Yson
 
     std::string JsonTokenizer::token() const
     {
-        const char *start, *end;
-        getToken(start, end);
-        return std::string(start, end);
+        auto range = rawToken();
+        return std::string(range.first, range.second);
     }
 
-    void JsonTokenizer::getToken(const char*& start, const char*& end) const
+    std::pair<const char*, const char*> JsonTokenizer::rawToken() const
     {
         if (m_InternalBuffer.empty())
         {
-            start = m_TokenStart;
-            end = m_TokenEnd;
+            return std::make_pair(m_TokenStart, m_TokenEnd);
         }
         else
         {
-            start = &m_InternalBuffer[0];
-            end = &m_InternalBuffer[0] + m_InternalBuffer.size();
+            return std::make_pair(
+                    &m_InternalBuffer[0],
+                    &m_InternalBuffer[0] + m_InternalBuffer.size());
         }
     }
 
@@ -115,6 +112,7 @@ namespace Yson
         case '/':
             tokenType = completeCommentToken();
             break;
+        case '0':
         default:
             tokenType = findEndOfValue();
             break;
@@ -153,8 +151,8 @@ namespace Yson
                                             endOfFile());
             if (tokenType == BLOCK_STRING)
                 m_TokenEnd = m_TokenStart + (3 - m_InternalBuffer.size());
-        else if (tokenType == STRING && endOfFile())
-            return STRING;
+            else if (tokenType == STRING && endOfFile())
+                return STRING;
         }
 
         if (tokenType == STRING)
@@ -170,7 +168,8 @@ namespace Yson
             size_t quotes = countQuotesAtEnd();
             if (quotes == m_InternalBuffer.size())
                 quotes -= 3;
-            return findEndOfBlockString(quotes, quotes == 0 && endsWithEscape());
+            return findEndOfBlockString(quotes,
+                                        quotes == 0 && endsWithEscape());
         }
         else
         {
@@ -194,10 +193,10 @@ namespace Yson
         case '\r':
         case '\n':
             return nextNewlineToken();
-        case '[': SINGLECHAR_TOKEN(ARRAY_START);
-        case ']': SINGLECHAR_TOKEN(ARRAY_END);
-        case '{': SINGLECHAR_TOKEN(OBJECT_START);
-        case '}': SINGLECHAR_TOKEN(OBJECT_END);
+        case '[': SINGLECHAR_TOKEN(START_ARRAY);
+        case ']': SINGLECHAR_TOKEN(END_ARRAY);
+        case '{': SINGLECHAR_TOKEN(START_OBJECT);
+        case '}': SINGLECHAR_TOKEN(END_OBJECT);
         case ':': SINGLECHAR_TOKEN(COLON);
         case ',': SINGLECHAR_TOKEN(COMMA);
         case '"': return nextStringToken();
@@ -205,7 +204,6 @@ namespace Yson
         default:
             return nextValueToken();
         }
-        return INVALID_TOKEN;
     }
 
     JsonTokenizer::TokenType JsonTokenizer::nextCommentToken()
@@ -213,7 +211,8 @@ namespace Yson
         assert(m_TokenStart != m_BufferEnd);
         assert(*m_TokenStart == '/');
 
-        TokenType tokenType = determineCommentType(m_TokenStart, m_BufferEnd, false);
+        TokenType tokenType = determineCommentType(
+                m_TokenStart, m_BufferEnd, false);
         if (tokenType == VALUE)
             return nextValueToken();
         else if (tokenType == END_OF_BUFFER)
@@ -298,7 +297,8 @@ namespace Yson
             return END_OF_BUFFER;
     }
 
-    JsonTokenizer::TokenType JsonTokenizer::findEndOfBlockComment(bool precededByStar)
+    JsonTokenizer::TokenType JsonTokenizer::findEndOfBlockComment(
+            bool precededByStar)
     {
         while (m_TokenEnd != m_BufferEnd)
         {
@@ -324,7 +324,8 @@ namespace Yson
         return endOfFile() ? COMMENT : END_OF_BUFFER;
     }
 
-    JsonTokenizer::TokenType JsonTokenizer::findEndOfNewline(bool precededByCr)
+    JsonTokenizer::TokenType JsonTokenizer::findEndOfNewline(
+            bool precededByCr)
     {
         assert(precededByCr ||
                m_TokenEnd != m_BufferEnd &&
@@ -382,6 +383,7 @@ namespace Yson
 
     JsonTokenizer::TokenType JsonTokenizer::findEndOfValue()
     {
+
         while (m_TokenEnd != m_BufferEnd)
         {
             switch (*m_TokenEnd)
@@ -429,7 +431,7 @@ namespace Yson
         auto qend = std::find_if(m_InternalBuffer.rbegin(),
                                  m_InternalBuffer.rend(),
                                  [](char c){return c != '"';});
-        size_t quotes = (size_t)std::distance(m_InternalBuffer.rbegin(), qend);
+        auto quotes = size_t(std::distance(m_InternalBuffer.rbegin(), qend));
         if  (quotes == 0)
             return quotes;
         auto eend = std::find_if(qend,
@@ -473,8 +475,8 @@ namespace Yson
         if (quotes >= 3)
             return JsonTokenizer::BLOCK_STRING;
         else if (beg != end)
-            // Ignores on purpose the case where quotes is 0. This function won't
-            // be called unless *beg is '"' or precedingQuotes > 0.
+            // Ignores on purpose the case where quotes is 0. This function
+            // won't be called unless *beg is '"' or precedingQuotes > 0.
             return JsonTokenizer::STRING;
         else if (!endOfFile)
             return JsonTokenizer::END_OF_BUFFER;
