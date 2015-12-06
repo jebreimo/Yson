@@ -122,17 +122,21 @@ namespace Yson
 
     bool JsonReader::nextToken()
     {
-        if (m_State == INITIAL_STATE)
+        switch (m_State)
         {
+        case INITIAL_STATE:
             fillBuffer();
             m_State = START_OF_DOCUMENT;
+            break;
+        case AFTER_DOCUMENT_VALUE:
+            m_State = END_OF_DOCUMENT;
+            return false;
+        case END_OF_DOCUMENT:
+            return false;
+        default:
+            if (m_EnteredElements.size() > m_StateStack.size())
+                return false;
         }
-
-        if (m_State == END_OF_DOCUMENT)
-            return false;
-
-        if (m_EnteredElements.size() > m_StateStack.size())
-            return false;
 
         bool filledBuffer;
 
@@ -213,10 +217,144 @@ namespace Yson
         return true;
     }
 
+    bool JsonReader::nextKey()
+    {
+        switch (m_State)
+        {
+        case AFTER_OBJECT_ENTRY:
+            break;
+        case AFTER_OBJECT_START:
+            if (m_EnteredElements.size() != m_StateStack.size() - 1)
+                YSON_THROW("Call enter() on object before nextKey()");
+            skipElement();
+            break;
+        case AFTER_OBJECT_KEY:
+        case AFTER_OBJECT_COLON:
+        case AFTER_OBJECT_VALUE:
+        case AFTER_OBJECT_COMMA:
+        case BEFORE_OBJECT_COMMA:
+        case BEFORE_OBJECT_COLON:
+        case BEFORE_OBJECT_KEY:
+            if (m_EnteredElements.size() != m_StateStack.size())
+                YSON_THROW("Call enter() on object before nextKey()");
+            break;
+        default:
+            YSON_THROW("nextKey() can only be called inside an object.");
+        }
+        while (nextToken())
+        {
+            switch (m_State)
+            {
+            case AFTER_OBJECT_START:
+            case AFTER_ARRAY_START:
+                skipElement();
+                break;
+            case AFTER_OBJECT_KEY:
+                return true;
+            case AFTER_OBJECT_ENTRY:
+            case AFTER_OBJECT_COLON:
+            case AFTER_OBJECT_VALUE:
+            case AFTER_OBJECT_COMMA:
+            case BEFORE_OBJECT_COLON:
+            case BEFORE_OBJECT_COMMA:
+            case BEFORE_OBJECT_KEY:
+                break;
+            default:
+                return false;
+            }
+        }
+        return false;
+    }
+
+    bool JsonReader::nextValue()
+    {
+        switch (m_State)
+        {
+        case INITIAL_STATE:
+        case START_OF_DOCUMENT:
+        case AFTER_OBJECT_ENTRY:
+        case AFTER_ARRAY_ENTRY:
+        case AFTER_DOCUMENT_VALUE:
+            break;
+        case AFTER_ARRAY_START:
+        case AFTER_OBJECT_START:
+            if (m_EnteredElements.size() != m_StateStack.size() - 1)
+                YSON_THROW("Call enter() on element before nextValue()");
+            skipElement();
+            break;
+        case AFTER_OBJECT_KEY:
+        case AFTER_OBJECT_COLON:
+        case AFTER_OBJECT_VALUE:
+        case AFTER_OBJECT_COMMA:
+        case AFTER_ARRAY_VALUE:
+        case AFTER_ARRAY_COMMA:
+        case BEFORE_OBJECT_COMMA:
+        case BEFORE_OBJECT_COLON:
+        case BEFORE_OBJECT_KEY:
+        case BEFORE_ARRAY_COMMA:
+        case BEFORE_ARRAY_VALUE:
+            if (m_EnteredElements.size() != m_StateStack.size())
+                YSON_THROW("Call enter() on element before nextValue()");
+            break;
+        default:
+            YSON_THROW("nextValue() can only be called inside an element.");
+        }
+        while (nextToken())
+        {
+            switch (m_State)
+            {
+            case AFTER_OBJECT_START:
+            case AFTER_ARRAY_START:
+            case AFTER_OBJECT_VALUE:
+            case AFTER_ARRAY_VALUE:
+            case AFTER_DOCUMENT_VALUE:
+                return true;
+            case START_OF_DOCUMENT:
+            case AFTER_OBJECT_KEY:
+            case AFTER_OBJECT_COLON:
+            case AFTER_OBJECT_COMMA:
+            case AFTER_ARRAY_ENTRY:
+            case AFTER_ARRAY_COMMA:
+            case BEFORE_OBJECT_COMMA:
+            case BEFORE_OBJECT_COLON:
+            case BEFORE_OBJECT_KEY:
+            case BEFORE_ARRAY_COMMA:
+            case BEFORE_ARRAY_VALUE:
+                break;
+            default:
+                return false;
+            }
+        }
+        return false;
+    }
+
+    void JsonReader::skipElement()
+    {
+        if (m_State != AFTER_ARRAY_START && m_State != AFTER_OBJECT_START)
+        {
+            YSON_THROW("skipElement() must be called at the start of "
+                               "an element.");
+        }
+        enter();
+        while (nextToken());
+        leave();
+    }
+
+    size_t JsonReader::lineNumber() const
+    {
+        return m_LineNumber;
+    }
+
+    size_t JsonReader::columnNumber() const
+    {
+        return m_ColumnNumber;
+    }
+
     bool JsonReader::fillBuffer()
     {
+        auto initialSize = m_Buffer.size();
         m_Buffer.clear();
-        if (!m_TextReader->read(m_Buffer, CHUNK_SIZE))
+        if (!m_TextReader->read(m_Buffer, CHUNK_SIZE) && initialSize == 0)
             return false;
         m_Tokenizer.setBuffer(m_Buffer.data(), m_Buffer.size());
         return true;
@@ -356,7 +494,7 @@ namespace Yson
         switch (m_State)
         {
         case START_OF_DOCUMENT:
-            m_State = END_OF_DOCUMENT;
+            m_State = AFTER_DOCUMENT_VALUE;
             break;
         case AFTER_OBJECT_START:
         case AFTER_OBJECT_ENTRY:
@@ -383,7 +521,7 @@ namespace Yson
         switch (m_State)
         {
         case START_OF_DOCUMENT:
-            m_State = END_OF_DOCUMENT;
+            m_State = AFTER_DOCUMENT_VALUE;
             break;
         case AFTER_OBJECT_COLON:
             m_State = AFTER_OBJECT_VALUE;
@@ -397,138 +535,6 @@ namespace Yson
         default:
             YSON_THROW("Unexpected value.");
         }
-    }
-
-    bool JsonReader::nextKey()
-    {
-        switch (m_State)
-        {
-        case AFTER_OBJECT_ENTRY:
-            break;
-        case AFTER_OBJECT_START:
-            if (m_EnteredElements.size() != m_StateStack.size() - 1)
-                YSON_THROW("Call enter() on object before nextKey()");
-            skipElement();
-            break;
-        case AFTER_OBJECT_KEY:
-        case AFTER_OBJECT_COLON:
-        case AFTER_OBJECT_VALUE:
-        case AFTER_OBJECT_COMMA:
-        case BEFORE_OBJECT_COMMA:
-        case BEFORE_OBJECT_COLON:
-        case BEFORE_OBJECT_KEY:
-            if (m_EnteredElements.size() != m_StateStack.size())
-                YSON_THROW("Call enter() on object before nextKey()");
-            break;
-        default:
-            YSON_THROW("nextKey() can only be called inside an object.");
-        }
-        while (nextToken())
-        {
-            switch (m_State)
-            {
-            case AFTER_OBJECT_START:
-            case AFTER_ARRAY_START:
-                skipElement();
-                break;
-            case AFTER_OBJECT_KEY:
-                return true;
-            case AFTER_OBJECT_ENTRY:
-            case AFTER_OBJECT_COLON:
-            case AFTER_OBJECT_VALUE:
-            case AFTER_OBJECT_COMMA:
-            case BEFORE_OBJECT_COLON:
-            case BEFORE_OBJECT_COMMA:
-            case BEFORE_OBJECT_KEY:
-                break;
-            default:
-                return false;
-            }
-        }
-        return false;
-    }
-
-    bool JsonReader::nextValue()
-    {
-        switch (m_State)
-        {
-        case INITIAL_STATE:
-        case START_OF_DOCUMENT:
-        case AFTER_OBJECT_ENTRY:
-        case AFTER_ARRAY_ENTRY:
-            break;
-        case AFTER_ARRAY_START:
-        case AFTER_OBJECT_START:
-            if (m_EnteredElements.size() != m_StateStack.size() - 1)
-                YSON_THROW("Call enter() on element before nextValue()");
-            skipElement();
-            break;
-        case AFTER_OBJECT_KEY:
-        case AFTER_OBJECT_COLON:
-        case AFTER_OBJECT_VALUE:
-        case AFTER_OBJECT_COMMA:
-        case AFTER_ARRAY_VALUE:
-        case AFTER_ARRAY_COMMA:
-        case BEFORE_OBJECT_COMMA:
-        case BEFORE_OBJECT_COLON:
-        case BEFORE_OBJECT_KEY:
-        case BEFORE_ARRAY_COMMA:
-        case BEFORE_ARRAY_VALUE:
-            if (m_EnteredElements.size() != m_StateStack.size())
-                YSON_THROW("Call enter() on element before nextValue()");
-            break;
-        default:
-            YSON_THROW("nextValue() can only be called inside an element.");
-        }
-        while (nextToken())
-        {
-            switch (m_State)
-            {
-            case AFTER_OBJECT_START:
-            case AFTER_ARRAY_START:
-            case AFTER_OBJECT_VALUE:
-            case AFTER_ARRAY_VALUE:
-                return true;
-            case START_OF_DOCUMENT:
-            case AFTER_OBJECT_KEY:
-            case AFTER_OBJECT_COLON:
-            case AFTER_OBJECT_COMMA:
-            case AFTER_ARRAY_ENTRY:
-            case AFTER_ARRAY_COMMA:
-            case BEFORE_OBJECT_COMMA:
-            case BEFORE_OBJECT_COLON:
-            case BEFORE_OBJECT_KEY:
-            case BEFORE_ARRAY_COMMA:
-            case BEFORE_ARRAY_VALUE:
-                break;
-            default:
-                return false;
-            }
-        }
-        return false;
-    }
-
-    void JsonReader::skipElement()
-    {
-        if (m_State != AFTER_ARRAY_START && m_State != AFTER_OBJECT_START)
-        {
-            YSON_THROW("skipElement() must be called at the start of "
-                               "an element.");
-        }
-        enter();
-        while (nextToken())
-            ;
-        leave();
-    }
-
-    size_t JsonReader::lineNumber() const
-    {
-        return m_LineNumber;
-    }
-
-    size_t JsonReader::columnNumber() const
-    {
-        return m_ColumnNumber;
     }
 
     void JsonReader::processColon()

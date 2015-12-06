@@ -46,6 +46,5 @@ namespace Yson {
         std::unique_ptr<Ystring::Conversion::Converter> m_Converter;
         Ystring::Encoding_t m_DestinationEncoding;
         std::vector<char> m_Buffer;
-        size_t m_UsedBufferSize;
     };
 }

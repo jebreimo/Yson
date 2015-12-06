@@ -15,17 +15,14 @@ namespace Yson {
     TextReader::TextReader(std::istream& stream,
                            Encoding_t destinationEncoding)
             : m_Stream(&stream),
-              m_DestinationEncoding(destinationEncoding),
-              m_UsedBufferSize()
-    {
-    }
+              m_DestinationEncoding(destinationEncoding)
+    {}
 
     TextReader::TextReader(std::istream& stream,
                            Encoding_t sourceEncoding,
                            Encoding_t destinationEncoding)
             : m_Stream(&stream),
-              m_DestinationEncoding(destinationEncoding),
-              m_UsedBufferSize()
+              m_DestinationEncoding(destinationEncoding)
     {
         if (sourceEncoding != Encoding::UNKNOWN)
         {
@@ -36,37 +33,42 @@ namespace Yson {
 
     TextReader::TextReader()
             : m_Stream(),
-              m_DestinationEncoding(),
-              m_UsedBufferSize()
-    {
-    }
+              m_DestinationEncoding()
+    {}
 
     TextReader::~TextReader()
-    {
-    }
+    {}
 
     bool TextReader::read(std::string& destination, size_t bytes)
     {
-        m_Buffer.resize(m_UsedBufferSize + bytes);
-        m_Stream->read(m_Buffer.data(), bytes);
+        auto initialBufferSize = m_Buffer.size();
+        m_Buffer.resize(initialBufferSize + bytes);
+        m_Stream->read(m_Buffer.data() + initialBufferSize, bytes);
+        auto readBytes = m_Stream->gcount();
+        if (readBytes < bytes)
+            m_Buffer.resize(initialBufferSize + readBytes);
+
         if (m_Stream->bad())
             return false;
-        auto readBytes = m_Stream->gcount();
-        if (readBytes == 0)
-            return false;
         const char* bufferStart = m_Buffer.data();
+        auto bufferSize = m_Buffer.size();
         if (!m_Converter)
         {
-            auto encoding = determineEncoding(m_Buffer.data(),
-                                              std::min<size_t>(bytes, 256));
+            auto encoding = determineEncoding(
+                    m_Buffer.data(),
+                    std::min<size_t>(bufferSize, 256));
             bufferStart = encoding.second;
-            readBytes -= bufferStart - m_Buffer.data();
+            bufferSize -= bufferStart - m_Buffer.data();
             m_Converter.reset(new Conversion::Converter(
                     encoding.first, m_DestinationEncoding));
         }
         auto convertedBytes = m_Converter->convert(
-                bufferStart, readBytes, destination);
-        if (convertedBytes < readBytes)
+                bufferStart, bufferSize, destination);
+        if (convertedBytes == bufferSize)
+        {
+            m_Buffer.clear();
+        }
+        else
         {
             auto tailOffset =
                     (bufferStart + convertedBytes) - m_Buffer.data();
@@ -81,7 +83,6 @@ namespace Yson {
         m_Stream = &stream;
         m_DestinationEncoding = destinationEncoding;
         m_Converter.reset();
-        m_UsedBufferSize = 0;
     }
 
     void TextReader::init(std::istream& stream,
@@ -92,6 +93,5 @@ namespace Yson {
         m_DestinationEncoding = destinationEncoding;
         m_Converter.reset(new Conversion::Converter(sourceEncoding,
                                                     destinationEncoding));
-        m_UsedBufferSize = 0;
     }
 }

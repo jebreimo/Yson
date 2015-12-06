@@ -17,6 +17,7 @@ namespace Yson
     template <typename BiIt>
     JsonTokenizer::TokenType determineCommentType(
             BiIt beg, BiIt end, size_t precededBySlash = false);
+
     template<typename BiIt>
     JsonTokenizer::TokenType determineStringType(BiIt beg, BiIt end,
                                                  size_t precedingQuotes = 0,

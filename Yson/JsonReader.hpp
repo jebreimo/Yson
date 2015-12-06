@@ -12,6 +12,7 @@
 #include <stack>
 #include <string>
 #include <Ystring/Encoding.hpp>
+#include "JsonReaderException.hpp"
 #include "JsonTokenizer.hpp"
 #include "JsonValue.hpp"
 #include "TextReader.hpp"
@@ -129,6 +130,7 @@ namespace Yson {
         {
             INITIAL_STATE,
             START_OF_DOCUMENT,
+            AFTER_DOCUMENT_VALUE,
             AFTER_OBJECT_START,
             AFTER_OBJECT_ENTRY,
             BEFORE_OBJECT_KEY,
