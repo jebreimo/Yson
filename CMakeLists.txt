@@ -46,7 +46,7 @@ set(SOURCE_FILES
     Yson/GetValueType.hpp
     Yson/ParseInteger.cpp
     Yson/ParseInteger.hpp
-    )
+    Yson/ParseDouble.cpp Yson/ParseDouble.hpp)
 
 add_subdirectory(Externals)
 

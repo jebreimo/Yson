@@ -10,6 +10,8 @@
 namespace Yson {
 
     namespace {
+        int getDigit(char c)
+
         bool isHexDigit(char c);
 
         template<typename Predicate>
@@ -57,7 +59,7 @@ namespace Yson {
             case 'E':
                 return getFloatingPointValueType(first, last);
             default:
-                if ('0' <= *first && *first <= '9')
+                if (getDigit(*first) <= 9)
                 {
                     if (++first == last)
                         return ValueType::INTEGER;
@@ -66,7 +68,7 @@ namespace Yson {
                 return ValueType::INVALID;
             }
         }
-        else if ('1' <= *first && *first <= '9')
+        else if (getDigit(*first) <= 9)
         {
             if (++first == last)
                 return ValueType::INTEGER;
@@ -97,9 +99,14 @@ namespace Yson {
 
     namespace {
 
+        int getDigit(char c)
+        {
+            return uint8_t(c) ^ 0x30;
+        }
+
         bool isHexDigit(char c)
         {
-            return ('0' <= c && c <= '9') ||
+            return (getDigit(c) <= 9) ||
                    ('A' <= c && c <= 'F') ||
                    ('a' <= c && c <= 'f');
         }
@@ -121,14 +128,14 @@ namespace Yson {
         ValueType_t getBinaryValueType(const char* first, const char* last)
         {
             return getValueType(first, last,
-                                [](char c) { return c == '0' || c == '1'; },
+                                [](char c) { return getDigit(c) <= 1; },
                                 ValueType::BIN_INTEGER);
         }
 
         ValueType_t getOctalValueType(const char* first, const char* last)
         {
             return getValueType(first, last,
-                                [](char c) { return '0' <= c || c <= '7'; },
+                                [](char c) { return getDigit(c) <= 7; },
                                 ValueType::OCT_INTEGER);
         }
 
@@ -147,7 +154,7 @@ namespace Yson {
             {
                 if (++first == last)
                     return ValueType::FLOAT;
-                while ('0' <= *first && *first <= '9')
+                while (getDigit(*first) <= 9)
                 {
                     if (++first == last)
                         return ValueType::FLOAT;
@@ -162,7 +169,7 @@ namespace Yson {
                 if (++first == last)
                     return ValueType::INVALID;
             }
-            while ('0' <= *first && *first <= '9')
+            while (getDigit(*first) <= 9)
             {
                 if (++first == last)
                     return ValueType::FLOAT;
@@ -172,7 +179,7 @@ namespace Yson {
 
         ValueType_t getNumberValueType(const char* first, const char* last)
         {
-            while ('0' <= *first && *first <= '9')
+            while (getDigit(*first) <= 9)
             {
                 if (++first == last)
                     return ValueType::INTEGER;

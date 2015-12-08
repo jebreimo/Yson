@@ -35,8 +35,17 @@ void testRead(const std::string& doc, T expectedValue)
 
 void test_IntegerOverflow()
 {
-    Y_CALL(testRead<int64_t>("999888777666555", 999888777666555));
-    Y_CALL(testReadOverflow<int32_t>("999888777666555"));
+    Y_CALL(testReadOverflow<int32_t>("2147483648"));
+    Y_CALL(testReadOverflow<int32_t>("-2147483649"));
 }
 
-Y_TEST(test_IntegerOverflow);
+void test_Integer()
+{
+    Y_CALL(testRead<int32_t>("2147483647", 2147483647));
+    Y_CALL(testRead<int32_t>("-2147483648", -2147483648));
+    Y_CALL(testRead<int64_t>("9223372036854775807", 9223372036854775807LL));
+    Y_CALL(testRead<uint64_t>("18446744073709551615", 18446744073709551615ULL));
+}
+
+Y_TEST(test_IntegerOverflow,
+       test_Integer);
