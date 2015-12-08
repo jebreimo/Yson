@@ -1,6 +1,6 @@
 //****************************************************************************
 // Copyright © 2015 Jan Erik Breimo. All rights reserved.
-// Created by Jan Erik Breimo on 07.12.2015
+// Created by Jan Erik Breimo on 2015-12-07.
 //
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
@@ -13,11 +13,14 @@
 namespace Yson
 {
 
-    int getDigit(char c)
+    namespace
     {
-        return uint8_t(c) ^ 0x30u;
+        int getDigit(char c)
+        {
+            return uint8_t(c) ^ 0x30u;
+        }
     }
-
+    
     std::pair<double, bool> parseDouble(const char* first, const char* last)
     {
         typedef std::pair<double, bool> Result;
