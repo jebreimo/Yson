@@ -10,7 +10,7 @@
 namespace Yson {
 
     namespace {
-        int getDigit(char c)
+        int getDigit(char c);
 
         bool isHexDigit(char c);
 

@@ -16,7 +16,7 @@ namespace {
     {
         auto result = parseDouble(s.data(), s.data() + s.size());
         Y_EQUAL(result.second, true);
-        Y_EQUIVALENT(result.first, expectedValue);
+        Y_EQUIVALENT(result.first, expectedValue, 1e-10);
     }
 
     void failure(const std::string& s)
