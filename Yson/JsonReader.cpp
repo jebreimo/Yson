@@ -9,6 +9,7 @@
 
 #include "GetValueType.hpp"
 #include "JsonReaderException.hpp"
+#include "ParseDouble.hpp"
 #include "ParseInteger.hpp"
 #include "TextFileReader.hpp"
 
@@ -43,6 +44,24 @@ namespace Yson
                 }
             }
             return std::make_pair(rows, cols);
+        }
+
+        bool equalsNull(const std::pair<const char*, const char*>& token)
+        {
+            return token.second - token.first == 4
+                   && std::equal(token.first, token.second, "null");
+        }
+
+        bool equalsTrue(const std::pair<const char*, const char*>& token)
+        {
+            return token.second - token.first == 4
+                   && std::equal(token.first, token.second, "true");
+        }
+
+        bool equalsFalse(const std::pair<const char*, const char*>& token)
+        {
+            return token.second - token.first == 5
+                   && std::equal(token.first, token.second, "false");
         }
     }
 
@@ -228,15 +247,18 @@ namespace Yson
                 YSON_THROW("Call enter() on object before nextKey()");
             skipElement();
             break;
+        case BEFORE_OBJECT_COMMA:
+            if (m_EnteredElements.size() != m_StateStack.size() + 1)
+                return false;
+            // No break here!
         case AFTER_OBJECT_KEY:
         case AFTER_OBJECT_COLON:
         case AFTER_OBJECT_VALUE:
         case AFTER_OBJECT_COMMA:
-        case BEFORE_OBJECT_COMMA:
-        case BEFORE_OBJECT_COLON:
         case BEFORE_OBJECT_KEY:
+        case BEFORE_OBJECT_COLON:
             if (m_EnteredElements.size() != m_StateStack.size())
-                YSON_THROW("Call enter() on object before nextKey()");
+                YSON_THROW("Call leave() on object before nextKey()");
             break;
         default:
             YSON_THROW("nextKey() can only be called inside an object.");
@@ -583,9 +605,7 @@ namespace Yson
     template<typename T>
     void JsonReader::readSignedInteger(T& value) const
     {
-        if (m_Tokenizer.tokenType() != JsonTokenizer::VALUE)
-            YSON_THROW("Current token is not an integer.");
-        auto token = m_Tokenizer.rawToken();
+        auto token = getValueToken();
         auto parsedValue = parseInteger(token.first, token.second,
                                         m_AllowExtendedValues);
         if (!parsedValue.second)
@@ -598,9 +618,7 @@ namespace Yson
     template<typename T>
     void JsonReader::readUnsignedInteger(T& value) const
     {
-        if (m_Tokenizer.tokenType() != JsonTokenizer::VALUE)
-            YSON_THROW("Current token is not an integer.");
-        auto token = m_Tokenizer.rawToken();
+        auto token = getValueToken();
         if (token.first != token.second && *token.first == '-')
         {
             YSON_THROW("Attempt to read a signed integer as "
@@ -650,5 +668,49 @@ namespace Yson
         default:
             break;
         }
+    }
+
+    void JsonReader::read(double& value) const
+    {
+        auto token = getValueToken();
+        auto parsedValue = parseDouble(token.first, token.second);
+        if (!parsedValue.second)
+            YSON_THROW("Invalid floating point value");
+        value = parsedValue.first;
+    }
+
+    void JsonReader::read(float& value) const
+    {
+        auto token = getValueToken();
+        auto parsedValue = parseFloat(token.first, token.second);
+        if (!parsedValue.second)
+            YSON_THROW("Invalid floating point value");
+        value = parsedValue.first;
+    }
+
+    void JsonReader::read(bool& value) const
+    {
+        auto token = getValueToken();
+        if (equalsTrue(token))
+            value = true;
+        else if (equalsFalse(token))
+            value = false;
+        else
+            YSON_THROW("Invalid boolean value");
+    }
+
+    std::pair<const char*, const char*> JsonReader::getValueToken() const
+    {
+        auto token = m_Tokenizer.rawToken();
+        if (m_Tokenizer.tokenType() == JsonTokenizer::STRING)
+        {
+            ++token.first;
+            --token.second;
+        }
+        else if (m_Tokenizer.tokenType() != JsonTokenizer::VALUE)
+        {
+            YSON_THROW("Current token is not a value.");
+        }
+        return token;
     }
 }

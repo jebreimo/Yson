@@ -12,4 +12,6 @@
 namespace Yson
 {
     std::pair<double, bool> parseDouble(const char* first, const char* last);
+
+    std::pair<float, bool> parseFloat(const char* first, const char* last);
 }

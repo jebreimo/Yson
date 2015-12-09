@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <limits>
 
 namespace Yson
 {
@@ -20,10 +21,11 @@ namespace Yson
             return uint8_t(c) ^ 0x30u;
         }
     }
-    
-    std::pair<double, bool> parseDouble(const char* first, const char* last)
+
+    template <typename T>
+    std::pair<T, bool> parseReal(const char* first, const char* last)
     {
-        typedef std::pair<double, bool> Result;
+        typedef std::pair<T, bool> Result;
         if (first == last)
             return Result(0, false);
 
@@ -42,7 +44,7 @@ namespace Yson
         }
 
         // Get the integer value
-        double value = getDigit(*first);
+        auto value = T(getDigit(*first));
         if (value > 9)
             return Result(0, false);
         while (true)
@@ -64,14 +66,14 @@ namespace Yson
         int exponent = 0;
         if (*first == '.')
         {
-            auto fractStart = ++first;
+            auto fractionStart = ++first;
             while (first != last && getDigit(*first) <= 9)
             {
                 value *= 10;
                 value += getDigit(*first);
                 ++first;
             }
-            exponent = -(int)(first - fractStart);
+            exponent = -(int)(first - fractionStart);
         }
 
         // Get the exponent
@@ -106,7 +108,7 @@ namespace Yson
                     return Result(0, false);
                 explicitExponent *= 10;
                 explicitExponent += getDigit(*first);
-                if (explicitExponent > 308)
+                if (explicitExponent > std::numeric_limits<T>::max_exponent10)
                     return Result(0, false);
             }
 
@@ -118,7 +120,7 @@ namespace Yson
 
         // Add the exponent
         if (exponent)
-            value *= pow(10.0, (double)exponent);
+            value *= pow(T(10), exponent);
 
         // Add the sign
         if (negative)
@@ -127,4 +129,13 @@ namespace Yson
         return Result(value, true);
     }
 
+    std::pair<double, bool> parseDouble(const char* first, const char* last)
+    {
+        return parseReal<double>(first, last);
+    }
+
+    std::pair<float, bool> parseFloat(const char* first, const char* last)
+    {
+        return parseReal<float>(first, last);
+    }
 }

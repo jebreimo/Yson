@@ -126,6 +126,8 @@ namespace Yson {
         template<typename T>
         void readSignedInteger(T& value) const;
 
+        std::pair<const char*, const char*> getValueToken() const;
+
         enum State
         {
             INITIAL_STATE,
