@@ -41,7 +41,7 @@ namespace Yson {
 
         ValueType_t valueType() const;
 
-        // TokentType_t tokenType() const;
+        JsonTokenType_t tokenType() const;
 
         bool isStringsAsValuesEnabled() const;
 
@@ -74,18 +74,6 @@ namespace Yson {
         int languageExtensions() const;
 
         JsonReader& setLanguageExtensions(int value);
-
-//        bool allowMinorSyntaxErrors() const;
-//
-//        JsonReader& setAllowMinorSyntaxErrors(bool value);
-//
-//        bool allowComments() const;
-//
-//        JsonReader& setAllowComments(bool value);
-//
-//        bool allowExtendedValues() const;
-//
-//        JsonReader& setAllowExtendedValues(bool value);
 
         size_t lineNumber() const;
 
@@ -134,6 +122,8 @@ namespace Yson {
 
     private:
         bool fillBuffer();
+
+        void processEndOfBuffer();
 
         void processStartArray();
 
@@ -184,7 +174,9 @@ namespace Yson {
             AT_END_OF_DOCUMENT,
             AT_END_OF_OBJECT,
             AT_END_OF_ARRAY,
-            AT_END_OF_NULL
+            AT_END_OF_NULL,
+            AT_END_OF_BUFFER,
+            UNRECOVERABLE_ERROR
         };
 
         enum LanguageExtensions
@@ -211,5 +203,14 @@ namespace Yson {
         size_t m_LineNumber = 1;
         size_t m_ColumnNumber = 1;
         int m_LanguagExtentions = 0;
+        int m_SkipElementDepth = 0;
     };
+
+    template <typename T>
+    T read(JsonReader& reader)
+    {
+        T value;
+        reader.read(value);
+        return value;
+    }
 }

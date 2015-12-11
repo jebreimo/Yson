@@ -48,7 +48,7 @@ namespace Yson {
         if (readBytes < bytes)
             m_Buffer.resize(initialBufferSize + readBytes);
 
-        if (m_Stream->bad())
+        if (m_Stream->bad() || readBytes == 0)
             return false;
         const char* bufferStart = m_Buffer.data();
         auto bufferSize = m_Buffer.size();

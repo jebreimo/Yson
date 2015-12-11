@@ -13,7 +13,7 @@
 using namespace Yson;
 
 template <typename T>
-void testReadOverflow(const std::string& doc)
+void testReadFails(const std::string& doc)
 {
     std::istringstream ss(doc);
     JsonReader reader(ss);
@@ -53,18 +53,37 @@ void testRead(const std::string& doc, float expectedValue, float e = 1e-3)
     Y_EQUIVALENT(n, expectedValue, e);
 }
 
-void test_IntegerOverflow()
+void test_IntegerError()
 {
-    Y_CALL(testReadOverflow<int32_t>("2147483648"));
-    Y_CALL(testReadOverflow<int32_t>("-2147483649"));
+    Y_CALL(testReadFails<int8_t>("-129"));
+    Y_CALL(testReadFails<int8_t>("128"));
+    Y_CALL(testReadFails<uint8_t>("-1"));
+    Y_CALL(testReadFails<uint8_t>("256"));
+    Y_CALL(testReadFails<int16_t>("-32769"));
+    Y_CALL(testReadFails<int16_t>("32768"));
+    Y_CALL(testReadFails<uint16_t>("-1"));
+    Y_CALL(testReadFails<uint16_t>("65536"));
+    Y_CALL(testReadFails<int32_t>("2147483648"));
+    Y_CALL(testReadFails<int32_t>("-2147483649"));
+    Y_CALL(testReadFails<uint32_t>("4294967296"));
+    Y_CALL(testReadFails<uint32_t>("-1"));
+    Y_CALL(testReadFails<uint64_t>("-1"));
 }
 
 void test_Integer()
 {
+    Y_CALL(testRead<int8_t>("-128", -128));
+    Y_CALL(testRead<int8_t>("127", 127));
+    Y_CALL(testRead<uint8_t>("255", 255));
+    Y_CALL(testRead<int16_t>("-32768", -32768));
+    Y_CALL(testRead<int16_t>("32767", 32767));
+    Y_CALL(testRead<uint16_t>("65535", 65535));
     Y_CALL(testRead<int32_t>("2147483647", 2147483647));
     Y_CALL(testRead<int32_t>("-2147483648", -2147483648));
+    Y_CALL(testRead<uint32_t>("4294967295", 4294967295u));
     Y_CALL(testRead<int64_t>("9223372036854775807", 9223372036854775807LL));
-    Y_CALL(testRead<uint64_t>("18446744073709551615", 18446744073709551615ULL));
+    Y_CALL(testRead<uint64_t>("18446744073709551615",
+                              18446744073709551615ULL));
 }
 
 void test_Double()
@@ -90,8 +109,58 @@ void test_EnterNull()
     Y_NO_THROW(reader.leave(), JsonReaderException);
     Y_ASSERT(!reader.nextValue());
 }
-Y_TEST(test_IntegerOverflow,
+
+void test_NextDocument()
+{
+    std::string doc = "1 {\"2\": []} 3";
+    std::istringstream ss(doc);
+    JsonReader reader(ss);
+    Y_ASSERT(reader.nextValue());
+    Y_EQUAL(read<int32_t>(reader), 1);
+    Y_ASSERT(!reader.nextValue());
+
+    Y_ASSERT(reader.nextDocument());
+    Y_ASSERT(reader.nextValue());
+    Y_NO_THROW(reader.enter(), JsonReaderException);
+    Y_ASSERT(reader.nextKey());
+    Y_EQUAL(read<std::string>(reader), "2");
+    Y_ASSERT(reader.nextValue());
+    Y_NO_THROW(reader.enter(), JsonReaderException);
+
+    Y_ASSERT(reader.nextDocument());
+    Y_ASSERT(reader.nextValue());
+    Y_EQUAL(read<double>(reader), 3);
+    Y_ASSERT(!reader.nextValue());
+
+    Y_ASSERT(reader.nextDocument());
+    Y_ASSERT(!reader.nextValue());
+    Y_ASSERT(!reader.nextDocument());
+}
+
+void test_RecoverFromError()
+{
+    std::string doc = "[{\"1\": [{23: 4, : 4}],,}, {\"2\": 3}]";
+    std::istringstream ss(doc);
+    JsonReader reader(ss);
+    Y_ASSERT(reader.nextValue());
+    Y_NO_THROW(reader.enter(), JsonReaderException);
+    Y_NO_THROW(reader.nextValue(), JsonReaderException);
+    Y_THROWS(reader.nextValue(), JsonReaderException);
+    Y_THROWS(reader.nextValue(), JsonReaderException);
+    Y_THROWS(reader.nextValue(), JsonReaderException);
+    Y_THROWS(reader.nextValue(), JsonReaderException);
+    Y_NO_THROW(reader.nextValue(), JsonReaderException);
+    Y_NO_THROW(reader.enter(), JsonReaderException);
+    Y_NO_THROW(reader.nextKey(), JsonReaderException);
+    Y_EQUAL(read<std::string>(reader), "2");
+    Y_NO_THROW(reader.leave(), JsonReaderException);
+    Y_ASSERT(!reader.nextValue());
+};
+
+Y_TEST(test_IntegerError,
        test_Integer,
        test_Double,
        test_Float,
-       test_EnterNull);
+       test_EnterNull,
+       test_NextDocument,
+       test_RecoverFromError);

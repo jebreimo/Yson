@@ -9,36 +9,18 @@
 
 #include <string>
 #include <vector>
+#include "JsonTokenType.hpp"
 
 namespace Yson
 {
     class JsonTokenizer
     {
     public:
-        enum TokenType
-        {
-            INVALID_TOKEN = 0,
-            START_ARRAY = '[',
-            END_ARRAY = ']',
-            START_OBJECT = '{',
-            END_OBJECT = '}',
-            COLON = ':',
-            COMMA = ',',
-            STRING = 's',
-            VALUE = 'v',
-            END_OF_BUFFER = 'E',
-            BLOCK_STRING = '"',
-            COMMENT = '/', ///< A line comment, i.e. one that starts with //.
-            BLOCK_COMMENT = '*', ///< A comment that starts with /* and ends with */.
-            WHITESPACE = ' ',
-            NEWLINE = 'n'
-        };
-
         JsonTokenizer();
 
         bool hasNext() const;
         void next();
-        TokenType tokenType() const;
+        JsonTokenType_t tokenType() const;
 
         const char* buffer() const;
         void setBuffer(const char* buffer, size_t size);
@@ -50,21 +32,21 @@ namespace Yson
 
         void reset();
     private:
-        TokenType nextToken();
-        TokenType completeCurrentToken();
-        TokenType completeCommentToken();
-        TokenType completeStringToken();
-        TokenType nextCommentToken();
-        TokenType nextNewlineToken();
-        TokenType nextStringToken();
-        TokenType nextValueToken();
-        TokenType findEndOfBlockComment(bool precededByStar);
-        TokenType findEndOfBlockString(size_t precedingQuotes, bool escapeFirst);
-        TokenType findEndOfLineComment();
-        TokenType findEndOfNewline(bool precededByCr);
-        TokenType findEndOfString(bool escapeFirst);
-        TokenType findEndOfValue();
-        TokenType findEndOfWhitespace();
+        JsonTokenType_t nextToken();
+        JsonTokenType_t completeCurrentToken();
+        JsonTokenType_t completeCommentToken();
+        JsonTokenType_t completeStringToken();
+        JsonTokenType_t nextCommentToken();
+        JsonTokenType_t nextNewlineToken();
+        JsonTokenType_t nextStringToken();
+        JsonTokenType_t nextValueToken();
+        JsonTokenType_t findEndOfBlockComment(bool precededByStar);
+        JsonTokenType_t findEndOfBlockString(size_t precedingQuotes, bool escapeFirst);
+        JsonTokenType_t findEndOfLineComment();
+        JsonTokenType_t findEndOfNewline(bool precededByCr);
+        JsonTokenType_t findEndOfString(bool escapeFirst);
+        JsonTokenType_t findEndOfValue();
+        JsonTokenType_t findEndOfWhitespace();
         bool endsWithEscape() const;
         bool endsWithStar() const;
         size_t countQuotesAtEnd() const;
@@ -75,7 +57,7 @@ namespace Yson
         const char* m_BufferEnd;
         const char* m_TokenStart;
         const char* m_TokenEnd;
-        TokenType m_TokenType;
+        JsonTokenType_t m_TokenType;
         std::vector<char> m_InternalBuffer;
     };
 }
