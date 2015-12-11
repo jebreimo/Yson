@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
     }
     std::ifstream file(argv[1]);
     JsonReader reader(file);
-    reader.setAllowComments(true);
+    reader.setCommentsEnabled(true);
     if (!reader.nextValue())
         return 0;
     switch (reader.valueType())

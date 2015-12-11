@@ -35,27 +35,63 @@ namespace Yson {
 
         bool nextToken();
 
-        ValueType_t valueType() const;
-
         void enter();
 
         void leave();
 
-        bool allowMinorSyntaxErrors() const;
+        ValueType_t valueType() const;
 
-        JsonReader& setAllowMinorSyntaxErrors(bool value);
+        // TokentType_t tokenType() const;
 
-        bool allowComments() const;
+        bool isStringsAsValuesEnabled() const;
 
-        JsonReader& setAllowComments(bool value);
+        JsonReader& setStringsAsValuesEnabled(bool value);
 
-        bool allowExtendedValues() const;
+        bool isValuesAsStringsEnabled() const;
 
-        JsonReader& setAllowExtendedValues(bool value);
+        JsonReader& setValuesAsStringsEnabled(bool value);
+
+        bool isEndElementAfterCommaEnabled() const;
+
+        JsonReader& setEndElementAfterCommaEnabled(bool value);
+
+        bool isCommentsEnabled() const;
+
+        JsonReader& setCommentsEnabled(bool value);
+
+        bool isEnterNullEnabled() const;
+
+        JsonReader& setEnterNullEnabled(bool value);
+
+        bool isValuesAsKeysEnabled() const;
+
+        JsonReader& setValuesAsKeysEnabled(bool value);
+
+        bool isExtendedIntegersEnabled() const;
+
+        JsonReader& setExtendedIntegersEnabled(bool value);
+
+        int languageExtensions() const;
+
+        JsonReader& setLanguageExtensions(int value);
+
+//        bool allowMinorSyntaxErrors() const;
+//
+//        JsonReader& setAllowMinorSyntaxErrors(bool value);
+//
+//        bool allowComments() const;
+//
+//        JsonReader& setAllowComments(bool value);
+//
+//        bool allowExtendedValues() const;
+//
+//        JsonReader& setAllowExtendedValues(bool value);
 
         size_t lineNumber() const;
 
         size_t columnNumber() const;
+
+        bool isNull() const;
 
         void read(bool& value) const;
 
@@ -96,10 +132,9 @@ namespace Yson {
 
         bool nextDocument();
 
-    protected:
+    private:
         bool fillBuffer();
 
-    private:
         void processStartArray();
 
         void processEndArray();
@@ -118,6 +153,8 @@ namespace Yson {
 
         void processWhitespace();
 
+        bool nextTokenImpl();
+
         void skipElement();
 
         template <typename T>
@@ -131,25 +168,39 @@ namespace Yson {
         enum State
         {
             INITIAL_STATE,
-            START_OF_DOCUMENT,
-            AFTER_DOCUMENT_VALUE,
-            AFTER_OBJECT_START,
-            AFTER_OBJECT_ENTRY,
-            BEFORE_OBJECT_KEY,
-            AFTER_OBJECT_KEY,
-            BEFORE_OBJECT_COLON,
-            AFTER_OBJECT_COLON,
-            AFTER_OBJECT_VALUE,
-            BEFORE_OBJECT_COMMA,
-            AFTER_OBJECT_COMMA,
-            AFTER_ARRAY_START,
-            AFTER_ARRAY_ENTRY,
-            BEFORE_ARRAY_VALUE,
-            AFTER_ARRAY_VALUE,
-            BEFORE_ARRAY_COMMA,
-            AFTER_ARRAY_COMMA,
-            END_OF_DOCUMENT
+            AT_START_OF_DOCUMENT,
+            AT_VALUE_OF_DOCUMENT,
+            AT_START_OF_OBJECT,
+            AT_KEY_IN_OBJECT,
+            AFTER_KEY_IN_OBJECT,
+            AT_COLON_IN_OBJECT,
+            AT_VALUE_IN_OBJECT,
+            AFTER_VALUE_IN_OBJECT,
+            AT_COMMA_IN_OBJECT,
+            AT_START_OF_ARRAY,
+            AT_VALUE_IN_ARRAY,
+            AFTER_VALUE_IN_ARRAY,
+            AT_COMMA_IN_ARRAY,
+            AT_END_OF_DOCUMENT,
+            AT_END_OF_OBJECT,
+            AT_END_OF_ARRAY,
+            AT_END_OF_NULL
         };
+
+        enum LanguageExtensions
+        {
+            STRINGS_AS_VALUES = 1,
+            VALUES_AS_STRINGS = 2,
+            END_ELEMENT_AFTER_COMMA = 4,
+            COMMENTS = 8,
+            BLOCK_STRINGS = 16,
+            ENTER_NULL = 32,
+            VALUES_AS_KEYS = 64,
+            EXTENDED_INTEGERS = 128
+        };
+
+        bool languageExtension(LanguageExtensions ext) const;
+        JsonReader& setLanguageExtension(LanguageExtensions ext, bool value);
 
         std::unique_ptr<TextReader> m_TextReader;
         std::string m_Buffer;
@@ -159,8 +210,6 @@ namespace Yson {
         std::stack<ValueType_t> m_EnteredElements;
         size_t m_LineNumber = 1;
         size_t m_ColumnNumber = 1;
-        bool m_AllowMinorSyntaxErrors = false;
-        bool m_AllowComments = false;
-        bool m_AllowExtendedValues = false;
+        int m_LanguagExtentions = 0;
     };
 }

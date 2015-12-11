@@ -82,14 +82,16 @@ void test_EnterNull()
     std::string doc = "null";
     std::istringstream ss(doc);
     JsonReader reader(ss);
+    reader.setEnterNullEnabled(true);
     Y_ASSERT(reader.nextValue());
-//    Y_NO_THROW(reader.enter(), JsonReaderException);
-//    Y_ASSERT(!reader.nextKey());
-//    Y_ASSERT(!reader.nextValue());
-//    Y_NO_THROW(reader.leave(), JsonReaderException);
-//    Y_ASSERT(!reader.nextValue());
+    Y_NO_THROW(reader.enter(), JsonReaderException);
+    Y_ASSERT(!reader.nextKey());
+    Y_ASSERT(!reader.nextValue());
+    Y_NO_THROW(reader.leave(), JsonReaderException);
+    Y_ASSERT(!reader.nextValue());
 }
 Y_TEST(test_IntegerOverflow,
        test_Integer,
        test_Double,
+       test_Float,
        test_EnterNull);
