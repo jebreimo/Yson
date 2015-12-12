@@ -43,37 +43,7 @@ namespace Yson {
 
         JsonTokenType_t tokenType() const;
 
-        bool isStringsAsValuesEnabled() const;
-
-        JsonReader& setStringsAsValuesEnabled(bool value);
-
-        bool isValuesAsStringsEnabled() const;
-
-        JsonReader& setValuesAsStringsEnabled(bool value);
-
-        bool isEndElementAfterCommaEnabled() const;
-
-        JsonReader& setEndElementAfterCommaEnabled(bool value);
-
-        bool isCommentsEnabled() const;
-
-        JsonReader& setCommentsEnabled(bool value);
-
-        bool isEnterNullEnabled() const;
-
-        JsonReader& setEnterNullEnabled(bool value);
-
-        bool isValuesAsKeysEnabled() const;
-
-        JsonReader& setValuesAsKeysEnabled(bool value);
-
-        bool isExtendedIntegersEnabled() const;
-
-        JsonReader& setExtendedIntegersEnabled(bool value);
-
-        int languageExtensions() const;
-
-        JsonReader& setLanguageExtensions(int value);
+        std::string token() const;
 
         size_t lineNumber() const;
 
@@ -120,6 +90,42 @@ namespace Yson {
 
         bool nextDocument();
 
+        bool isStringsAsValuesEnabled() const;
+
+        JsonReader& setStringsAsValuesEnabled(bool value);
+
+        bool isValuesAsStringsEnabled() const;
+
+        JsonReader& setValuesAsStringsEnabled(bool value);
+
+        bool isEndElementAfterCommaEnabled() const;
+
+        JsonReader& setEndElementAfterCommaEnabled(bool value);
+
+        bool isCommentsEnabled() const;
+
+        JsonReader& setCommentsEnabled(bool value);
+
+        bool isEnterNullEnabled() const;
+
+        JsonReader& setEnterNullEnabled(bool value);
+
+        bool isValuesAsKeysEnabled() const;
+
+        JsonReader& setValuesAsKeysEnabled(bool value);
+
+        bool isExtendedIntegersEnabled() const;
+
+        JsonReader& setExtendedIntegersEnabled(bool value);
+
+        bool isBlockStringsEnabled() const;
+
+        JsonReader& setBlockStringsEnabled(bool value);
+
+        int languageExtensions() const;
+
+        JsonReader& setLanguageExtensions(int value);
+
     private:
         bool fillBuffer();
 
@@ -143,9 +149,12 @@ namespace Yson {
 
         void processWhitespace();
 
+        void processBlockString();
+
         bool nextTokenImpl();
 
         void skipElement();
+
 
         template <typename T>
         void readUnsignedInteger(T& value) const;

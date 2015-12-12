@@ -81,10 +81,23 @@ namespace Yson
 
     void JsonReader::read(std::string& value) const
     {
-        if (m_Tokenizer.tokenType() != JsonTokenType::STRING)
-            YSON_THROW("Current token is not a string.");
         auto token = m_Tokenizer.rawToken();
-        value.assign(token.first + 1, token.second - 1);
+        if (m_Tokenizer.tokenType() == JsonTokenType::STRING)
+        {
+            ++token.first;
+            --token.second;
+        }
+        else if (m_Tokenizer.tokenType() == JsonTokenType::BLOCK_STRING)
+        {
+            token.first += 3;
+            token.second -= 3;
+        }
+        else if (!isValuesAsStringsEnabled()
+                 || m_Tokenizer.tokenType() != JsonTokenType::VALUE)
+        {
+            YSON_THROW("Current token is not a string.");
+        }
+        value.assign(token.first, token.second);
     }
 
     void JsonReader::read(int32_t& value) const
@@ -305,8 +318,17 @@ namespace Yson
                     processEndOfBuffer();
                 break;
             case JsonTokenType::BLOCK_STRING:
-                return false;
+            {
+                processBlockString();
+                auto lineCol = countRowsAndColumns(m_Tokenizer.rawToken());
+                if (lineCol.first)
+                {
+                    m_LineNumber += lineCol.first;
+                    m_ColumnNumber = lineCol.second;
+                }
+                m_ColumnNumber += lineCol.second;
                 break;
+            }
             case JsonTokenType::COMMENT:
                 if (!isCommentsEnabled())
                     YSON_THROW("Invalid token.");
@@ -794,6 +816,16 @@ namespace Yson
         return setLanguageExtension(EXTENDED_INTEGERS, value);
     }
 
+    bool JsonReader::isBlockStringsEnabled() const
+    {
+        return languageExtension(BLOCK_STRINGS);
+    }
+
+    JsonReader& JsonReader::setBlockStringsEnabled(bool value)
+    {
+        return setLanguageExtension(BLOCK_STRINGS, value);
+    }
+
     int JsonReader::languageExtensions() const
     {
         return m_LanguagExtentions;
@@ -893,5 +925,32 @@ namespace Yson
     JsonTokenType_t JsonReader::tokenType() const
     {
         return m_Tokenizer.tokenType();
+    }
+
+    std::string JsonReader::token() const
+    {
+        return m_Tokenizer.token();
+    }
+
+    void JsonReader::processBlockString()
+    {
+        if (!isBlockStringsEnabled())
+            YSON_THROW("Invalid token.");
+
+        switch (m_State)
+        {
+        case AT_START_OF_DOCUMENT:
+            m_State = AT_VALUE_OF_DOCUMENT;
+            break;
+        case AT_START_OF_ARRAY:
+        case AT_COMMA_IN_ARRAY:
+            m_State = AT_VALUE_IN_ARRAY;
+            break;
+        case AT_COLON_IN_OBJECT:
+            m_State = AT_VALUE_IN_OBJECT;
+            break;
+        default:
+            YSON_THROW("Unexpected block string.");
+        }
     }
 }
