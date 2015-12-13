@@ -76,19 +76,6 @@ namespace Yson {
 
         void read(std::string& value) const;
 
-        template<typename T>
-        void readArray(std::vector<T>& values)
-        {
-            enter();
-            while (nextValue())
-            {
-                T value;
-                read(value);
-                values.push_back(std::move(value));
-            }
-            leave();
-        }
-
         bool nextDocument();
 
         bool isStringsAsValuesEnabled() const;
@@ -128,41 +115,57 @@ namespace Yson {
         JsonReader& setLanguageExtensions(int value);
 
     private:
+        enum LanguageExtensions
+        {
+            STRINGS_AS_VALUES = 1,
+            VALUES_AS_STRINGS = 2,
+            END_ELEMENT_AFTER_COMMA = 4,
+            COMMENTS = 8,
+            BLOCK_STRINGS = 16,
+            ENTER_NULL = 32,
+            VALUES_AS_KEYS = 64,
+            EXTENDED_INTEGERS = 128
+        };
+
+        bool languageExtension(LanguageExtensions ext) const;
+
+        JsonReader& setLanguageExtension(LanguageExtensions ext, bool value);
+
         bool fillBuffer();
 
-        void processEndOfBuffer();
+        bool nextTokenImpl();
 
-        void processStartArray();
-
-        void processEndArray();
-
-        void processStartObject();
-
-        void processEndObject();
-
-        void processString();
-
-        void processValue();
+        void processBlockString();
 
         void processColon();
 
         void processComma();
 
+        void processEndArray();
+
+        void processEndObject();
+
+        void processEndOfBuffer();
+
+        void processStartArray();
+
+        void processStartObject();
+
+        void processString();
+
+        void processValue();
+
         void processWhitespace();
 
-        void processBlockString();
-
-        bool nextTokenImpl();
-
         void skipElement();
+
+        std::pair<const char*, const char*> getValueToken() const;
 
         template <typename T>
         void readUnsignedInteger(T& value) const;
 
         template<typename T>
         void readSignedInteger(T& value) const;
-
-        std::pair<const char*, const char*> getValueToken() const;
 
         enum State
         {
@@ -187,21 +190,6 @@ namespace Yson {
             AT_END_OF_BUFFER,
             UNRECOVERABLE_ERROR
         };
-
-        enum LanguageExtensions
-        {
-            STRINGS_AS_VALUES = 1,
-            VALUES_AS_STRINGS = 2,
-            END_ELEMENT_AFTER_COMMA = 4,
-            COMMENTS = 8,
-            BLOCK_STRINGS = 16,
-            ENTER_NULL = 32,
-            VALUES_AS_KEYS = 64,
-            EXTENDED_INTEGERS = 128
-        };
-
-        bool languageExtension(LanguageExtensions ext) const;
-        JsonReader& setLanguageExtension(LanguageExtensions ext, bool value);
 
         std::unique_ptr<TextReader> m_TextReader;
         std::string m_Buffer;

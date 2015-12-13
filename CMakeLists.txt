@@ -25,28 +25,36 @@ include_directories(${YSTRING_INCLUDE_DIR})
 
 set(PUBLIC_HEADERS
     Yson/JsonReader.hpp
+    Yson/JsonReaderException.hpp
+    Yson/JsonTokenType.hpp
     Yson/JsonTokenizer.hpp
     Yson/JsonValue.hpp
     Yson/JsonValueError.hpp
     Yson/JsonWriter.hpp
-    Yson/TextReader.hpp
+    Yson/LineNumberCounter.hpp
     Yson/TextFileReader.hpp
+    Yson/TextReader.hpp
+    )
+
+set(PRIVATE_HEADERS
+    Yson/GetValueType.hpp
+    Yson/ParseDouble.hpp
+    Yson/ParseInteger.hpp
     )
 
 set(SOURCE_FILES
+    Yson/GetValueType.cpp
     Yson/JsonReader.cpp
+    Yson/JsonReaderException.cpp
     Yson/JsonTokenizer.cpp
     Yson/JsonValue.cpp
     Yson/JsonWriter.cpp
-    Yson/TextReader.cpp
-    Yson/TextFileReader.cpp
-    Yson/JsonReaderException.cpp
-    Yson/JsonReaderException.hpp
-    Yson/GetValueType.cpp
-    Yson/GetValueType.hpp
+    Yson/LineNumberCounter.cpp
+    Yson/ParseDouble.cpp
     Yson/ParseInteger.cpp
-    Yson/ParseInteger.hpp
-    Yson/ParseDouble.cpp Yson/ParseDouble.hpp Yson/JsonTokenType.hpp Yson/LineNumberCounter.cpp Yson/LineNumberCounter.hpp)
+    Yson/TextFileReader.cpp
+    Yson/TextReader.cpp
+    )
 
 add_subdirectory(Externals)
 
