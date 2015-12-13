@@ -14,7 +14,6 @@
 #include <Ystring/Encoding.hpp>
 #include "JsonReaderException.hpp"
 #include "JsonTokenizer.hpp"
-#include "JsonValue.hpp"
 #include "LineNumberCounter.hpp"
 #include "TextReader.hpp"
 #include "ValueType.hpp"
@@ -145,7 +144,7 @@ namespace Yson {
 
         void processEndObject();
 
-        void processEndOfBuffer();
+        void processEndOfStream();
 
         void processStartArray();
 
@@ -170,8 +169,13 @@ namespace Yson {
         enum State
         {
             INITIAL_STATE,
+            AT_END_OF_STREAM,
+            UNRECOVERABLE_ERROR,
+
             AT_START_OF_DOCUMENT,
             AT_VALUE_OF_DOCUMENT,
+            AT_END_OF_DOCUMENT,
+
             AT_START_OF_OBJECT,
             AT_KEY_IN_OBJECT,
             AFTER_KEY_IN_OBJECT,
@@ -179,16 +183,15 @@ namespace Yson {
             AT_VALUE_IN_OBJECT,
             AFTER_VALUE_IN_OBJECT,
             AT_COMMA_IN_OBJECT,
+            AT_END_OF_OBJECT,
+
             AT_START_OF_ARRAY,
             AT_VALUE_IN_ARRAY,
             AFTER_VALUE_IN_ARRAY,
             AT_COMMA_IN_ARRAY,
-            AT_END_OF_DOCUMENT,
-            AT_END_OF_OBJECT,
             AT_END_OF_ARRAY,
-            AT_END_OF_NULL,
-            AT_END_OF_BUFFER,
-            UNRECOVERABLE_ERROR
+
+            AT_END_OF_NULL
         };
 
         std::unique_ptr<TextReader> m_TextReader;

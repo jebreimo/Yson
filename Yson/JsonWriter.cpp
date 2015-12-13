@@ -11,41 +11,27 @@
 #include <iostream>
 #include <stdexcept>
 #include <Ystring/Utf8.hpp>
-#include "JsonValue.hpp"
 
 namespace Yson
 {
-    namespace
-    {
-        void write(JsonWriter& writer,
-                   const JsonObject& object,
-                   JsonWriter::Formatting formatting);
-        void write(JsonWriter& writer,
-                   const std::vector<JsonValue>& array,
-                   JsonWriter::Formatting formatting);
-    }
-
     JsonWriter::JsonWriter()
         : m_IsFirst(true),
           m_Indentation("  "),
           m_Stream(&std::cout)
-    {
-    }
+    {}
 
     JsonWriter::JsonWriter(std::ostream& stream)
         : m_IsFirst(true),
           m_Indentation("  "),
           m_Stream(&stream)
-    {
-    }
+    {}
 
     JsonWriter::JsonWriter(std::unique_ptr<std::ostream> stream)
         : m_IsFirst(true),
           m_Indentation("  "),
           m_Stream(stream.get()),
           m_StreamPtr(std::move(stream))
-    {
-    }
+    {}
 
     JsonWriter::JsonWriter(JsonWriter&& rhs)
         : m_Context(std::move(rhs.m_Context)),
@@ -78,9 +64,10 @@ namespace Yson
         return m_Indentation;
     }
 
-    void JsonWriter::setIndentation(const std::string& indentation)
+    JsonWriter& JsonWriter::setIndentation(const std::string& indentation)
     {
         m_Indentation = indentation;
+        return *this;
     }
 
     const std::string& JsonWriter::valueName() const
@@ -88,52 +75,59 @@ namespace Yson
         return m_ValueName;
     }
 
-    void JsonWriter::setValueName(const std::string& name)
+    JsonWriter& JsonWriter::setValueName(const std::string& name)
     {
         m_ValueName = name;
+        return *this;
     }
 
-    void JsonWriter::beginArray(Formatting formatting)
+    JsonWriter& JsonWriter::beginArray(Formatting formatting)
     {
         beginValue();
         *m_Stream << "[";
 
         m_IsFirst = true;
         m_Context.push(Context(']', shouldFormat(formatting)));
+        return *this;
     }
 
-    void JsonWriter::beginArray(const std::string& name, Formatting formatting)
+    JsonWriter& JsonWriter::beginArray(const std::string& name, Formatting formatting)
     {
         setValueName(name);
         beginArray(formatting);
+        return *this;
     }
 
-    void JsonWriter::endArray()
+    JsonWriter& JsonWriter::endArray()
     {
         endStructure(']');
+        return *this;
     }
 
-    void JsonWriter::beginObject(Formatting formatting)
+    JsonWriter& JsonWriter::beginObject(Formatting formatting)
     {
         beginValue();
         *m_Stream << "{";
 
         m_IsFirst = true;
         m_Context.push(Context('}', shouldFormat(formatting)));
+        return *this;
     }
 
-    void JsonWriter::beginObject(const std::string& name, Formatting formatting)
+    JsonWriter& JsonWriter::beginObject(const std::string& name, Formatting formatting)
     {
         setValueName(name);
         beginObject(formatting);
+        return *this;
     }
 
-    void JsonWriter::endObject()
+    JsonWriter& JsonWriter::endObject()
     {
         endStructure('}');
+        return *this;
     }
 
-    void JsonWriter::newline(bool comma)
+    JsonWriter& JsonWriter::newline(bool comma)
     {
         if (comma && !m_IsFirst)
             *m_Stream << ",\n";
@@ -142,102 +136,81 @@ namespace Yson
 
         indent();
         m_IsFirst = true;
+        return *this;
     }
 
-    void JsonWriter::value()
+    JsonWriter& JsonWriter::value()
     {
         writeValue("null");
+        return *this;
     }
 
-    void JsonWriter::value(int32_t value)
+    JsonWriter& JsonWriter::value(int32_t value)
     {
         writeValue(value);
+        return *this;
     }
 
-    void JsonWriter::value(int64_t value)
+    JsonWriter& JsonWriter::value(int64_t value)
     {
         writeValue(value);
+        return *this;
     }
 
-    void JsonWriter::value(uint32_t value)
+    JsonWriter& JsonWriter::value(uint32_t value)
     {
         writeValue(value);
+        return *this;
     }
 
-    void JsonWriter::value(uint64_t value)
+    JsonWriter& JsonWriter::value(uint64_t value)
     {
         writeValue(value);
+        return *this;
     }
 
-    void JsonWriter::value(double value)
+    JsonWriter& JsonWriter::value(double value)
     {
         writeValue(value);
+        return *this;
     }
 
-    void JsonWriter::value(const char* value)
+    JsonWriter& JsonWriter::value(const char* value)
     {
         beginValue();
         *m_Stream << "\"" << value << "\"";
         m_IsFirst = false;
+        return *this;
     }
 
-    void JsonWriter::value(const std::string& value)
+    JsonWriter& JsonWriter::value(const std::string& value)
     {
         beginValue();
         *m_Stream << "\"" << value << "\"";
         m_IsFirst = false;
+        return *this;
     }
 
-    void JsonWriter::value(const wchar_t* _value)
+    JsonWriter& JsonWriter::value(const wchar_t* _value)
     {
         value(std::wstring(_value));
+        return *this;
     }
 
-    void JsonWriter::value(const std::wstring& value)
+    JsonWriter& JsonWriter::value(const std::wstring& value)
     {
         beginValue();
-        *m_Stream << "\"" << Ystring::Utf8::toUtf8(value, Ystring::Encoding::UTF_16) << "\"";
+        *m_Stream << "\""
+                  << Ystring::Utf8::toUtf8(value, Ystring::Encoding::UTF_16)
+                  << "\"";
         m_IsFirst = false;
+        return *this;
     }
 
-    void JsonWriter::value(bool value)
+    JsonWriter& JsonWriter::value(bool value)
     {
         writeValue(value ? "true" : "false");
-    }
-
-    void JsonWriter::value(const JsonValue& jsonValue, Formatting formatting)
-    {
-        switch (jsonValue.type())
-        {
-        case JsonValue::OBJECT:
-            write(*this, jsonValue.object(), formatting);
-            break;
-        case JsonValue::ARRAY:
-            write(*this, jsonValue.array(), formatting);
-            break;
-        case JsonValue::STRING:
-            value(jsonValue.string());
-            break;
-        case JsonValue::REAL:
-            value(jsonValue.real());
-            break;
-        case JsonValue::INTEGER:
-            value(jsonValue.integer());
-            break;
-        case JsonValue::BOOLEAN:
-            value(jsonValue.boolean());
-            break;
-        case JsonValue::NULL_VALUE:
-        default:
-            value();
-            break;
-        }
-    }
-
-    void JsonWriter::value(const std::string& name, const JsonValue& val, Formatting formatting)
-    {
-        setValueName(name);
-        value(val, formatting);
+        return *this;
     }
 
     void JsonWriter::beginValue()
@@ -295,28 +268,5 @@ namespace Yson
         beginValue();
         *m_Stream << value;
         m_IsFirst = false;
-    }
-
-    namespace
-    {
-        void write(JsonWriter& writer,
-                   const JsonObject& object,
-                   JsonWriter::Formatting formatting)
-        {
-            writer.beginObject(formatting);
-            for (auto it = object.begin(); it != object.end(); it++)
-                writer.value(it->first, it->second, formatting);
-            writer.endObject();
-        }
-
-        void write(JsonWriter& writer,
-                   const std::vector<JsonValue>& array,
-                   JsonWriter::Formatting formatting)
-        {
-            writer.beginArray(formatting);
-            for (auto it = array.begin(); it != array.end(); it++)
-                writer.value(*it, formatting);
-            writer.endArray();
-        }
     }
 }

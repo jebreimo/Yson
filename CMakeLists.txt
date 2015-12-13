@@ -28,8 +28,6 @@ set(PUBLIC_HEADERS
     Yson/JsonReaderException.hpp
     Yson/JsonTokenType.hpp
     Yson/JsonTokenizer.hpp
-    Yson/JsonValue.hpp
-    Yson/JsonValueError.hpp
     Yson/JsonWriter.hpp
     Yson/LineNumberCounter.hpp
     Yson/TextFileReader.hpp
@@ -47,7 +45,6 @@ set(SOURCE_FILES
     Yson/JsonReader.cpp
     Yson/JsonReaderException.cpp
     Yson/JsonTokenizer.cpp
-    Yson/JsonValue.cpp
     Yson/JsonWriter.cpp
     Yson/LineNumberCounter.cpp
     Yson/ParseDouble.cpp

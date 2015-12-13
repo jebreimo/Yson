@@ -13,7 +13,6 @@ namespace Yson {
     {
         enum Enum
         {
-//            EMPTY = 'e',
             INTEGER = 'i',
             FLOAT = 'f',
             STRING = 's',

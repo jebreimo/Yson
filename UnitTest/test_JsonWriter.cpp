@@ -10,12 +10,12 @@ namespace
     static void test_SimpleObject()
     {
         std::stringstream ss;
-        JsonWriter writer(ss);
-        writer.beginObject();
-        writer.setValueName("name");
-        writer.beginObject();
-        writer.endObject();
-        writer.endObject();
+        JsonWriter(ss)
+            .beginObject()
+            .setValueName("name")
+            .beginObject()
+            .endObject()
+            .endObject();
         std::string expected = "\
 {\n\
   \"name\": {}\n\

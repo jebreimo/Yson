@@ -131,7 +131,7 @@ namespace Yson
 
         switch (m_State)
         {
-        case AT_END_OF_BUFFER:
+        case AT_END_OF_STREAM:
         case AT_END_OF_DOCUMENT:
         case AT_END_OF_ARRAY:
         case AT_END_OF_OBJECT:
@@ -217,7 +217,7 @@ namespace Yson
         case AT_START_OF_DOCUMENT:
         case AT_VALUE_OF_DOCUMENT:
         case AT_END_OF_DOCUMENT:
-        case AT_END_OF_BUFFER:
+        case AT_END_OF_STREAM:
             YSON_THROW("leave() wasn't preceded by enter().");
         case AT_END_OF_ARRAY:
         case AT_END_OF_OBJECT:
@@ -387,7 +387,7 @@ namespace Yson
         {
             switch (m_State)
             {
-            case AT_END_OF_BUFFER:
+            case AT_END_OF_STREAM:
                 return false;
             case AT_END_OF_OBJECT:
             case AT_END_OF_ARRAY:
@@ -543,7 +543,7 @@ namespace Yson
         case AT_END_OF_ARRAY:
         case AT_END_OF_OBJECT:
         case AT_END_OF_NULL:
-        case AT_END_OF_BUFFER:
+        case AT_END_OF_STREAM:
         case AT_END_OF_DOCUMENT:
             return false;
         default:
@@ -595,7 +595,7 @@ namespace Yson
                 if (fillBuffer())
                     filledBuffer = true;
                 else
-                    processEndOfBuffer();
+                    processEndOfStream();
                 break;
             case JsonTokenType::BLOCK_STRING:
             {
@@ -742,15 +742,15 @@ namespace Yson
         }
     }
 
-    void JsonReader::processEndOfBuffer()
+    void JsonReader::processEndOfStream()
     {
         switch (m_State)
         {
         case AT_START_OF_DOCUMENT:
         case AT_END_OF_DOCUMENT:
-            m_State = AT_END_OF_BUFFER;
+            m_State = AT_END_OF_STREAM;
             break;
-        case AT_END_OF_BUFFER:
+        case AT_END_OF_STREAM:
             break;
         default:
             m_State = UNRECOVERABLE_ERROR;

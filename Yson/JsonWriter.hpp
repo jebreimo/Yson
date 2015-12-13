@@ -31,42 +31,48 @@ namespace Yson
         JsonWriter& operator=(JsonWriter&& rhs);
 
         const std::string& indentation() const;
-        void setIndentation(const std::string& indentation);
+
+        JsonWriter& setIndentation(const std::string& indentation);
 
         const std::string& valueName() const;
-        void setValueName(const std::string& name);
 
-        void beginArray(Formatting formatting = DEFAULT);
-        void beginArray(const std::string& name, Formatting formatting = DEFAULT);
-        void endArray();
+        JsonWriter& setValueName(const std::string& name);
 
-        void beginObject(Formatting formatting = DEFAULT);
-        void beginObject(const std::string& name, Formatting formatting = DEFAULT);
-        void endObject();
+        JsonWriter& beginArray(Formatting formatting = DEFAULT);
 
-        void newline(bool comma = false);
+        JsonWriter& beginArray(const std::string& name,
+                               Formatting formatting = DEFAULT);
 
-        void value();
-        void value(int32_t value);
-        void value(int64_t value);
-        void value(uint32_t value);
-        void value(uint64_t value);
-        void value(double value);
-        void value(const char* value);
-        void value(const std::string& value);
-        void value(const wchar_t* value);
-        void value(const std::wstring& value);
-        void value(bool value);
-        void value(const JsonValue& jsonValue, Formatting formatting = DEFAULT);
+        JsonWriter& endArray();
+
+        JsonWriter& beginObject(Formatting formatting = DEFAULT);
+
+        JsonWriter& beginObject(const std::string& name,
+                                Formatting formatting = DEFAULT);
+
+        JsonWriter& endObject();
+
+        JsonWriter& newline(bool comma = false);
+
+        JsonWriter& value();
+
+        JsonWriter& value(int32_t value);
+        JsonWriter& value(int64_t value);
+        JsonWriter& value(uint32_t value);
+        JsonWriter& value(uint64_t value);
+        JsonWriter& value(double value);
+        JsonWriter& value(const char* value);
+        JsonWriter& value(const std::string& value);
+        JsonWriter& value(const wchar_t* value);
+        JsonWriter& value(const std::wstring& value);
+        JsonWriter& value(bool value);
 
         template <typename T>
-        void value(const std::string& name, T value)
+        JsonWriter& value(const std::string& name, T value)
         {
             setValueName(name);
             this->value(value);
         }
-
-        void value(const std::string& name, const JsonValue& value, Formatting formatting = DEFAULT);
     private:
         void beginValue();
         void endStructure(char endChar);
@@ -77,8 +83,16 @@ namespace Yson
 
         struct Context
         {
-            Context() : endChar(0), format(false) {}
-            Context(char endChar, bool format) : endChar(endChar), format(format) {}
+            Context()
+                : endChar(0),
+                  format(false)
+            {}
+
+            Context(char endChar, bool format)
+                : endChar(endChar),
+                  format(format)
+            {}
+
             char endChar;
             bool format;
         };
