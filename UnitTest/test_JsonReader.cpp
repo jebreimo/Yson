@@ -198,10 +198,38 @@ void test_BlockString()
     Y_EQUAL(read<std::string>(reader), "multi-line text");
     Y_ASSERT(reader.nextValue());
     Y_EQUAL(read<std::string>(reader), "This is a\nmulti-line text!");
-    Y_EQUAL(reader.lineNumber(), 2);
     Y_ASSERT(!reader.nextKey());
     Y_NO_THROW(reader.leave(), JsonReaderException);
     Y_ASSERT(!reader.nextValue());
+}
+
+void test_LineAndColumnNumbers()
+{
+    std::string doc = "{\n  \"foo\": 34, \"bar\": /* as df\ngh*/    64\n}";
+    std::istringstream ss(doc);
+    JsonReader reader(ss);
+    reader.setCommentsEnabled(true);
+    Y_EQUAL(reader.lineNumber(), 1);
+    Y_EQUAL(reader.columnNumber(), 1);
+    Y_ASSERT(reader.nextValue());
+    Y_EQUAL(reader.lineNumber(), 1);
+    Y_EQUAL(reader.columnNumber(), 1);
+    Y_NO_THROW(reader.enter(), JsonReaderException);
+    Y_ASSERT(reader.nextKey());
+    Y_EQUAL(reader.lineNumber(), 2);
+    Y_EQUAL(reader.columnNumber(), 3);
+    Y_ASSERT(reader.nextValue());
+    Y_EQUAL(reader.lineNumber(), 2);
+    Y_EQUAL(reader.columnNumber(), 10);
+    Y_ASSERT(reader.nextKey());
+    Y_EQUAL(reader.lineNumber(), 2);
+    Y_EQUAL(reader.columnNumber(), 14);
+    Y_ASSERT(reader.nextValue());
+    Y_EQUAL(reader.lineNumber(), 3);
+    Y_EQUAL(reader.columnNumber(), 9);
+    Y_NO_THROW(reader.leave(), JsonReaderException);
+    Y_EQUAL(reader.lineNumber(), 4);
+    Y_EQUAL(reader.columnNumber(), 1);
 }
 
 Y_TEST(test_IntegerError,
@@ -212,4 +240,5 @@ Y_TEST(test_IntegerError,
        test_NextDocument,
        test_RecoverFromError,
        test_ValuesAsStrings,
-       test_BlockString);
+       test_BlockString,
+       test_LineAndColumnNumbers);

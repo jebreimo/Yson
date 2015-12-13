@@ -22,20 +22,20 @@ namespace Yson
                                   lineNumber(), columnNumber())
 
     namespace {
-        std::pair<size_t, size_t> countRowsAndColumns(
+        std::pair<unsigned, unsigned> countRowsAndColumns(
                 std::pair<const char*, const char*> token)
         {
-            size_t rows = 0, cols = 0;
+            unsigned rows = 0, cols = 0;
             for (auto it = token.first; it != token.second; ++it)
             {
                 if (*it == '\n')
                 {
                     ++rows;
-                    cols = 1;
+                    cols = 0;
                 }
                 else if (*it == '\r')
                 {
-                    cols = 1;
+                    cols = 0;
                 }
                 else
                 {
@@ -273,6 +273,8 @@ namespace Yson
             break;
         }
 
+        m_LineNumberCounter.applyNextLineAndColumn();
+
         bool filledBuffer;
 
         do
@@ -281,7 +283,8 @@ namespace Yson
 
             m_Tokenizer.next();
             auto tok = m_Tokenizer.rawToken();
-            auto nextColumnNumber = m_ColumnNumber + (tok.second - tok.first);
+            m_LineNumberCounter.setNextLineAndColumnOffsets(
+                    0, int(tok.second - tok.first));
 
             switch (m_Tokenizer.tokenType())
             {
@@ -321,12 +324,8 @@ namespace Yson
             {
                 processBlockString();
                 auto lineCol = countRowsAndColumns(m_Tokenizer.rawToken());
-                if (lineCol.first)
-                {
-                    m_LineNumber += lineCol.first;
-                    m_ColumnNumber = lineCol.second;
-                }
-                m_ColumnNumber += lineCol.second;
+                m_LineNumberCounter.setNextLineAndColumnOffsets(
+                        lineCol.first, lineCol.second);
                 break;
             }
             case JsonTokenType::COMMENT:
@@ -340,12 +339,8 @@ namespace Yson
                     YSON_THROW("Invalid token.");
                 processWhitespace();
                 auto lineCol = countRowsAndColumns(m_Tokenizer.rawToken());
-                if (lineCol.first)
-                {
-                    m_LineNumber += lineCol.first;
-                    m_ColumnNumber = lineCol.second;
-                }
-                m_ColumnNumber += lineCol.second;
+                m_LineNumberCounter.setNextLineAndColumnOffsets(
+                        lineCol.first, lineCol.second);
                 break;
             }
             case JsonTokenType::WHITESPACE:
@@ -353,11 +348,9 @@ namespace Yson
                 break;
             case JsonTokenType::NEWLINE:
                 processWhitespace();
-                ++m_LineNumber;
-                nextColumnNumber = 1;
+                m_LineNumberCounter.setNextLineAndColumnOffsets(1, 0);
                 break;
             }
-            m_ColumnNumber = nextColumnNumber;
         } while (filledBuffer);
         return true;
     }
@@ -394,6 +387,7 @@ namespace Yson
                 break;
             case AT_KEY_IN_OBJECT:
                 return true;
+            case AT_START_OF_OBJECT:
             case AFTER_KEY_IN_OBJECT:
             case AT_COLON_IN_OBJECT:
             case AFTER_VALUE_IN_OBJECT:
@@ -478,12 +472,12 @@ namespace Yson
 
     size_t JsonReader::lineNumber() const
     {
-        return m_LineNumber;
+        return m_LineNumberCounter.line();
     }
 
     size_t JsonReader::columnNumber() const
     {
-        return m_ColumnNumber;
+        return m_LineNumberCounter.column();
     }
 
     bool JsonReader::fillBuffer()
@@ -953,4 +947,15 @@ namespace Yson
             YSON_THROW("Unexpected block string.");
         }
     }
+
+//    void JsonReader::updateRowsAndColumns()
+//    {
+//        auto lineCol = countRowsAndColumns(m_Tokenizer.rawToken());
+//        if (lineCol.first)
+//        {
+//            m_LineNumber += lineCol.first;
+//            m_ColumnNumber = lineCol.second;
+//        }
+//        m_ColumnNumber += lineCol.second;
+//    }
 }

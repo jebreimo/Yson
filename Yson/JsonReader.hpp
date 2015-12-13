@@ -15,6 +15,7 @@
 #include "JsonReaderException.hpp"
 #include "JsonTokenizer.hpp"
 #include "JsonValue.hpp"
+#include "LineNumberCounter.hpp"
 #include "TextReader.hpp"
 #include "ValueType.hpp"
 
@@ -155,7 +156,6 @@ namespace Yson {
 
         void skipElement();
 
-
         template <typename T>
         void readUnsignedInteger(T& value) const;
 
@@ -209,8 +209,7 @@ namespace Yson {
         State m_State = INITIAL_STATE;
         std::stack<State> m_StateStack;
         std::stack<ValueType_t> m_EnteredElements;
-        size_t m_LineNumber = 1;
-        size_t m_ColumnNumber = 1;
+        LineNumberCounter m_LineNumberCounter;
         int m_LanguagExtentions = 0;
         int m_SkipElementDepth = 0;
     };
