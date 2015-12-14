@@ -58,9 +58,9 @@ namespace Yson
         return *this;
     }
 
-    std::ostream& JsonWriter::stream()
+    std::ostream* JsonWriter::stream()
     {
-        return &m_Stream;
+        return m_Stream;
     }
 
     const std::string& JsonWriter::indentation() const
