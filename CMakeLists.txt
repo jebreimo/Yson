@@ -32,6 +32,7 @@ set(PUBLIC_HEADERS
     Yson/LineNumberCounter.hpp
     Yson/TextFileReader.hpp
     Yson/TextReader.hpp
+    Yson/ValueType.hpp
     )
 
 set(PRIVATE_HEADERS

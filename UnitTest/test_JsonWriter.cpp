@@ -11,11 +11,11 @@ namespace
     {
         std::stringstream ss;
         JsonWriter(ss)
-            .beginObject()
+            .writeBeginObject()
             .setValueName("name")
-            .beginObject()
-            .endObject()
-            .endObject();
+            .writeBeginObject()
+            .writeEndObject()
+            .writeEndObject();
         std::string expected = "\
 {\n\
   \"name\": {}\n\

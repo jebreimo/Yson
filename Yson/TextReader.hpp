@@ -27,10 +27,6 @@ namespace Yson {
 
         bool read(std::string& destination, size_t bytes);
 
-//    bool read(std::u16string& destination, size_t bytes);
-//
-//    bool read(std::u32string& destination, size_t bytes);
-
     protected:
         TextReader();
 
