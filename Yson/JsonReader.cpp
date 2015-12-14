@@ -63,7 +63,7 @@ namespace Yson
                    && std::equal(token.first, token.second, "false");
         }
 
-        bool isSubElement(JsonTokenType_t tokenType)
+        bool isStartOfStructure(JsonTokenType_t tokenType)
         {
             return tokenType == JsonTokenType::START_ARRAY
                    || tokenType == JsonTokenType::START_OBJECT;
@@ -71,12 +71,18 @@ namespace Yson
     }
 
     JsonReader::JsonReader(std::istream& stream, Encoding_t encoding)
-        : m_TextReader(new TextReader(stream, encoding, Encoding::UTF_8))
+        : m_TextReader(new TextReader(stream, encoding, Encoding::UTF_8)),
+          m_State(INITIAL_STATE),
+          m_LanguagExtentions(0),
+          m_SkipElementDepth(0)
     {}
 
     JsonReader::JsonReader(const std::string& fileName, Encoding_t encoding)
         : m_TextReader(new TextFileReader(fileName, encoding,
-                                          Encoding::UTF_8))
+                                          Encoding::UTF_8)),
+          m_State(INITIAL_STATE),
+          m_LanguagExtentions(0),
+          m_SkipElementDepth(0)
     {}
 
     bool JsonReader::nextKey()
@@ -140,7 +146,7 @@ namespace Yson
         case AT_VALUE_IN_OBJECT:
         case AT_VALUE_IN_ARRAY:
         case AT_VALUE_OF_DOCUMENT:
-            if (isSubElement(m_Tokenizer.tokenType()))
+            if (isStartOfStructure(m_Tokenizer.tokenType()))
                 skipElement();
             break;
         default:
@@ -171,7 +177,7 @@ namespace Yson
         case AT_VALUE_OF_DOCUMENT:
         case AT_VALUE_IN_ARRAY:
         case AT_VALUE_IN_OBJECT:
-            if (isSubElement(m_Tokenizer.tokenType()))
+            if (isStartOfStructure(m_Tokenizer.tokenType()))
                 skipElement();
             break;
         default:
@@ -532,11 +538,11 @@ namespace Yson
             break;
         case AT_VALUE_IN_ARRAY:
         case AT_VALUE_IN_OBJECT:
-            if (isSubElement(m_Tokenizer.tokenType()))
+            if (isStartOfStructure(m_Tokenizer.tokenType()))
                 return false;
             break;
         case AT_VALUE_OF_DOCUMENT:
-            if (isSubElement(m_Tokenizer.tokenType()))
+            if (isStartOfStructure(m_Tokenizer.tokenType()))
                 return false;
             m_State = AT_END_OF_DOCUMENT;
             return false;
@@ -871,7 +877,7 @@ namespace Yson
     {
         if (m_SkipElementDepth == 0)
         {
-            if (!isSubElement(m_Tokenizer.tokenType()))
+            if (!isStartOfStructure(m_Tokenizer.tokenType()))
                 return;
             enter();
             m_SkipElementDepth = 1;
