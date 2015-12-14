@@ -197,12 +197,12 @@ namespace Yson {
         std::unique_ptr<TextReader> m_TextReader;
         std::string m_Buffer;
         JsonTokenizer m_Tokenizer;
-        State m_State = INITIAL_STATE;
+        State m_State;
         std::stack<State> m_StateStack;
         std::stack<ValueType_t> m_EnteredElements;
         LineNumberCounter m_LineNumberCounter;
-        int m_LanguagExtentions = 0;
-        int m_SkipElementDepth = 0;
+        int m_LanguagExtentions;
+        int m_SkipElementDepth;
     };
 
     template <typename T>
