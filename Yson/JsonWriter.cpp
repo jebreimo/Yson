@@ -328,6 +328,8 @@ namespace Yson
         case AT_END_OF_VALUE:
             m_State = AT_START_OF_LINE_BEFORE_COMMA;
             break;
+        default:
+            break;
         }
         return *this;
     }
@@ -381,6 +383,8 @@ namespace Yson
                 *m_Stream << ",\n";
                 writeIndentationImpl();
                 break;
+            default:
+                break;
             }
             break;
         case AT_START_OF_LINE_NO_COMMA:
@@ -401,6 +405,8 @@ namespace Yson
                 writeIndentationImpl();
                 *m_Stream << ",\n";
                 writeIndentationImpl();
+                break;
+            default:
                 break;
             }
             break;
