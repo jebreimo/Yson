@@ -9,6 +9,7 @@
 
 #include <stdexcept>
 #include <string>
+#include "YsonDefinitions.hpp"
 
 #ifndef _NOEXCEPT
     #define _NOEXCEPT
@@ -17,7 +18,7 @@
 namespace Yson
 {
 
-    class JsonReaderException : public std::logic_error
+    class YSON_API JsonReaderException : public std::logic_error
     {
     public:
 

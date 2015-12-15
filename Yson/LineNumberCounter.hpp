@@ -6,10 +6,11 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
+#include "YsonDefinitions.hpp"
 
 namespace Yson {
 
-    class LineNumberCounter
+    class YSON_API LineNumberCounter
     {
     public:
         LineNumberCounter();

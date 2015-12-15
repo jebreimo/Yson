@@ -85,6 +85,9 @@ namespace Yson
           m_SkipElementDepth(0)
     {}
 
+    JsonReader::~JsonReader()
+    {}
+
     bool JsonReader::nextKey()
     {
         if (m_SkipElementDepth != 0 && m_State != UNRECOVERABLE_ERROR)

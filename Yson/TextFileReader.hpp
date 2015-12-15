@@ -12,7 +12,7 @@
 
 namespace Yson {
 
-    class TextFileReader : public TextReader
+    class YSON_API TextFileReader : public TextReader
     {
     public:
         TextFileReader(const std::string& fileName,

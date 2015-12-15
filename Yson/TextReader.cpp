@@ -6,6 +6,8 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "TextReader.hpp"
+
+#include <algorithm>
 #include <istream>
 
 namespace Yson {
@@ -44,7 +46,7 @@ namespace Yson {
         auto initialBufferSize = m_Buffer.size();
         m_Buffer.resize(initialBufferSize + bytes);
         m_Stream->read(m_Buffer.data() + initialBufferSize, bytes);
-        auto readBytes = m_Stream->gcount();
+        auto readBytes = static_cast<size_t>(m_Stream->gcount());
         if (readBytes < bytes)
             m_Buffer.resize(initialBufferSize + readBytes);
 

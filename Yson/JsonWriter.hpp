@@ -12,29 +12,38 @@
 #include <memory>
 #include <string>
 #include <stack>
+#include "YsonDefinitions.hpp"
 
 namespace Yson
 {
     class JsonValue;
 
-    class JsonWriter
+    class YSON_API JsonWriter
     {
     public:
-        enum Formatting {DEFAULT, FORMATTED, PLAIN};
+        enum Formatting {DEFAULT, NONE, FLAT, FORMAT};
 
         JsonWriter();
+
         JsonWriter(std::ostream& stream);
-        JsonWriter(std::unique_ptr<std::ostream> stream);
+
+        JsonWriter(std::unique_ptr<std::ostream>&& stream);
+
         JsonWriter(JsonWriter&& rhs);
+
         ~JsonWriter();
 
         JsonWriter& operator=(JsonWriter&& rhs);
 
+        bool isFormattingEnabled() const;
+
+        JsonWriter& setFormattingEnabled(bool value);
+
+        std::pair<char, unsigned> indentation() const;
+
+        JsonWriter& setIndentation(char character, unsigned width);
+
         std::ostream* stream();
-
-        const std::string& indentation() const;
-
-        JsonWriter& setIndentation(const std::string& indentation);
 
         const std::string& valueName() const;
 
@@ -53,8 +62,6 @@ namespace Yson
                                      Formatting formatting = DEFAULT);
 
         JsonWriter& writeEndObject();
-
-        JsonWriter& writeNewline(bool comma = false);
 
         JsonWriter& writeNull();
 
@@ -84,22 +91,41 @@ namespace Yson
 
         JsonWriter& writeValue(const std::string& value);
 
-        JsonWriter& writeValue(const wchar_t* value);
-
         JsonWriter& writeValue(const std::wstring& value);
 
         template <typename T>
         JsonWriter& writeValue(const std::string& name, const T& value)
         {
             setValueName(name);
-            this->writeValue(value);
-            return *this;
+            return this->writeValue(value);
         }
+
+        JsonWriter& writeRawValue(const std::string& value);
+
+        JsonWriter& writeRawValue(const std::string& name,
+                                  const std::string& value);
+
+        JsonWriter& writeRawText(const std::string& text);
+
+        JsonWriter& indent();
+
+        JsonWriter& outdent();
+
+        JsonWriter& writeComma();
+
+        JsonWriter& writeIndentation();
+
+        JsonWriter& writeNewline();
+
+        JsonWriter& writeSeparator(size_t count = 1);
     private:
         void beginValue();
+        Formatting formatting() const;
+        bool isInsideObject() const;
+        JsonWriter& writeBeginStructure(char startChar, char endChar,
+                                        Formatting formatting);
         void writeEndStructure(char endChar);
-        void writeIndent();
-        bool shouldFormat(Formatting formatting);
+        void writeIndentationImpl();
         template <typename T>
         JsonWriter& writeValueImpl(T value);
 
@@ -107,23 +133,38 @@ namespace Yson
         {
             Context()
                 : endChar(0),
-                  format(false)
+                  formatting(NONE)
             {}
 
-            Context(char endChar, bool format)
+            Context(char endChar, Formatting formatting)
                 : endChar(endChar),
-                  format(format)
+                  formatting(formatting)
             {}
 
             char endChar;
-            bool format;
+            Formatting formatting;
         };
 
+        enum State
+        {
+            AT_START_OF_VALUE_NO_COMMA,
+            AT_START_OF_VALUE_AFTER_COMMA,
+            AT_START_OF_STRUCTURE,
+            AT_END_OF_VALUE,
+            AT_START_OF_LINE_NO_COMMA,
+            AT_START_OF_LINE_AFTER_COMMA,
+            AT_START_OF_LINE_BEFORE_COMMA,
+            AFTER_COMMA
+        };
+
+        std::unique_ptr<std::ostream> m_StreamPtr;
+        std::ostream* m_Stream;
         std::stack<Context> m_Context;
         std::string m_ValueName;
-        bool m_IsFirst;
-        std::string m_Indentation;
-        std::ostream* m_Stream;
-        std::unique_ptr<std::ostream> m_StreamPtr;
+        State m_State;
+        unsigned m_Indentation;
+        unsigned m_IndentationWidth;
+        bool m_FormattingEnabled;
+        char m_IndentationCharacter;
     };
 }

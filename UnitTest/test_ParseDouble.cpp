@@ -12,11 +12,11 @@
 namespace {
     using namespace Yson;
 
-    void success(const std::string& s, double expectedValue)
+    void success(const std::string& s, double expectedValue, double e = 1e-10)
     {
         auto result = parseDouble(s.data(), s.data() + s.size());
         Y_EQUAL(result.second, true);
-        Y_EQUIVALENT(result.first, expectedValue, 1e-10);
+        Y_EQUIVALENT(result.first, expectedValue, e);
     }
 
     void failure(const std::string& s)
@@ -53,13 +53,13 @@ namespace {
         Y_CALL(failure("1.2E "));
         Y_CALL(failure("1.2E2."));
         Y_CALL(failure("1.2E2 "));
-        Y_CALL(success("1234.5678e222", 1234.5678e222));
+        Y_CALL(success("1234.5678e222", 1234.5678e222, 1e215));
         Y_CALL(success("1234.5678e-222", 1234.5678e-222));
-        Y_CALL(success("1234.5678e+222", 1234.5678e222));
-        Y_CALL(success("-1234.5678e222", -1234.5678e222));
+        Y_CALL(success("1234.5678e+222", 1234.5678e222, 1e215));
+        Y_CALL(success("-1234.5678e222", -1234.5678e222, 1e215));
         Y_CALL(success("-1234.5678e-222", -1234.5678e-222));
-        Y_CALL(success("-1234.5678e+222", -1234.5678e222));
-        Y_CALL(success("1e308", 1e308));
+        Y_CALL(success("-1234.5678e+222", -1234.5678e222, 1e215));
+        Y_CALL(success("1e308", 1e308, 1e298));
         Y_CALL(failure("1e309"));
         Y_CALL(success("1e-308", 1e-308));
         Y_CALL(failure("1e-309"));

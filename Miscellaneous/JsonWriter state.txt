@@ -1,0 +1,164 @@
+AT_START_OF_VALUE
+AFTER_OPENING
+AT_START_OF_LINE
+AFTER_INDENTATION
+AFTER_VALUE
+AFTER_COMMA
+AT_START_OF_LINE
+AFTER_INDENTATION
+AFTER_OPENING
+AFTER_VALUE
+AT_START_OF_LINE_BEFORE_COMMA
+AFTER_INDENTATION_BEFORE_COMMA
+
+
+
+
+#AFTER_START_STRUCTURE
+
+AT_START_OF_VALUE
+AT_START_OF_LINE
+AT_START_OF_LINE_AFTER_
+AFTER_INDENTATION
+
+
+
+{
+    "key": "value",
+    "foo": ["bar"
+        , "baz", "bom"
+    ]
+}
+
+
+Events:
+    StartStructure (i.e. "{" "[" )
+    EndStructure
+    Value (includes "key: value", "}", "]")
+    Newline
+    Indentation
+    Comma
+    Separator
+
+States:
+    AFTER_COMMA
+    AT_END_OF_VALUE
+    AT_START_OF_LINE_AFTER_COMMA
+    AT_START_OF_LINE_BEFORE_COMMA
+    AT_START_OF_LINE_NO_COMMA
+    AT_START_OF_STRUCTURE
+    AT_START_OF_VALUE_AFTER_COMMA
+    AT_START_OF_VALUE_NO_COMMA
+
+AT_START_OF_VALUE_NO_COMMA:
+    StartStructure: AT_START_OF_STRUCTURE
+        None, Flat, Formatted: indent
+    EndStructure: AT_END_OF_VALUE
+        None, Flat, Formatted: outdent
+    Value: AT_END_OF_VALUE
+    Newline: AT_START_OF_LINE_NO_COMMA
+    Indentation: <ignore>
+    Comma: <error>
+    Separator: AT_START_OF_VALUE_NO_COMMA
+
+AT_START_OF_VALUE_AFTER_COMMA:
+    StartStructure: AT_START_OF_STRUCTURE
+        None, Flat, Formatted: indent
+    EndStructure: <error>
+    Value: AT_END_OF_VALUE
+    Newline: AT_START_OF_LINE_AFTER_COMMA
+    Indentation: <ignore>
+    Comma: <error>
+    Separator: AT_START_OF_VALUE_AFTER_COMMA
+
+AT_START_OF_STRUCTURE:
+    StartStructure: AT_START_OF_STRUCTURE
+        None, Flat: indent
+        Formatted: newline, indentation, indent
+    EndStructure: AT_END_OF_VALUE
+        None, Flat, Formatted: outdent
+    Value: AT_END_OF_VALUE
+        Formatted: newline, indentation
+    Newline: AT_START_OF_LINE_NO_COMMA
+    Indentation: <ignore>
+    Comma: <error>
+    Separator: AT_START_OF_STRUCTURE
+
+AT_END_OF_VALUE:
+    StartStructure: AT_START_OF_STRUCTURE
+        None: comma, indent
+        Flat: comma, separator, indent
+        Formatted: comma, newline, indentation, indent
+    EndStructure: AT_END_OF_VALUE
+        None, Flat: outdent
+        Formatted: outdent, newline, indentation
+    Value: AT_END_OF_VALUE
+        None: comma
+        Flat: comma, separator
+        Formatted: comma, newline, indentation
+    Newline: AT_START_OF_LINE_BEFORE_COMMA
+    Indentation: <ignore>
+    Comma: AFTER_COMMA
+    Separator: AT_END_OF_VALUE
+
+AFTER_COMMA
+    StartStructure: AT_START_OF_STRUCTURE
+        None: indent
+        Flat: separator, indent
+        Formatted: newline, indentation, indent
+    EndStructure: <error>
+    Value: AT_END_OF_VALUE
+        Flat: separator
+        Formatted: newline, indentation
+    Newline: AT_START_OF_LINE_AFTER_COMMA
+    Indentation: <ignore>
+    Comma: <error>
+    Separator: AT_START_OF_VALUE_AFTER_COMMA
+
+AT_START_OF_LINE_NO_COMMA:
+    StartStructure: AT_START_OF_STRUCTURE
+        None: indent
+        Flat: separator, indent
+        Formatted: indentation, indent
+    EndStructure: AT_END_OF_VALUE
+        None, Flat: outdent
+        Formatted: outdent, indentation
+    Value: AT_END_OF_VALUE
+        Flat: separator
+        Formatted: indentation
+    Newline: AT_START_OF_LINE_NO_COMMA
+    Indentation: AT_START_OF_VALUE_NO_COMMA
+    Comma: <error>
+    Separator: AT_START_OF_VALUE_NO_COMMA
+
+AT_START_OF_LINE_AFTER_COMMA:
+    StartStructure: AT_START_OF_STRUCTURE
+        None: indent
+        Flat: separator, indent
+        Formatted: indentation, indent
+    EndStructure: <error>
+    Value: AT_END_OF_VALUE
+        Flat: separator
+        Formatted: indentation
+    Newline: AT_START_OF_LINE_AFTER_COMMA
+    Indentation: AT_START_OF_VALUE_AFTER_COMMA
+    Comma: <error>
+    Separator: AT_START_OF_VALUE_AFTER_COMMA
+
+AT_START_OF_LINE_BEFORE_COMMA:
+    StartStructure: AT_START_OF_STRUCTURE
+        None: comma, indent
+        Flat: comma, separator, indent
+        Formatted: indentation, comma, newline, indentation, indent
+    EndStructure: AT_END_OF_VALUE
+        None, Flat: outdent
+        Formatted: outdent, indentation
+    Value: AT_END_OF_VALUE
+        None: comma
+        Flat: comma, separator
+        Formatted: indentation, comma, newline, indentation
+    Newline: AT_START_OF_LINE_BEFORE_COMMA
+    Indentation: AT_END_OF_VALUE
+    Comma: AFTER_COMMA
+        Formatted: indentation
+    Separator: AT_END_OF_VALUE

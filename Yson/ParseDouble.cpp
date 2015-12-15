@@ -27,7 +27,7 @@ namespace Yson
     {
         typedef std::pair<T, bool> Result;
         if (first == last)
-            return Result(0, false);
+            return Result();
 
         // Get the sign of the number
         bool negative = false;
@@ -35,18 +35,18 @@ namespace Yson
         {
             negative = true;
             if (++first == last)
-                return Result(0, false);
+                return Result();
         }
         else if (*first == '+')
         {
             if (++first == last)
-                return Result(0, false);
+                return Result();
         }
 
         // Get the integer value
         auto value = T(getDigit(*first));
         if (value > 9)
-            return Result(0, false);
+            return Result();
         while (true)
         {
             if (++first == last)
@@ -80,36 +80,36 @@ namespace Yson
         if (first != last)
         {
             if ((*first & 0xDF) != 'E')
-                return Result(0, false);
+                return Result();
 
             if (++first == last)
-                return Result(0, false);
+                return Result();
 
             bool negativeExponent = false;
             if (*first == '-')
             {
                 negativeExponent = true;
                 if (++first == last)
-                    return Result(0, false);
+                    return Result();
             }
             else if (*first == '+')
             {
                 if (++first == last)
-                    return Result(0, false);
+                    return Result();
             }
 
             int explicitExponent = getDigit(*first);
             if (explicitExponent > 9)
-                return Result(0, false);
+                return Result();
 
             while (++first != last)
             {
                 if (getDigit(*first) > 9)
-                    return Result(0, false);
+                    return Result();
                 explicitExponent *= 10;
                 explicitExponent += getDigit(*first);
                 if (explicitExponent > std::numeric_limits<T>::max_exponent10)
-                    return Result(0, false);
+                    return Result();
             }
 
             if (negativeExponent)

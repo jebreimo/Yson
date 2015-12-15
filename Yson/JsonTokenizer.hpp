@@ -10,13 +10,15 @@
 #include <string>
 #include <vector>
 #include "JsonTokenType.hpp"
+#include "YsonDefinitions.hpp"
 
 namespace Yson
 {
-    class JsonTokenizer
+    class YSON_API JsonTokenizer
     {
     public:
         JsonTokenizer();
+        ~JsonTokenizer();
 
         bool hasNext() const;
         void next();

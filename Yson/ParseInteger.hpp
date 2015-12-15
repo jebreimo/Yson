@@ -9,10 +9,10 @@
 
 #include <cstdint>
 #include <utility>
+#include "YsonDefinitions.hpp"
 
 namespace Yson
 {
-
-    std::pair<int64_t, bool> parseInteger(const char* first, const char* last,
-                                          bool detectBase);
+    YSON_API std::pair<int64_t, bool> parseInteger(
+            const char* first, const char* last, bool detectBase);
 }

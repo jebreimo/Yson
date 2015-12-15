@@ -9,13 +9,14 @@
 
 #include <string>
 #include "ValueType.hpp"
+#include "YsonDefinitions.hpp"
 
 namespace Yson {
 
-    ValueType_t getValueType(const char* first, const char* last);
+    YSON_API ValueType_t getValueType(const char* first, const char* last);
 
-    ValueType_t getValueType(
+    YSON_API ValueType_t getValueType(
             const std::pair<const char*, const char*>& value);
 
-    ValueType_t getValueType(const std::string& value);
+    YSON_API ValueType_t getValueType(const std::string& value);
 }

@@ -7,6 +7,8 @@
 //****************************************************************************
 #include "GetValueType.hpp"
 
+#include <cstdint>
+
 namespace Yson {
 
     namespace {

@@ -12,8 +12,10 @@
 #  YSTRING_LIBRARIES - The libraries needed to use Ystring
 #  YSTRING_DEFINITIONS - Compiler switches required for using Ystring
 
+set(DEBUG_LIBRARY_NAME Ystring.debug)
+
 if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-    set(LIBRARY_NAME Ystring.debug)
+    set(LIBRARY_NAME ${DEBUG_LIBRARY_NAME})
 else(CMAKE_BUILD_TYPE MATCHES DEBUG)
     set(LIBRARY_NAME Ystring)
 endif(CMAKE_BUILD_TYPE MATCHES DEBUG)
@@ -21,9 +23,11 @@ endif(CMAKE_BUILD_TYPE MATCHES DEBUG)
 if(WIN32)
     set(POSSIBLE_INCLUDE_PATHS
         $ENV{HOMEDRIVE}$ENV{HOMEPATH}/include
+        ${CMAKE_SOURCE_DIR}/../include
         )
     set(POSSIBLE_LIBRARY_PATHS
         $ENV{HOMEDRIVE}$ENV{HOMEPATH}/lib
+        ${CMAKE_SOURCE_DIR}/../lib
         )
 else(WIN32)
     set(POSSIBLE_INCLUDE_PATHS
@@ -39,7 +43,12 @@ find_path(YSTRING_INCLUDE_DIR Ystring/YstringDefinitions.hpp
           PATH_SUFFIXES Ystring
           PATHS ${POSSIBLE_INCLUDE_PATHS})
 
-find_library(YSTRING_LIBRARY NAMES ${LIBRARY_NAME} lib${LIBRARY_NAME}
+find_library(YSTRING_LIBRARY
+             NAMES ${LIBRARY_NAME} lib${LIBRARY_NAME}
+             PATHS ${POSSIBLE_LIBRARY_PATHS})
+
+find_library(YSTRING_DEBUG_LIBRARY
+             NAMES ${DEBUG_LIBRARY_NAME} lib${DEBUG_LIBRARY_NAME}
              PATHS ${POSSIBLE_LIBRARY_PATHS})
 
 include(FindPackageHandleStandardArgs)
@@ -49,4 +58,4 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Ystring DEFAULT_MSG
                                   YSTRING_INCLUDE_DIR YSTRING_LIBRARY)
 
-mark_as_advanced(YSTRING_INCLUDE_DIR YSTRING_LIBRARY)
+mark_as_advanced(YSTRING_INCLUDE_DIR YSTRING_LIBRARY YSTRING_DEBUG_LIBRARY)

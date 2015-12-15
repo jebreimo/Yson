@@ -13,7 +13,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
 if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
 elseif(WIN32)
-    add_definitions(-D_SCL_SECURE_NO_WARNINGS -DYSTRING_EXPORTS)
+    add_definitions(-D_SCL_SECURE_NO_WARNINGS
+                    -DYSON_EXPORTS
+                    -DYSTRING_NO_AUTO_IMPORT)
 endif(APPLE)
 
 set(CMAKE_MODULE_PATH
@@ -33,6 +35,7 @@ set(PUBLIC_HEADERS
     Yson/TextFileReader.hpp
     Yson/TextReader.hpp
     Yson/ValueType.hpp
+    Yson/YsonDefinitions.hpp
     )
 
 set(PRIVATE_HEADERS
@@ -69,7 +72,9 @@ set_target_properties(
         MACOSX_RPATH ON
         DEBUG_OUTPUT_NAME "${PROJECT_NAME}.debug")
 
-target_link_libraries(${PROJECT_NAME} ${YSTRING_LIBRARY})
+target_link_libraries(${PROJECT_NAME}
+                      optimized ${YSTRING_LIBRARY}
+                      debug ${YSTRING_DEBUG_LIBRARY})
 
 if (HAS_YTEST)
      set(CTEST_OUTPUT_ON_FAILURE 1)

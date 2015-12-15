@@ -20,7 +20,7 @@
 
 namespace Yson {
 
-    class JsonReader
+    class YSON_API JsonReader
     {
     public:
         JsonReader(std::istream& stream,
@@ -29,6 +29,8 @@ namespace Yson {
         JsonReader(const std::string& fileName,
                    Ystring::Encoding_t encoding = Ystring::Encoding::UNKNOWN);
 
+        ~JsonReader();
+        
         bool nextKey();
 
         bool nextValue();

@@ -7,6 +7,7 @@
 //****************************************************************************
 #include "JsonTokenizer.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <functional>
 
@@ -30,6 +31,10 @@ namespace Yson
           m_TokenEnd(NULL),
           m_TokenType(JsonTokenType::INVALID_TOKEN)
     {}
+
+    JsonTokenizer::~JsonTokenizer()
+    {
+    }
 
     bool JsonTokenizer::hasNext() const
     {

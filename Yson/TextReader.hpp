@@ -10,6 +10,7 @@
 #include <Ystring/Encoding.hpp>
 #include <Ystring/EncodingInfo.hpp>
 #include <Ystring/Conversion/Converter.hpp>
+#include "YsonDefinitions.hpp"
 
 namespace Yson {
 
