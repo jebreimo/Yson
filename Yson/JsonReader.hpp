@@ -9,16 +9,18 @@
 
 #include <cstdint>
 #include <istream>
+#include <memory>
 #include <stack>
 #include <string>
 #include <Ystring/Encoding.hpp>
 #include "JsonReaderException.hpp"
 #include "JsonTokenizer.hpp"
 #include "LineNumberCounter.hpp"
-#include "TextReader.hpp"
 #include "ValueType.hpp"
 
 namespace Yson {
+
+    class TextReader;
 
     class YSON_API JsonReader
     {

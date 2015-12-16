@@ -12,16 +12,16 @@ namespace Yson {
     TextFileReader::TextFileReader(
             const std::string& fileName,
             Ystring::Encoding_t destinationEncoding)
-            : m_FileStream(fileName)
+        : m_FileStream(fileName)
     {
-        init(m_FileStream, destinationEncoding);
+        init(m_FileStream, Ystring::Encoding::UNKNOWN, destinationEncoding);
     }
 
     TextFileReader::TextFileReader(
             const std::string& fileName,
             Ystring::Encoding_t sourceEncoding,
             Ystring::Encoding_t destinationEncoding)
-            : m_FileStream(fileName)
+        : m_FileStream(fileName)
     {
         init(m_FileStream, sourceEncoding, destinationEncoding);
     }

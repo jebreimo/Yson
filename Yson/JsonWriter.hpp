@@ -16,7 +16,6 @@
 
 namespace Yson
 {
-    class JsonValue;
 
     class YSON_API JsonWriter
     {
