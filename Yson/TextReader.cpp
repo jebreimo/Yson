@@ -9,10 +9,16 @@
 
 #include <algorithm>
 #include <istream>
+#include <Ystring/Conversion/Converter.hpp>
 
 namespace Yson {
 
     using namespace Ystring;
+
+    TextReader::TextReader()
+            : m_Stream(),
+              m_DestinationEncoding()
+    {}
 
     TextReader::TextReader(std::istream& stream,
                            Encoding_t destinationEncoding)
@@ -32,11 +38,6 @@ namespace Yson {
                                                         destinationEncoding));
         }
     }
-
-    TextReader::TextReader()
-            : m_Stream(),
-              m_DestinationEncoding()
-    {}
 
     TextReader::~TextReader()
     {}
@@ -80,20 +81,19 @@ namespace Yson {
     }
 
     void TextReader::init(std::istream& stream,
-                          Encoding_t destinationEncoding)
-    {
-        m_Stream = &stream;
-        m_DestinationEncoding = destinationEncoding;
-        m_Converter.reset();
-    }
-
-    void TextReader::init(std::istream& stream,
                           Encoding_t sourceEncoding,
                           Encoding_t destinationEncoding)
     {
         m_Stream = &stream;
         m_DestinationEncoding = destinationEncoding;
-        m_Converter.reset(new Conversion::Converter(sourceEncoding,
-                                                    destinationEncoding));
+        if (sourceEncoding != Encoding::UNKNOWN)
+        {
+            m_Converter.reset(new Conversion::Converter(sourceEncoding,
+                                                        destinationEncoding));
+        }
+        else if (m_Converter)
+        {
+            m_Converter.reset();
+        }
     }
 }

@@ -32,8 +32,6 @@ set(PUBLIC_HEADERS
     Yson/JsonTokenizer.hpp
     Yson/JsonWriter.hpp
     Yson/LineNumberCounter.hpp
-    Yson/TextFileReader.hpp
-    Yson/TextReader.hpp
     Yson/ValueType.hpp
     Yson/YsonDefinitions.hpp
     )
@@ -42,6 +40,8 @@ set(PRIVATE_HEADERS
     Yson/GetValueType.hpp
     Yson/ParseDouble.hpp
     Yson/ParseInteger.hpp
+    Yson/TextFileReader.hpp
+    Yson/TextReader.hpp
     )
 
 set(SOURCE_FILES

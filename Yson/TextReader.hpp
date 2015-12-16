@@ -6,15 +6,19 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
+#include <memory>
 #include <vector>
 #include <Ystring/Encoding.hpp>
 #include <Ystring/EncodingInfo.hpp>
-#include <Ystring/Conversion/Converter.hpp>
 #include "YsonDefinitions.hpp"
+
+namespace Ystring { namespace Conversion {
+    class Converter;
+}}
 
 namespace Yson {
 
-    class TextReader
+    class YSON_API TextReader
     {
     public:
         TextReader(std::istream& stream,
@@ -33,9 +37,6 @@ namespace Yson {
 
         void init(std::istream& stream,
                   Ystring::Encoding_t sourceEncoding,
-                  Ystring::Encoding_t destinationEncoding);
-
-        void init(std::istream& stream,
                   Ystring::Encoding_t destinationEncoding);
 
     private:
