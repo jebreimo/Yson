@@ -13,12 +13,16 @@ namespace Yson
 {
 
     JsonReaderException::JsonReaderException()
-        : std::logic_error("Unspecified error.")
+        : std::logic_error("Unspecified error."),
+          m_LineNumber(0),
+          m_ColumnNumber(0)
     {
     }
 
     JsonReaderException::JsonReaderException(const std::string& msg)
-        : std::logic_error(msg)
+        : std::logic_error(msg),
+          m_LineNumber(0),
+          m_ColumnNumber(0)
     {
     }
 

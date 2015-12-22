@@ -18,10 +18,17 @@
 #include "LineNumberCounter.hpp"
 #include "ValueType.hpp"
 
+/** @file
+  * @brief Defines the JsonReader class.
+  */
+
 namespace Yson {
 
     class TextReader;
 
+    /** @brief A class for iterating efficiently over the contents of a JSON
+      *   file.
+      */
     class YSON_API JsonReader
     {
     public:
@@ -33,8 +40,16 @@ namespace Yson {
 
         ~JsonReader();
         
+        /** @brief Advances the reader to the next key in the most recently
+          *     entered JSON object.
+          * @throws JsonReaderException if it encounters an error in the JSON
+          *     file or the most recently entered object isn't an object.
+          */
         bool nextKey();
 
+        /** @brief Advances the reader to the next value in the most recently
+          *     entered JSON array or JSON object.
+          */
         bool nextValue();
 
         bool nextToken();

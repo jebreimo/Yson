@@ -41,7 +41,7 @@
 
 /// @endcond
 
-/** @brief The top-level namespace for all functions and classes
+/** @brief The namespace for all functions, types and classes
   *     in @a Yson.
   */
 namespace Yson {}
