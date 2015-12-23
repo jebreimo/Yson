@@ -7,23 +7,16 @@ namespace
 {
     using namespace Yson;
 
-    static void test_SimpleObject()
+    void test_EscapedString()
     {
         std::stringstream ss;
         JsonWriter(ss)
-            .writeBeginObject()
-            .setValueName("name")
-            .writeBeginObject()
-            .writeEndObject()
-            .writeEndObject();
-        std::string expected =
-                "{\n"
-                "  \"name\": {}\n"
-                "}";
+            .writeValue("\"foo\nbar\t\\x89baz\"");
+        std::string expected = "\"\\\"foo\\nbar\\t\\\\x89baz\\\"";
         Y_EQUAL(ss.str(), expected);
     }
 
-    static void test_Newline()
+    void test_Newline()
     {
         std::stringstream ss;
         JsonWriter(ss)
@@ -68,5 +61,23 @@ namespace
         Y_EQUAL(ss.str(), expected);
     }
 
-    Y_TEST(test_SimpleObject, test_Newline);
+    void test_SimpleObject()
+    {
+        std::stringstream ss;
+        JsonWriter(ss)
+            .writeBeginObject()
+            .setValueName("name")
+            .writeBeginObject()
+            .writeEndObject()
+            .writeEndObject();
+        std::string expected =
+                "{\n"
+                "  \"name\": {}\n"
+                "}";
+        Y_EQUAL(ss.str(), expected);
+    }
+
+    Y_TEST(test_EscapedString,
+           test_Newline,
+           test_SimpleObject);
 }
