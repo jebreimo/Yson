@@ -7,6 +7,7 @@
 //****************************************************************************
 #include "JsonReader.hpp"
 
+#include <Ystring/Utf8.hpp>
 #include "GetValueType.hpp"
 #include "ParseDouble.hpp"
 #include "ParseInteger.hpp"
@@ -388,6 +389,9 @@ namespace Yson
             YSON_THROW("Current token is not a string.");
         }
         value.assign(token.first, token.second);
+        using namespace Ystring;
+        if (Utf8::hasEscapedCharacters(value, EscapeType::JSON))
+            value = Utf8::unescape(value, EscapeType::JSON);
     }
 
     bool JsonReader::nextDocument()

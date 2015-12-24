@@ -86,8 +86,6 @@ namespace Yson
 
         JsonWriter& writeValue(double value);
 
-        JsonWriter& writeValue(const char* value);
-
         JsonWriter& writeValue(const std::string& value);
 
         JsonWriter& writeValue(const std::wstring& value);

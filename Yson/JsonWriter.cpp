@@ -213,18 +213,16 @@ namespace Yson
         return writeValueImpl(value);
     }
 
-    JsonWriter& JsonWriter::writeValue(const char* value)
-    {
-        beginValue();
-        *m_Stream << "\"" << value << "\"";
-        m_State = AT_END_OF_VALUE;
-        return *this;
-    }
-
     JsonWriter& JsonWriter::writeValue(const std::string& value)
     {
         beginValue();
-        *m_Stream << "\"" << value << "\"";
+        *m_Stream << "\"";
+        using namespace Ystring;
+        if (!Utf8::hasUnescapedCharacters(value, EscapeType::JSON))
+            *m_Stream << value;
+        else
+            *m_Stream << Utf8::escape(value, EscapeType::JSON);
+        *m_Stream << "\"";
         m_State = AT_END_OF_VALUE;
         return *this;
     }

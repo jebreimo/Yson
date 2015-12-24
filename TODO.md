@@ -1,5 +1,3 @@
-* Escape characters in JsonWriter
-* Unescape character in JsonReader
 * Enable/disable escaping characters in JsonWriter
 * Enable/disable quotes around keys in JsonWriter
 * Make nextDocument more usable (requires peek-functionality in JsonTokenizer)

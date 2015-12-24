@@ -12,7 +12,7 @@ namespace
         std::stringstream ss;
         JsonWriter(ss)
             .writeValue("\"foo\nbar\t\\x89baz\"");
-        std::string expected = "\"\\\"foo\\nbar\\t\\\\x89baz\\\"";
+        std::string expected = "\"\\\"foo\\nbar\\t\\\\x89baz\\\"\"";
         Y_EQUAL(ss.str(), expected);
     }
 
