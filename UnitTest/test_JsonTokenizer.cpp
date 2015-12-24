@@ -59,7 +59,7 @@ namespace
     {
         Y_CALL(testNextToken("\"", JsonTokenType::END_OF_BUFFER, "\""));
         Y_CALL(testNextToken("\"\" ", JsonTokenType::STRING, "\"\""));
-        Y_CALL(testNextToken("\"\n", JsonTokenType::INVALID_TOKEN, "\"\n"));
+        Y_CALL(testNextToken("\"\n", JsonTokenType::INVALID_TOKEN, "\""));
         Y_CALL(testNextToken("\"\"\"", JsonTokenType::END_OF_BUFFER,
                              "\"\"\""));
         Y_CALL(testNextToken("\"\"\"\"", JsonTokenType::END_OF_BUFFER,
