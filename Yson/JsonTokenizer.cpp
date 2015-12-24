@@ -481,8 +481,8 @@ namespace Yson
 
     template <typename BiIt>
     JsonTokenType_t determineStringType(BiIt beg, BiIt end,
-                                                 size_t precedingQuotes,
-                                                 bool endOfFile)
+                                        size_t precedingQuotes,
+                                        bool endOfFile)
     {
         assert((beg != end && *beg == '"') || precedingQuotes != 0);
 
