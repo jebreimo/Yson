@@ -157,7 +157,7 @@ namespace Yson
         return *this;
     }
 
-    JsonWriter& JsonWriter::writeValue(bool value)
+    JsonWriter& JsonWriter::writeBool(bool value)
     {
         writeValue(value ? "true" : "false");
         return *this;

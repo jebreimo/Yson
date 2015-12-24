@@ -64,7 +64,7 @@ namespace Yson
 
         JsonWriter& writeNull();
 
-        JsonWriter& writeValue(bool value);
+        JsonWriter& writeBool(bool value);
 
         JsonWriter& writeValue(int8_t value);
 
