@@ -1,35 +1,52 @@
-A library for reading and writing JSON files.
+Yson - JSON serialization and de-serialization made easy
+========================================================
 
-The library has two main classes: JsonReader and JsonWriter. JsonReader is somewhat inspired by Microsoft's [XmlReader](https://msdn.microsoft.com/en-us/library/system.xml.xmlreader.aspx) and makes it easy to iterate through the contents of a JSON file. JsonWriter is similarly inspired by Microsoft's [XmlWriter](https://msdn.microsoft.com/en-us/library/system.xml.xmlwriter.aspx) and writes JSON contents directly to a stream or file.
+Yson provides classes for reading and writing JSON files, and is particularly well suited for serialization/de-serialization and processing very large JSON files. The library has two main classes: JsonReader and JsonWriter. JsonReader is somewhat inspired by .Net's [XmlReader](https://msdn.microsoft.com/en-us/library/system.xml.xmlreader.aspx) and makes it easy to iterate through the contents of a JSON file. JsonWriter is similarly inspired by .Net's [XmlWriter](https://msdn.microsoft.com/en-us/library/system.xml.xmlwriter.aspx) and writes JSON contents directly to a stream or file. 
 
 JsonReader
 ==========
 
+Main features
+-------------
+* Supports all standard text encodings plus more.
+* Supports various extensions to the basic JSON syntax, including JavaScript comments and multiple documents in the same file.
+* Memory-efficient and fairly fast when processing large files.
+
+The high-level interface of JsonReader consists of the following members:
+-------------------------------------------------------------------------
+* its two constructors, one taking in a std::istream, the other the name of a file.
+* *nextKey()* for advancing to the next key in a JSON-object.
+* *nextValue()* for advancing to the next value in a JSON-array or JSON-object.
+* *enter()* for entering the JSON-array or JSON-object starting at the current position in the file. nextKey() and nextValue() will only advance through the most recently entered structure, structures that haven been entered will be skipped entirely by next time either of the two functions is called.
+* *leave()* for leaving the most recently *entered* JSON-array or JSON-object.
+* *read(...)* for reading the current key or value.
+* *valueType()* returns the value type of the current key or value.
+
 Example
 -------
-
-To read a file name scores.json
+To read and process a file name scores.json
 
 ```json
-    [
-        {
-            "first-name": "Ben",
-            "last-name": "Benson",
-            "year-of-birth": 1970,
-            "score": 86.765
-        },
-        {
-            "first-name": "Carl",
-            "last-name": "Carlson",
-            "year-of-birth": 1980,
-            "score": 91.201
-        }
-    ]
+[
+    {
+        "first-name": "Ben",
+        "last-name": "Benson",
+        "year-of-birth": 1970,
+        "score": 86.765
+    },
+    {
+        "first-name": "Carl",
+        "last-name": "Carlson",
+        "year-of-birth": 1980,
+        "score": 91.201
+    }
+]
 ```
 
 Code
 
 ```cpp
+#include <iostream>
 #include <Yson/JsonReader.hpp>
 
 struct Person
@@ -40,14 +57,23 @@ struct Person
     double score;
 };
 
-Person readPerson(Yson::JsonReader& reader)
+Person deserializePerson(Yson::JsonReader& reader)
 {
     Person person;
+
+    // Enter the JSON object and make nextKey/nextValue apply there.
+    reader.enter();
+
+    // For each key in the object
     while (reader.nextKey())
     {
-        std::string key;
-        reader.read(key);
+        // Read the key
+        auto key = read<std::string>(reader);
+
+        // Advance the reader from the key to the value
         reader.nextValue();
+
+        // Depending on the key, read the corresponding value
         if (key == "first-name")
             reader.read(person.firstName);
         else if (key == "last-name")
@@ -57,67 +83,77 @@ Person readPerson(Yson::JsonReader& reader)
         else if (key == "score")
             reader.read(person.score);
     }
+
+    // Leave the JSON object an make nextKey/nextValue apply to the parent structure.
+    reader.leave();
+
     return person;
 }
 
 int main()
 {
-    Yson::JsonReader reader("scores.json");
     std::vector<Person> persons;
 
-    if (!reader.nextValue())
-        return 1; 
-    reader.enter();
-    while (reader.nextValue())
+    try
     {
+        // Open the file
+        Yson::JsonReader reader("scores.json");
+
+        // Advance to the top-level "value" in the file, i.e. the opening bracket.
+        if (!reader.nextValue())
+            return 1; // 
+
+        // Enter the top-level array and make nextValue apply there.
         reader.enter();
-        persons.push_back(readPerson(reader));
+    	
+        // Process each object inside the top-level array
+        while (reader.nextValue())
+        {
+            // Deserialize the Person in a separate function
+            persons.push_back(readPerson(reader));
+        }
+
+        // Leave the top-level array.
         reader.leave();
     }
-    reader.leave();
+    catch (Yson::JsonReaderException& ex)
+    {
+        std::cerr << ex << "\n";
+    }
+    	
+    // ...
 }
 ```
 
-The high-level interface of JsonReader consists of the following members:
+### The low-level interface supplements the high-level interface with the following members:
 
-* its two constructors, one taking in a std::istream, the other the name of a file.
-* nextKey() for advancing to the next key in a JSON-object.
-* nextValue() for advancing to the next value in a JSON-array or JSON-object.
-* enter() for entering the JSON-array or JSON-object starting at the current position in the file.
-* leave() for leaving the most recently *entered* JSON-array or JSON-object.
-* read(...) for reading the current key or value.
-* valueType() returns the value type of the current key or value.
-* isNull() checks if the current value is *null*.
+* *nextToken()* moves to the next token in the JSON contents, including whitespace and commas.
+* *tokenType()* returns the type of the current token.
+* *token()* returns the current token as string.
 
-The low-level interface supplements the high-level interface with the following members:
-
-* nextToken() moves to the next token in the JSON contents, including whitespace and commas.
-* tokenType() returns the type of the current token.
-* token() returns the current token as string.
-
-The following extensions to JSON are supported:
+### The following extensions to JSON are supported:
 
 * comments, both //... and /*...*/
 * multi-line strings """...."""
 * special integer formats (0x... for hexadecimals, 0o... for octals and 0b... for binary numbers)
 * non-string keys
 * single-word keys without quotes
-* and more...
+* multiple JSON top-level documents in a single file or stream (iterated over with *nextDocument()*).
 
-The following encodings are supported and automatically detected:
+### The following encodings are supported and automatically detected:
 
 * UTF-8 with and without BOM (plain ASCII is also treated as UTF-8)
 * UTF-16 little-endian and big-endian, with and without BOM
 * UTF-32 little-endian and big-endian, with and without BOM
 
-In addition these encodings are supported, but must be specified manually:
+### In addition these encodings are supported, but must be specified:
 
-* ISO8859-1
-* ISO8859-10
-* ISO8859-25
-* IBM437
-* IBM850
-* Windows1252
+* ISO8859-1 (Latin-1)
+* ISO8859-10 (Latin-6)
+* ISO8859-15 (Latin-10)
+* IBM437 (The default MSDOS codepage)
+* IBM850 (Western European MSDOS codepage)
+* Windows1252 (The U.S. / Western European Windows codepage)
 
 JsonWriter
 ==========
