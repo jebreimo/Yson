@@ -11,20 +11,17 @@
 
 namespace Yson
 {
-
     JsonReaderException::JsonReaderException()
         : std::logic_error("Unspecified error."),
           m_LineNumber(0),
           m_ColumnNumber(0)
-    {
-    }
+    {}
 
     JsonReaderException::JsonReaderException(const std::string& msg)
         : std::logic_error(msg),
           m_LineNumber(0),
           m_ColumnNumber(0)
-    {
-    }
+    {}
 
     JsonReaderException::JsonReaderException(
             const std::string& msg,
@@ -33,11 +30,14 @@ namespace Yson
             const std::string& funcName)
         : std::logic_error(msg)
     {
-        std::stringstream ss;
-        if (!funcName.empty())
-            ss << funcName << "() in ";
-        ss << sourceFileName << ":" << sourceFileLineNumber << ": " << msg;
-        m_Message = ss.str();
+        #ifndef NDEBUG
+            std::stringstream ss;
+            if (!funcName.empty())
+                ss << funcName << "() in ";
+            ss << sourceFileName << ":" << sourceFileLineNumber << ": "
+               << msg;
+            m_Message = ss.str();
+        #endif
     }
 
 
@@ -53,10 +53,12 @@ namespace Yson
           m_ColumnNumber(fileColumnNumber)
     {
         std::stringstream ss;
-        if (!funcName.empty())
-            ss << funcName << "() in ";
-        ss << sourceFileName << ":" << sourceFileLineNumber << ": "
-           << "On line " << fileLineNumber
+        #ifndef NDEBUG
+            if (!funcName.empty())
+                ss << funcName << "() in ";
+            ss << sourceFileName << ":" << sourceFileLineNumber << ": ";
+        #endif
+        ss << "On line " << fileLineNumber
            << ", column " << fileColumnNumber
            << ": " << msg;
         m_Message = ss.str();
