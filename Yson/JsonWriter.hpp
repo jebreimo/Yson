@@ -24,6 +24,8 @@ namespace Yson
 
         JsonWriter();
 
+        JsonWriter(const std::string& fileName);
+
         JsonWriter(std::ostream& stream);
 
         JsonWriter(std::unique_ptr<std::ostream>&& stream);

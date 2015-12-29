@@ -7,6 +7,7 @@
 //****************************************************************************
 #include "JsonWriter.hpp"
 
+#include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <Ystring/Utf8.hpp>
@@ -25,6 +26,17 @@ namespace Yson
           m_IndentationCharacter(' ')
     {}
 
+    JsonWriter::JsonWriter(const std::string& fileName)
+        : m_StreamPtr(new std::ofstream(fileName)),
+          m_State(AT_START_OF_VALUE_NO_COMMA),
+          m_Indentation(0),
+          m_IndentationWidth(2),
+          m_FormattingEnabled(true),
+          m_IndentationCharacter(' ')
+    {
+        m_Stream = m_StreamPtr.get();
+    }
+
     JsonWriter::JsonWriter(std::ostream& stream)
         : m_Stream(&stream),
           m_State(AT_START_OF_VALUE_NO_COMMA),
@@ -36,17 +48,17 @@ namespace Yson
 
     JsonWriter::JsonWriter(std::unique_ptr<std::ostream>&& stream)
         : m_StreamPtr(std::move(stream)),
-          m_Stream(stream.get()),
           m_State(AT_START_OF_VALUE_NO_COMMA),
           m_Indentation(0),
           m_IndentationWidth(2),
           m_FormattingEnabled(true),
           m_IndentationCharacter(' ')
-    {}
+    {
+        m_Stream = m_StreamPtr.get();
+    }
 
     JsonWriter::JsonWriter(JsonWriter&& rhs)
         : m_StreamPtr(std::move(rhs.m_StreamPtr)),
-          m_Stream(rhs.m_Stream),
           m_Context(std::move(rhs.m_Context)),
           m_ValueName(std::move(rhs.m_ValueName)),
           m_Indentation(rhs.m_Indentation),
@@ -54,6 +66,7 @@ namespace Yson
           m_FormattingEnabled(rhs.m_FormattingEnabled),
           m_IndentationCharacter(rhs.m_IndentationCharacter)
     {
+        m_Stream = m_StreamPtr.get();
         rhs.m_Stream = nullptr;
     }
 
