@@ -193,6 +193,25 @@ void test_NextDocument()
     Y_ASSERT(!reader.nextDocument());
 }
 
+void test_NextDocument_comments()
+{
+    std::string doc = "/* foo */ 7 /* bar */ 8 /* baz */";
+    std::istringstream ss(doc);
+    JsonReader reader(ss);
+    reader.setCommentsEnabled(true);
+    Y_ASSERT(reader.nextDocument());
+    Y_ASSERT(reader.nextValue());
+    Y_EQUAL(read<int32_t>(reader), 7);
+    Y_ASSERT(!reader.nextValue());
+
+    Y_ASSERT(reader.nextDocument());
+    Y_ASSERT(reader.nextValue());
+    Y_EQUAL(read<int32_t>(reader), 8);
+    Y_ASSERT(!reader.nextValue());
+
+    Y_ASSERT(!reader.nextDocument());
+}
+
 void test_RecoverFromError()
 {
     std::string doc = "[{\"1\": [{23: 4, : 4}],,}, {\"2\": 3}]";
@@ -250,5 +269,6 @@ Y_TEST(test_BlockString,
        test_IntegerError,
        test_LineAndColumnNumbers,
        test_NextDocument,
+       test_NextDocument_comments,
        test_RecoverFromError,
        test_ValuesAsStrings);

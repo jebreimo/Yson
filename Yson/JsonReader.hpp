@@ -39,7 +39,7 @@ namespace Yson {
                    Ystring::Encoding_t encoding = Ystring::Encoding::UNKNOWN);
 
         ~JsonReader();
-        
+
         /** @brief Advances the reader to the next key in the most recently
           *     entered JSON object.
           * @throws JsonReaderException if it encounters an error in the JSON
@@ -176,6 +176,8 @@ namespace Yson {
         void processWhitespace();
 
         void skipElement();
+
+        void skipWhitespace();
 
         std::pair<const char*, const char*> getValueToken() const;
 

@@ -148,13 +148,13 @@ namespace Yson
                     TokenRange(m_InternalBuffer.data(),
                                m_InternalBuffer.data()
                                + m_InternalBuffer.size()),
-                    makeRange(m_BufferStart, m_BufferEnd),
+                    makeRange(m_TokenEnd, m_BufferEnd),
                     isEndOfFile());
             return std::make_pair(result.tokenType, !result.isIncomplete);
         }
         else
         {
-            auto result = nextToken(makeRange(m_BufferStart, m_BufferEnd));
+            auto result = nextToken(makeRange(m_TokenEnd, m_BufferEnd));
             return std::make_pair(result.tokenType, !result.isIncomplete);
         }
     }

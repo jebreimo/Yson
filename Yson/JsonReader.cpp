@@ -418,8 +418,7 @@ namespace Yson
             }
         }
         m_State = AT_START_OF_DOCUMENT;
-        while (m_Tokenizer.peek().first == JsonTokenType::WHITESPACE)
-            nextTokenImpl();
+        skipWhitespace();
         return m_Tokenizer.peek().first != JsonTokenType::END_OF_BUFFER;
     }
 
@@ -920,6 +919,27 @@ namespace Yson
         }
     }
 
+    void JsonReader::skipWhitespace()
+    {
+        while (m_State != AT_END_OF_STREAM)
+        {
+            switch (m_Tokenizer.peek().first)
+            {
+            case JsonTokenType::COMMENT:
+            case JsonTokenType::BLOCK_COMMENT:
+                if (!isCommentsEnabled())
+                    return;
+                nextTokenImpl();
+                break;
+            case JsonTokenType::WHITESPACE:
+                nextTokenImpl();
+                break;
+            default:
+                return;
+            }
+        }
+    }
+
     std::pair<const char*, const char*> JsonReader::getValueToken() const
     {
         auto token = m_Tokenizer.rawToken();
@@ -966,5 +986,4 @@ namespace Yson
         if (value != unsignedValue)
             YSON_THROW("Overflow error while reading integer value.");
     }
-
 }

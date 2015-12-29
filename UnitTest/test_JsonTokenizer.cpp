@@ -134,6 +134,16 @@ namespace
         Y_CALL(peek("\"\"", JsonTokenType::STRING, false));
         Y_CALL(peek("\"\" ", JsonTokenType::STRING, true));
         Y_CALL(peek(" 1", JsonTokenType::WHITESPACE, true));
+
+        std::string txt = "1 2";
+        JsonTokenizer tokenizer;
+        tokenizer.setBuffer(txt.data(), txt.size());
+        Y_EQUAL(tokenizer.peek(), std::make_pair(JsonTokenType::VALUE, true));
+        tokenizer.next();
+        Y_EQUAL(tokenizer.peek(),
+                std::make_pair(JsonTokenType::WHITESPACE, true));
+        tokenizer.next();
+        Y_EQUAL(tokenizer.peek(), std::make_pair(JsonTokenType::VALUE, false));
     }
 
     void test_ValueTokens()
