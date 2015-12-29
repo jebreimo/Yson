@@ -1,6 +1,5 @@
 * Enable/disable escaping characters in JsonWriter
 * Enable/disable quotes around keys in JsonWriter
-* Make nextDocument more usable (requires peek-functionality in JsonTokenizer)
 
 Perhaps:
 * Convert null to 0 in read-int.

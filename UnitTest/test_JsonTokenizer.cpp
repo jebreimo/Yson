@@ -93,6 +93,12 @@ namespace
         Y_CALL(testNextToken("\"\"\"", "\"abra\"\"\"\"", "",
                              JsonTokenType::BLOCK_STRING,
                              "\"\"\"\"abra\"\"\"\""));
+        Y_CALL(testNextToken("\"\\", "\"\"", JsonTokenType::STRING,
+                             "\"\\\"\""));
+        Y_CALL(testNextToken("\"\\\\", "\"\"", JsonTokenType::STRING,
+                             "\"\\\\\""));
+        Y_CALL(testNextToken("\"\\\\\\", "\"\"", JsonTokenType::STRING,
+                             "\"\\\\\\\"\""));
     }
 
     void test_NewlineTokens()
@@ -106,6 +112,28 @@ namespace
         Y_CALL(testNextToken("\ra", JsonTokenType::NEWLINE, "\r"));
         Y_CALL(testNextToken("\r", "\r", JsonTokenType::NEWLINE, "\r"));
         Y_CALL(testNextToken("\r", "\n", JsonTokenType::NEWLINE, "\r\n"));
+    }
+
+    void peek(const std::string& txt, JsonTokenType_t expectedToken,
+              bool expectedCompleteToken)
+    {
+        JsonTokenizer tokenizer;
+        tokenizer.setBuffer(txt.data(), txt.size());
+        auto result = tokenizer.peek();
+        Y_EQUAL(result.first, expectedToken);
+        Y_EQUAL(result.second, expectedCompleteToken);
+    }
+
+    void test_Peek()
+    {
+        Y_CALL(peek("", JsonTokenType::END_OF_BUFFER, true));
+        Y_CALL(peek("\"", JsonTokenType::STRING, false));
+        Y_CALL(peek("0", JsonTokenType::VALUE, false));
+        Y_CALL(peek(" ", JsonTokenType::WHITESPACE, false));
+        Y_CALL(peek("0,", JsonTokenType::VALUE, true));
+        Y_CALL(peek("\"\"", JsonTokenType::STRING, false));
+        Y_CALL(peek("\"\" ", JsonTokenType::STRING, true));
+        Y_CALL(peek(" 1", JsonTokenType::WHITESPACE, true));
     }
 
     void test_ValueTokens()
@@ -123,14 +151,15 @@ namespace
         Y_CALL(testNextToken("--", "---", "--[ ", JsonTokenType::VALUE, "-------"));
         Y_CALL(testNextToken("--", "---", "--: ", JsonTokenType::VALUE, "-------"));
         Y_CALL(testNextToken("--", "---", "--\" ", JsonTokenType::VALUE, "-------"));
-        Y_CALL(testNextToken("/a ", JsonTokenType::VALUE, "/a"));
+        Y_CALL(testNextToken("/a ", JsonTokenType::INVALID_TOKEN, "/a"));
+        Y_CALL(testNextToken("/", "a", "", JsonTokenType::INVALID_TOKEN, "/a"));
         Y_CALL(testNextToken("8:", JsonTokenType::VALUE, "8"));
     }
 
     void test_CommentTokens()
     {
         Y_CALL(testNextToken("/", JsonTokenType::END_OF_BUFFER, "/"));
-        Y_CALL(testNextToken("/", "", JsonTokenType::VALUE, "/"));
+        Y_CALL(testNextToken("/", "", JsonTokenType::INVALID_TOKEN, "/"));
         Y_CALL(testNextToken("//", JsonTokenType::END_OF_BUFFER, "//"));
         Y_CALL(testNextToken("//", "", JsonTokenType::COMMENT, "//"));
         Y_CALL(testNextToken("//\n", JsonTokenType::COMMENT, "//"));
@@ -154,10 +183,14 @@ namespace
 
     void test_WhitespaceTokens()
     {
-        Y_CALL(testNextToken(" ", JsonTokenType::WHITESPACE, " "));
-        Y_CALL(testNextToken("\t", JsonTokenType::WHITESPACE, "\t"));
-        Y_CALL(testNextToken("\t ", JsonTokenType::WHITESPACE, "\t "));
-        Y_CALL(testNextToken(" \t ", JsonTokenType::WHITESPACE, " \t "));
+        Y_CALL(testNextToken(" 1", JsonTokenType::WHITESPACE, " "));
+        Y_CALL(testNextToken("\t1", JsonTokenType::WHITESPACE, "\t"));
+        Y_CALL(testNextToken("\t 1", JsonTokenType::WHITESPACE, "\t "));
+        Y_CALL(testNextToken(" \t 1", JsonTokenType::WHITESPACE, " \t "));
+        Y_CALL(testNextToken(" ", "", JsonTokenType::WHITESPACE, " "));
+        Y_CALL(testNextToken("\t", "", JsonTokenType::WHITESPACE, "\t"));
+        Y_CALL(testNextToken("\t", " 1", JsonTokenType::WHITESPACE, "\t "));
+        Y_CALL(testNextToken(" \t", " ", "", JsonTokenType::WHITESPACE, " \t "));
     }
 
     void testStructureToken(const std::string token,
@@ -241,7 +274,8 @@ namespace
         Y_CALL(testNextToken(tokenizer, JsonTokenType::WHITESPACE, " "));
         Y_CALL(testNextToken(tokenizer, JsonTokenType::END_OF_BUFFER,
                              "\"A value with\\"));
-        tokenizer.setBuffer(json1.c_str() + splits[0], json1.size() - splits[0]);
+        tokenizer.setBuffer(json1.c_str() + splits[0],
+                            json1.size() - splits[0]);
         Y_CALL(testNextToken(tokenizer, JsonTokenType::STRING,
                              "\"A value with\\n\\\"escaped characters\\\"\""));
     }
@@ -249,6 +283,7 @@ namespace
     Y_TEST(test_StringTokens,
            test_NewlineTokens,
            test_CommentTokens,
+           test_Peek,
            test_ValueTokens,
            test_WhitespaceTokens,
            test_StructureTokens,

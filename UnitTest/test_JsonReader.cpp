@@ -172,6 +172,7 @@ void test_NextDocument()
     std::string doc = "1 {\"2\": []} 3";
     std::istringstream ss(doc);
     JsonReader reader(ss);
+    Y_ASSERT(reader.nextDocument());
     Y_ASSERT(reader.nextValue());
     Y_EQUAL(read<int32_t>(reader), 1);
     Y_ASSERT(!reader.nextValue());
@@ -189,8 +190,6 @@ void test_NextDocument()
     Y_EQUAL(read<double>(reader), 3);
     Y_ASSERT(!reader.nextValue());
 
-    Y_ASSERT(reader.nextDocument());
-    Y_ASSERT(!reader.nextValue());
     Y_ASSERT(!reader.nextDocument());
 }
 

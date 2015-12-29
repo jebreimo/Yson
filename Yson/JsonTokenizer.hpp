@@ -22,6 +22,7 @@ namespace Yson
 
         bool hasNext() const;
         void next();
+        std::pair<JsonTokenType_t, bool> peek() const;
         JsonTokenType_t tokenType() const;
 
         const char* buffer() const;
@@ -34,26 +35,8 @@ namespace Yson
 
         void reset();
     private:
-        JsonTokenType_t nextToken();
-        JsonTokenType_t completeCurrentToken();
-        JsonTokenType_t completeCommentToken();
-        JsonTokenType_t completeStringToken();
-        JsonTokenType_t nextCommentToken();
-        JsonTokenType_t nextNewlineToken();
-        JsonTokenType_t nextStringToken();
-        JsonTokenType_t nextValueToken();
-        JsonTokenType_t findEndOfBlockComment(bool precededByStar);
-        JsonTokenType_t findEndOfBlockString(size_t precedingQuotes, bool escapeFirst);
-        JsonTokenType_t findEndOfLineComment();
-        JsonTokenType_t findEndOfNewline(bool precededByCr);
-        JsonTokenType_t findEndOfString(bool escapeFirst);
-        JsonTokenType_t findEndOfValue();
-        JsonTokenType_t findEndOfWhitespace();
-        bool endsWithEscape() const;
-        bool endsWithStar() const;
-        size_t countQuotesAtEnd() const;
         void appendTokenToInternalBuffer();
-        bool endOfFile() const;
+        bool isEndOfFile() const;
 
         const char* m_BufferStart;
         const char* m_BufferEnd;

@@ -396,10 +396,15 @@ namespace Yson
 
     bool JsonReader::nextDocument()
     {
-        while (m_State != AT_END_OF_DOCUMENT)
+        while (m_State != AT_END_OF_DOCUMENT
+               && m_State != AT_START_OF_DOCUMENT)
         {
             switch (m_State)
             {
+            case INITIAL_STATE:
+                fillBuffer();
+                m_State = AT_START_OF_DOCUMENT;
+                break;
             case AT_END_OF_STREAM:
                 return false;
             case AT_END_OF_OBJECT:
@@ -413,7 +418,9 @@ namespace Yson
             }
         }
         m_State = AT_START_OF_DOCUMENT;
-        return true;
+        while (m_Tokenizer.peek().first == JsonTokenType::WHITESPACE)
+            nextTokenImpl();
+        return m_Tokenizer.peek().first != JsonTokenType::END_OF_BUFFER;
     }
 
     bool JsonReader::isStringsAsValuesEnabled() const
@@ -578,8 +585,6 @@ namespace Yson
 
             switch (m_Tokenizer.tokenType())
             {
-            case JsonTokenType::INVALID_TOKEN:
-                YSON_THROW("Invalid token.");
             case JsonTokenType::START_ARRAY:
                 processStartArray();
                 break;
@@ -640,6 +645,8 @@ namespace Yson
                 processWhitespace();
                 m_LineNumberCounter.setNextLineAndColumnOffsets(1, 0);
                 break;
+            case JsonTokenType::INVALID_TOKEN:
+                YSON_THROW("Invalid token.");
             }
         } while (filledBuffer);
         return true;

@@ -26,11 +26,11 @@ namespace Yson
             BLOCK_STRING,
             /** A line comment, i.e. one that starts with //.
               */
-                    COMMENT,
+            COMMENT,
             /** @brief A comment that starts with \/\* and ends with *\/ and
               *     can span multiple lines.
               */
-                    BLOCK_COMMENT,
+            BLOCK_COMMENT,
             WHITESPACE,
             NEWLINE
         };
