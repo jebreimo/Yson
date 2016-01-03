@@ -11,6 +11,7 @@ Main features
 * Supports all standard text encodings plus more.
 * Supports various extensions to the basic JSON syntax, including JavaScript comments and multiple documents in the same file.
 * Memory-efficient and fairly fast when processing large files.
+* Released under the 2-clause *BSD Licence*.
 
 The high-level interface of JsonReader consists of the following members:
 -------------------------------------------------------------------------
