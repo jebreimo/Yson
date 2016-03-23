@@ -177,7 +177,12 @@ namespace Yson
 
     size_t JsonTokenizer::bufferSize() const
     {
-        return (size_t)(m_BufferEnd - m_BufferStart);
+        return size_t(m_BufferEnd - m_BufferStart);
+    }
+
+    size_t JsonTokenizer::currentPosition() const
+    {
+        return size_t(m_TokenEnd - m_BufferStart);
     }
 
     std::string JsonTokenizer::token() const

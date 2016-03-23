@@ -28,6 +28,7 @@ namespace Yson
         const char* buffer() const;
         void setBuffer(const char* buffer, size_t size);
         size_t bufferSize() const;
+        size_t currentPosition() const;
 
         std::string token() const;
 
