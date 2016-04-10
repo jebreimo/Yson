@@ -40,7 +40,7 @@ set(PRIVATE_HEADERS
     Yson/GetValueType.hpp
     Yson/ParseDouble.hpp
     Yson/ParseInteger.hpp
-    Yson/Range.hpp
+    Yson/Span.hpp
     Yson/TextFileReader.hpp
     Yson/TextReader.hpp
     )
