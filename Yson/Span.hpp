@@ -13,7 +13,7 @@
 namespace Yson
 {
     template <typename IteratorT>
-    class Range
+    class Span
     {
     public:
         typedef IteratorT Iterator;
@@ -22,14 +22,14 @@ namespace Yson
         typedef typename IteratorTraits::reference Reference;
         typedef typename IteratorTraits::difference_type DifferenceType;
 
-        Range()
+        Span()
         {}
 
-        Range(Iterator first, Iterator last)
+        Span(Iterator first, Iterator last)
             : m_Range(first, last)
         {}
 
-        explicit Range(std::pair<Iterator, Iterator> range)
+        explicit Span(std::pair<Iterator, Iterator> range)
             : m_Range(range)
         {}
 
@@ -78,75 +78,75 @@ namespace Yson
     };
 
     template <typename Iterator>
-    Iterator begin(Range<Iterator> range)
+    Iterator begin(Span<Iterator> range)
     {
         return range.begin();
     }
 
     template <typename Iterator>
-    Iterator end(Range<Iterator> range)
+    Iterator end(Span<Iterator> range)
     {
         return range.end();
     }
 
     template <typename Iterator>
-    bool isEmpty(const Range<Iterator>& range)
+    bool isEmpty(const Span<Iterator>& range)
     {
         return begin(range) == end(range);
     }
 
     template <typename Iterator>
-    Range<Iterator> makeRange(Iterator first, Iterator last)
+    Span<Iterator> makeSpan(Iterator first, Iterator last)
     {
-        return Range<Iterator>(first, last);
+        return Span<Iterator>(first, last);
     }
 
     template <typename Container>
-    auto makeRange(const Container& c) -> Range<decltype(begin(c))>
+    auto makeSpan(const Container& c) -> Span<decltype(begin(c))>
     {
-        return makeRange(begin(c), end(c));
+        return makeSpan(begin(c), end(c));
     }
 
     template <typename Container>
-    auto makeRange(Container& c) -> Range<decltype(begin(c))>
+    auto makeSpan(Container& c) -> Span<decltype(begin(c))>
     {
-        return makeRange(begin(c), end(c));
+        return makeSpan(begin(c), end(c));
     }
 
     template <typename T, size_t N>
-    Range<T*> makeArrayRange(T (&a)[N])
+    Span<T*> makeArraySpan(T (& a)[N])
     {
-        return makeRange<T*>(a, a + N - (a[N - 1] ? 0 : 1));
+        return makeSpan<T*>(a, a + N - (a[N - 1] ? 0 : 1));
     }
 
     template <typename T>
-    Range<T*> makeRange(T* s)
+    Span<T*> makeSpan(T* s)
     {
-        return makeRange(s, s + std::char_traits<T>::length(s));
+        return makeSpan(s, s + std::char_traits<T>::length(s));
     }
 
     template <typename Iterator>
-    Range<Iterator> makeRange(std::pair<Iterator, Iterator> p)
+    Span<Iterator> makeSpan(std::pair<Iterator, Iterator> p)
     {
-        return Range<Iterator>(p);
+        return Span<Iterator>(p);
     }
 
     template <typename Iterator>
-    Range<std::reverse_iterator<Iterator>>
-    makeReverseRange(Range<Iterator> range)
+    Span<std::reverse_iterator<Iterator>>
+    makeReverseSpan(Span<Iterator> range)
     {
-        return makeRange(std::reverse_iterator<Iterator>(range.end()),
+        return makeSpan(std::reverse_iterator<Iterator>(range.end()),
                          std::reverse_iterator<Iterator>(range.begin()));
     }
 
     template <typename Iterator>
-    size_t getSize(const Range<Iterator>& range)
+    size_t getSize(const Span<Iterator>& range)
     {
         return static_cast<size_t>(std::distance(begin(range), end(range)));
     }
 
     template <typename Container, typename Iterator>
-    Container fromRange(Range<Iterator> range)
+    Container fromSpan(Span<Iterator> range)
     {
         return Container(begin(range), end(range));
     }

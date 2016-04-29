@@ -10,13 +10,13 @@
 #include <algorithm>
 #include <cassert>
 #include <functional>
-#include "Range.hpp"
+#include "Span.hpp"
 
 namespace Yson
 {
     using namespace std::placeholders;
 
-    typedef Range<const char*> TokenRange;
+    typedef Span<const char*> TokenSpan;
 
     namespace {
         struct Result
@@ -40,60 +40,60 @@ namespace Yson
             bool isIncomplete;
         };
 
-        Result nextToken(TokenRange range);
+        Result nextToken(TokenSpan span);
 
-        Result completeToken(TokenRange firstPart, TokenRange secondPart,
+        Result completeToken(TokenSpan firstPart, TokenSpan secondPart,
                              bool isEndOfFile);
 
-        Result completeCommentToken(TokenRange firstPart,
-                                    TokenRange secondPart,
+        Result completeCommentToken(TokenSpan firstPart,
+                                    TokenSpan secondPart,
                                     bool isEndOfFile);
 
-        Result completeStringToken(TokenRange firstPart,
-                                   TokenRange secondPart, bool isEndOfFile);
+        Result completeStringToken(TokenSpan firstPart,
+                                   TokenSpan secondPart, bool isEndOfFile);
 
-        Result nextCommentToken(TokenRange range);
+        Result nextCommentToken(TokenSpan span);
 
-        Result nextStringToken(TokenRange range);
+        Result nextStringToken(TokenSpan span);
 
-        Result findEndOfBlockComment(TokenRange range, bool precededByStar,
+        Result findEndOfBlockComment(TokenSpan span, bool precededByStar,
                                      bool isEndOfFile);
 
-        Result findEndOfBlockString(TokenRange range, size_t precedingQuotes,
+        Result findEndOfBlockString(TokenSpan span, size_t precedingQuotes,
                                     bool escapeFirst, bool isEndOfFile);
 
-        Result findEndOfLineComment(TokenRange range, bool isEndOfFile);
+        Result findEndOfLineComment(TokenSpan span, bool isEndOfFile);
 
-        Result findEndOfNewline(TokenRange range, bool precededByCr,
+        Result findEndOfNewline(TokenSpan span, bool precededByCr,
                                 bool isEndOfFile);
 
-        Result findEndOfString(TokenRange range, bool escapeFirst,
+        Result findEndOfString(TokenSpan span, bool escapeFirst,
                                bool isEndOfFile);
 
-        Result findEndOfValue(TokenRange range, bool isEndOfFile);
+        Result findEndOfValue(TokenSpan span, bool isEndOfFile);
 
-        Result findEndOfWhitespace(TokenRange range, bool isEndOfFile);
+        Result findEndOfWhitespace(TokenSpan span, bool isEndOfFile);
 
-        bool endsWithEscape(TokenRange range);
+        bool endsWithEscape(TokenSpan span);
 
-        bool endsWithStar(TokenRange range);
+        bool endsWithStar(TokenSpan span);
 
-        size_t countQuotesAtEnd(TokenRange range);
+        size_t countQuotesAtEnd(TokenSpan span);
 
-        JsonTokenType_t determineCommentType(TokenRange range,
+        JsonTokenType_t determineCommentType(TokenSpan span,
                                              bool precededBySlash);
 
         std::pair<JsonTokenType_t, bool> determineStringType(
-                TokenRange range,
+                TokenSpan span,
                 size_t precedingQuotes,
                 bool isEndOfFile);
     }
 
     JsonTokenizer::JsonTokenizer()
-        : m_BufferStart(NULL),
-          m_BufferEnd(NULL),
-          m_TokenStart(NULL),
-          m_TokenEnd(NULL),
+        : m_BufferStart(nullptr),
+          m_BufferEnd(nullptr),
+          m_TokenStart(nullptr),
+          m_TokenEnd(nullptr),
           m_TokenType(JsonTokenType::INVALID_TOKEN)
     {}
 
@@ -112,7 +112,7 @@ namespace Yson
             || m_TokenType != JsonTokenType::END_OF_BUFFER)
         {
             m_InternalBuffer.clear();
-            auto result = nextToken(makeRange(m_TokenStart, m_BufferEnd));
+            auto result = nextToken(makeSpan(m_TokenStart, m_BufferEnd));
             m_TokenEnd = result.endOfToken;
             if (!result.isIncomplete)
             {
@@ -127,10 +127,10 @@ namespace Yson
         else
         {
             auto result = completeToken(
-                    TokenRange(m_InternalBuffer.data(),
+                    TokenSpan(m_InternalBuffer.data(),
                                m_InternalBuffer.data()
                                + m_InternalBuffer.size()),
-                    makeRange(m_BufferStart, m_BufferEnd),
+                    makeSpan(m_BufferStart, m_BufferEnd),
                     isEndOfFile());
             m_TokenType = result.isIncomplete ? JsonTokenType::END_OF_BUFFER
                                               : result.tokenType;
@@ -145,16 +145,16 @@ namespace Yson
             && m_TokenType == JsonTokenType::END_OF_BUFFER)
         {
             auto result = completeToken(
-                    TokenRange(m_InternalBuffer.data(),
+                    TokenSpan(m_InternalBuffer.data(),
                                m_InternalBuffer.data()
                                + m_InternalBuffer.size()),
-                    makeRange(m_TokenEnd, m_BufferEnd),
+                    makeSpan(m_TokenEnd, m_BufferEnd),
                     isEndOfFile());
             return std::make_pair(result.tokenType, !result.isIncomplete);
         }
         else
         {
-            auto result = nextToken(makeRange(m_TokenEnd, m_BufferEnd));
+            auto result = nextToken(makeSpan(m_TokenEnd, m_BufferEnd));
             return std::make_pair(result.tokenType, !result.isIncomplete);
         }
     }
@@ -177,13 +177,18 @@ namespace Yson
 
     size_t JsonTokenizer::bufferSize() const
     {
-        return (size_t)(m_BufferEnd - m_BufferStart);
+        return size_t(m_BufferEnd - m_BufferStart);
+    }
+
+    size_t JsonTokenizer::currentPosition() const
+    {
+        return size_t(m_TokenEnd - m_BufferStart);
     }
 
     std::string JsonTokenizer::token() const
     {
-        auto range = rawToken();
-        return std::string(range.first, range.second);
+        auto span = rawToken();
+        return std::string(span.first, span.second);
     }
 
     std::pair<const char*, const char*> JsonTokenizer::rawToken() const
@@ -195,8 +200,8 @@ namespace Yson
         else
         {
             return std::make_pair(
-                    &m_InternalBuffer[0],
-                    &m_InternalBuffer[0] + m_InternalBuffer.size());
+                    m_InternalBuffer.data(),
+                    m_InternalBuffer.data() + m_InternalBuffer.size());
         }
     }
 
@@ -205,11 +210,6 @@ namespace Yson
         m_TokenStart = m_TokenEnd = m_BufferStart;
         m_TokenType = JsonTokenType::INVALID_TOKEN;
         m_InternalBuffer.clear();
-    }
-
-    bool JsonTokenizer::isEndOfFile() const
-    {
-        return m_BufferStart == m_BufferEnd;
     }
 
     void JsonTokenizer::appendTokenToInternalBuffer()
@@ -224,8 +224,13 @@ namespace Yson
         }
     }
 
+    bool JsonTokenizer::isEndOfFile() const
+    {
+        return m_BufferStart == m_BufferEnd;
+    }
+
     namespace {
-        Result completeToken(TokenRange firstPart, TokenRange secondPart,
+        Result completeToken(TokenSpan firstPart, TokenSpan secondPart,
                              bool isEndOfFile)
         {
             switch (firstPart.front())
@@ -247,8 +252,8 @@ namespace Yson
             }
         }
 
-        Result completeCommentToken(TokenRange firstPart,
-                                    TokenRange secondPart,
+        Result completeCommentToken(TokenSpan firstPart,
+                                    TokenSpan secondPart,
                                     bool isEndOfFile)
         {
             auto tokenType = determineCommentType(firstPart, false);
@@ -279,8 +284,8 @@ namespace Yson
             return result;
         }
 
-        Result completeStringToken(TokenRange firstPart,
-                                   TokenRange secondPart, bool isEndOfFile)
+        Result completeStringToken(TokenSpan firstPart,
+                                   TokenSpan secondPart, bool isEndOfFile)
         {
             auto tokenType = determineStringType(firstPart, 0, false);
             if (!tokenType.second)
@@ -320,101 +325,101 @@ namespace Yson
             }
         }
 
-        Result nextToken(TokenRange range)
+        Result nextToken(TokenSpan span)
         {
-            if (isEmpty(range))
-                return Result(JsonTokenType::END_OF_BUFFER, range.end());
-            switch (range.front())
+            if (isEmpty(span))
+                return Result(JsonTokenType::END_OF_BUFFER, span.end());
+            switch (span.front())
             {
             case ' ':
             case '\t':
-                return findEndOfWhitespace(range, false);
+                return findEndOfWhitespace(span, false);
             case '\r':
             case '\n':
-                return findEndOfNewline(range, false, false);
+                return findEndOfNewline(span, false, false);
             case '[':
-                return Result(JsonTokenType::START_ARRAY, range.begin() + 1);
+                return Result(JsonTokenType::START_ARRAY, span.begin() + 1);
             case ']':
-                return Result(JsonTokenType::END_ARRAY, range.begin() + 1);
+                return Result(JsonTokenType::END_ARRAY, span.begin() + 1);
             case '{':
-                return Result(JsonTokenType::START_OBJECT, range.begin() + 1);
+                return Result(JsonTokenType::START_OBJECT, span.begin() + 1);
             case '}':
-                return Result(JsonTokenType::END_OBJECT, range.begin() + 1);
+                return Result(JsonTokenType::END_OBJECT, span.begin() + 1);
             case ':':
-                return Result(JsonTokenType::COLON, range.begin() + 1);
+                return Result(JsonTokenType::COLON, span.begin() + 1);
             case ',':
-                return Result(JsonTokenType::COMMA, range.begin() + 1);
+                return Result(JsonTokenType::COMMA, span.begin() + 1);
             case '"':
-                return nextStringToken(range);
+                return nextStringToken(span);
             case '/':
-                return nextCommentToken(range);
+                return nextCommentToken(span);
             default:
-                return findEndOfValue(range, false);
+                return findEndOfValue(span, false);
             }
         }
 
-        Result nextCommentToken(TokenRange range)
+        Result nextCommentToken(TokenSpan span)
         {
-            assert(!isEmpty(range));
-            assert(range.front() == '/');
+            assert(!isEmpty(span));
+            assert(span.front() == '/');
 
-            auto tokenType = determineCommentType(range, false);
+            auto tokenType = determineCommentType(span, false);
             if (tokenType == JsonTokenType::VALUE)
             {
-                auto result = findEndOfValue(range, false);
+                auto result = findEndOfValue(span, false);
                 result.tokenType = JsonTokenType::INVALID_TOKEN;
                 return result;
             }
 
             if (tokenType == JsonTokenType::END_OF_BUFFER)
-                return Result(JsonTokenType::COMMENT, range.end(), true);
+                return Result(JsonTokenType::COMMENT, span.end(), true);
 
-            range.begin() += 2;
+            span.begin() += 2;
 
             if (tokenType == JsonTokenType::COMMENT)
-                return findEndOfLineComment(range, false);
+                return findEndOfLineComment(span, false);
             else
-                return findEndOfBlockComment(range, false, false);
+                return findEndOfBlockComment(span, false, false);
         }
 
-        Result nextStringToken(TokenRange range)
+        Result nextStringToken(TokenSpan span)
         {
-            auto tokenType = determineStringType(range, 0, false);
+            auto tokenType = determineStringType(span, 0, false);
             if (!tokenType.second)
-                return Result(tokenType.first, range.end(), true);
+                return Result(tokenType.first, span.end(), true);
             if (tokenType.first == JsonTokenType::BLOCK_STRING)
             {
-                range.begin() += 3;
-                return findEndOfBlockString(range, 0, false, false);
+                span.begin() += 3;
+                return findEndOfBlockString(span, 0, false, false);
             }
             if (tokenType.first != JsonTokenType::STRING)
-                return Result(tokenType.first, range.end(), false);
+                return Result(tokenType.first, span.end(), false);
 
-            range.begin() += 1;
-            return findEndOfString(range, false, false);
+            span.begin() += 1;
+            return findEndOfString(span, false, false);
         }
 
-        Result findEndOfBlockComment(TokenRange range, bool precededByStar,
+        Result findEndOfBlockComment(TokenSpan span, bool precededByStar,
                                      bool isEndOfFile)
         {
-            for (auto it = range.begin(); it != range.end(); ++it)
+            for (auto it = span.begin(); it != span.end(); ++it)
             {
                 if (*it == '/' && precededByStar)
                     return Result(JsonTokenType::BLOCK_COMMENT, ++it);
                 precededByStar = *it == '*';
             }
             if (isEndOfFile)
-                return Result(JsonTokenType::INVALID_TOKEN, range.end());
-            return Result(JsonTokenType::BLOCK_COMMENT, range.end(), true);
+                return Result(JsonTokenType::INVALID_TOKEN, span.end());
+            return Result(JsonTokenType::BLOCK_COMMENT, span.end(), true);
         }
 
-        Result findEndOfBlockString(TokenRange range, size_t precedingQuotes,
+        Result findEndOfBlockString(TokenSpan span, size_t precedingQuotes,
                                     bool escapeFirst, bool isEndOfFile)
         {
             assert(!escapeFirst || precedingQuotes == 0);
 
             auto quotes = precedingQuotes;
-            for (auto it = range.begin(); it != range.end(); ++it)
+            for (auto it = span.begin(); it != span.end(); ++it)
             {
                 if (escapeFirst)
                     escapeFirst = false;
@@ -426,31 +431,31 @@ namespace Yson
                     return Result(JsonTokenType::BLOCK_STRING, it);
             }
             if (!isEndOfFile)
-                return Result(JsonTokenType::BLOCK_STRING, range.end(), true);
+                return Result(JsonTokenType::BLOCK_STRING, span.end(), true);
             else if (quotes >= 3)
-                return Result(JsonTokenType::BLOCK_STRING, range.end());
+                return Result(JsonTokenType::BLOCK_STRING, span.end());
             else
-                return Result(JsonTokenType::INVALID_TOKEN, range.end());
+                return Result(JsonTokenType::INVALID_TOKEN, span.end());
         }
 
-        Result findEndOfLineComment(TokenRange range, bool isEndOfFile)
+        Result findEndOfLineComment(TokenSpan span, bool isEndOfFile)
         {
-            for (auto it = range.begin(); it != range.end(); ++it)
+            for (auto it = span.begin(); it != span.end(); ++it)
             {
                 if (*it == '\r' || *it == '\n')
                     return Result(JsonTokenType::COMMENT, it);
             }
-            return Result(JsonTokenType::COMMENT, range.end(), !isEndOfFile);
+            return Result(JsonTokenType::COMMENT, span.end(), !isEndOfFile);
         }
 
-        Result findEndOfNewline(TokenRange range, bool precededByCr,
+        Result findEndOfNewline(TokenSpan span, bool precededByCr,
                                 bool isEndOfFile)
         {
             assert(precededByCr
-                   || (!isEmpty(range)
-                       && (range.front() == '\n' || range.front() == '\r')));
+                   || (!isEmpty(span)
+                       && (span.front() == '\n' || span.front() == '\r')));
 
-            for (auto it = range.begin(); it != range.end(); ++it)
+            for (auto it = span.begin(); it != span.end(); ++it)
             {
                 if (*it == '\n')
                     return Result(JsonTokenType::NEWLINE, ++it);
@@ -458,14 +463,14 @@ namespace Yson
                     return Result(JsonTokenType::NEWLINE, it);
                 precededByCr = true;
             }
-            return Result(JsonTokenType::NEWLINE, range.end(), !isEndOfFile);
+            return Result(JsonTokenType::NEWLINE, span.end(), !isEndOfFile);
         }
 
-        Result findEndOfString(TokenRange range, bool escapeFirst,
+        Result findEndOfString(TokenSpan span, bool escapeFirst,
                                bool isEndOfFile)
         {
             bool valid = true;
-            for (auto it = range.begin(); it != range.end(); ++it)
+            for (auto it = span.begin(); it != span.end(); ++it)
             {
                 if (*it < 0x20)
                 {
@@ -489,14 +494,14 @@ namespace Yson
                 }
             }
             if (isEndOfFile)
-                return Result(JsonTokenType::INVALID_TOKEN, range.end());
+                return Result(JsonTokenType::INVALID_TOKEN, span.end());
             else
-                return Result(JsonTokenType::STRING, range.end(), true);
+                return Result(JsonTokenType::STRING, span.end(), true);
         }
 
-        Result findEndOfValue(TokenRange range, bool isEndOfFile)
+        Result findEndOfValue(TokenSpan span, bool isEndOfFile)
         {
-            for (auto it = range.begin(); it != range.end(); ++it)
+            for (auto it = span.begin(); it != span.end(); ++it)
             {
                 switch (*it)
                 {
@@ -516,58 +521,58 @@ namespace Yson
                     break;
                 }
             }
-            return Result(JsonTokenType::VALUE, range.end(), !isEndOfFile);
+            return Result(JsonTokenType::VALUE, span.end(), !isEndOfFile);
         }
 
-        Result findEndOfWhitespace(TokenRange range, bool isEndOfFile)
+        Result findEndOfWhitespace(TokenSpan span, bool isEndOfFile)
         {
-            for (auto it = range.begin(); it != range.end(); ++it)
+            for (auto it = span.begin(); it != span.end(); ++it)
             {
                 if (*it != ' ' && *it != '\t')
                     return Result(JsonTokenType::WHITESPACE, it);
             }
-            return Result(JsonTokenType::WHITESPACE, range.end(),
+            return Result(JsonTokenType::WHITESPACE, span.end(),
                           !isEndOfFile);
         }
 
-        bool endsWithEscape(TokenRange range)
+        bool endsWithEscape(TokenSpan span)
         {
-            auto revRange = makeReverseRange(range);
-            auto end = std::find_if(revRange.begin(), revRange.end(),
+            auto revSpan = makeReverseSpan(span);
+            auto end = std::find_if(revSpan.begin(), revSpan.end(),
                                     [](char c){return c != '\\';});
-            return std::distance(revRange.begin(), end) % 2 == 1;
+            return std::distance(revSpan.begin(), end) % 2 == 1;
         }
 
-        bool endsWithStar(TokenRange range)
+        bool endsWithStar(TokenSpan span)
         {
-            return range.size() > 2 && range.back() == '*';
+            return span.size() > 2 && span.back() == '*';
         }
 
-        size_t countQuotesAtEnd(TokenRange range)
+        size_t countQuotesAtEnd(TokenSpan span)
         {
-            auto revRange = makeReverseRange(range);
-            auto qend = std::find_if(revRange.begin(), revRange.end(),
+            auto revSpan = makeReverseSpan(span);
+            auto qend = std::find_if(revSpan.begin(), revSpan.end(),
                                      [](char c){return c != '"';});
-            auto quotes = std::distance(revRange.begin(), qend);
+            auto quotes = std::distance(revSpan.begin(), qend);
             if  (quotes == 0)
                 return 0;
-            auto eend = std::find_if(qend, revRange.end(),
+            auto eend = std::find_if(qend, revSpan.end(),
                                      [](char c){return c != '\\';});
             bool escaped = std::distance(qend, eend) % 2 == 1;
             return size_t(quotes) - (escaped ? 1 : 0);
         }
 
         std::pair<JsonTokenType_t, bool> determineStringType(
-                TokenRange range,
+                TokenSpan span,
                 size_t precedingQuotes,
                 bool isEndOfFile)
         {
-            assert((!isEmpty(range) && range.front() == '"')
+            assert((!isEmpty(span) && span.front() == '"')
                    || precedingQuotes != 0);
 
             size_t quotes = precedingQuotes;
-            auto it = range.begin();
-            while (it != range.end() && *it == '"' && quotes < 3)
+            auto it = span.begin();
+            while (it != span.end() && *it == '"' && quotes < 3)
             {
                 ++it;
                 ++quotes;
@@ -575,7 +580,7 @@ namespace Yson
 
             if (quotes == 3)
                 return std::make_pair(JsonTokenType::BLOCK_STRING, true);
-            else if (it != range.end())
+            else if (it != span.end())
                 // Ignores on purpose the case where quotes is 0. This
                 // function won't be called unless *beg is '"'
                 // or precedingQuotes > 0.
@@ -588,12 +593,12 @@ namespace Yson
                 return std::make_pair(JsonTokenType::INVALID_TOKEN, true);
         }
 
-        JsonTokenType_t determineCommentType(TokenRange range,
+        JsonTokenType_t determineCommentType(TokenSpan span,
                                              bool precededBySlash)
         {
             assert(precededBySlash
-                   || (!isEmpty(range) && range.front() == '/'));
-            for (auto it = range.begin(); it != range.end(); ++it)
+                   || (!isEmpty(span) && span.front() == '/'));
+            for (auto it = span.begin(); it != span.end(); ++it)
             {
                 if (*it == '*' && precededBySlash)
                     return JsonTokenType::BLOCK_COMMENT;
