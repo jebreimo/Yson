@@ -66,7 +66,11 @@ namespace Yson
 
         JsonWriter& writeNull();
 
+        JsonWriter& writeNull(const std::string& name);
+
         JsonWriter& writeBool(bool value);
+
+        JsonWriter& writeBool(const std::string& name, bool value);
 
         JsonWriter& writeValue(int8_t value);
 
@@ -127,6 +131,8 @@ namespace Yson
         void writeIndentationImpl();
         template <typename T>
         JsonWriter& writeValueImpl(T value);
+        template <typename T>
+        JsonWriter& writeFloatValueImpl(T value);
 
         struct Context
         {
@@ -156,6 +162,11 @@ namespace Yson
             AFTER_COMMA
         };
 
+        enum LanguageExtensions
+        {
+          EXTENDED_FLOATS = 1
+        };
+
         std::unique_ptr<std::ostream> m_StreamPtr;
         std::ostream* m_Stream;
         std::stack<Context> m_Context;
@@ -163,6 +174,7 @@ namespace Yson
         State m_State;
         unsigned m_Indentation;
         unsigned m_IndentationWidth;
+        int m_LanguagExtentions;
         bool m_FormattingEnabled;
         char m_IndentationCharacter;
     };

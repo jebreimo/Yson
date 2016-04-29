@@ -142,7 +142,8 @@ namespace Yson {
             BLOCK_STRINGS = 16,
             ENTER_NULL = 32,
             VALUES_AS_KEYS = 64,
-            EXTENDED_INTEGERS = 128
+            EXTENDED_INTEGERS = 128,
+            EXTENDED_FLOATS = 256
         };
 
         bool languageExtension(LanguageExtensions ext) const;
