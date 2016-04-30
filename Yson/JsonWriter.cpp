@@ -7,6 +7,7 @@
 //****************************************************************************
 #include "JsonWriter.hpp"
 
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
@@ -23,6 +24,7 @@ namespace Yson
           m_State(AT_START_OF_VALUE_NO_COMMA),
           m_Indentation(0),
           m_IndentationWidth(2),
+          m_LanguagExtentions(EXTENDED_FLOATS),
           m_FormattingEnabled(true),
           m_IndentationCharacter(' ')
     {}
@@ -32,6 +34,7 @@ namespace Yson
           m_State(AT_START_OF_VALUE_NO_COMMA),
           m_Indentation(0),
           m_IndentationWidth(2),
+          m_LanguagExtentions(EXTENDED_FLOATS),
           m_FormattingEnabled(true),
           m_IndentationCharacter(' ')
     {
@@ -43,6 +46,7 @@ namespace Yson
           m_State(AT_START_OF_VALUE_NO_COMMA),
           m_Indentation(0),
           m_IndentationWidth(2),
+          m_LanguagExtentions(EXTENDED_FLOATS),
           m_FormattingEnabled(true),
           m_IndentationCharacter(' ')
     {}
@@ -52,6 +56,7 @@ namespace Yson
           m_State(AT_START_OF_VALUE_NO_COMMA),
           m_Indentation(0),
           m_IndentationWidth(2),
+          m_LanguagExtentions(EXTENDED_FLOATS),
           m_FormattingEnabled(true),
           m_IndentationCharacter(' ')
     {
@@ -64,6 +69,7 @@ namespace Yson
           m_ValueName(std::move(rhs.m_ValueName)),
           m_Indentation(rhs.m_Indentation),
           m_IndentationWidth(rhs.m_IndentationWidth),
+          m_LanguagExtentions(EXTENDED_FLOATS),
           m_FormattingEnabled(rhs.m_FormattingEnabled),
           m_IndentationCharacter(rhs.m_IndentationCharacter)
     {
@@ -171,10 +177,22 @@ namespace Yson
         return *this;
     }
 
+    JsonWriter& JsonWriter::writeNull(const std::string& name)
+    {
+        setValueName(name);
+        return writeNull();
+    }
+
     JsonWriter& JsonWriter::writeBool(bool value)
     {
         writeValue(value ? "true" : "false");
         return *this;
+    }
+
+    JsonWriter& JsonWriter::writeBool(const std::string& name, bool value)
+    {
+        setValueName(name);
+        return writeBool(value);
     }
 
     JsonWriter& JsonWriter::writeValue(int8_t value)
@@ -219,12 +237,12 @@ namespace Yson
 
     JsonWriter& JsonWriter::writeValue(float value)
     {
-        return writeValueImpl(value);
+        return writeFloatValueImpl(value);
     }
 
     JsonWriter& JsonWriter::writeValue(double value)
     {
-        return writeValueImpl(value);
+        return writeFloatValueImpl(value);
     }
 
     JsonWriter& JsonWriter::writeValue(const std::string& value)
@@ -528,6 +546,35 @@ namespace Yson
     {
         beginValue();
         *m_Stream << value;
+        m_State = AT_END_OF_VALUE;
+        return *this;
+    }
+
+    template <typename T>
+    JsonWriter& JsonWriter::writeFloatValueImpl(T value)
+    {
+        beginValue();
+        if (std::isfinite(value))
+        {
+            *m_Stream << value;
+        }
+        else if ((m_LanguagExtentions & EXTENDED_FLOATS) == 0)
+        {
+            JSONWRITER_THROW(std::string("Illegal floating point value '")
+                             + std::to_string(value) + "'");
+        }
+        else if (std::isnan(value))
+        {
+            *m_Stream << "NaN";
+        }
+        else if (value < 0)
+        {
+            *m_Stream << "-infinity";
+        }
+        else
+        {
+            *m_Stream << "infinity";
+        }
         m_State = AT_END_OF_VALUE;
         return *this;
     }
