@@ -5,7 +5,7 @@
 // This file is distributed under the Simplified BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include "Utf8String.hpp"
+#include "Escape.hpp"
 
 #include "../Encodings/EncodeUtf8.hpp"
 #include "DecoderAlgorithms.hpp"

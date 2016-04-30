@@ -12,7 +12,7 @@
 #include <iostream>
 #include <stdexcept>
 #include "../Ystring/Conversion.hpp"
-#include "../Ystring/Utf8.hpp"
+#include "../Ystring/Escape/Escape.hpp"
 
 #define JSONWRITER_THROW(msg) \
     throw std::logic_error(msg)

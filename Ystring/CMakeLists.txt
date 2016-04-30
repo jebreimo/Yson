@@ -15,7 +15,6 @@ set(PRIVATE_HEADERS
     Endianness.hpp
     PlatformDetails.hpp
     PrivatePlatformDetails.hpp
-    Utf8.hpp
     YstringDefinitions.hpp
     YstringException.hpp
     Conversion/AbstractDecoder.hpp
@@ -42,9 +41,9 @@ set(PRIVATE_HEADERS
     Encodings/EncodeUtf32.hpp
     Encodings/EncodeUtf8-impl.hpp
     Encodings/EncodeUtf8.hpp
-    Utf8/DecoderAlgorithms.hpp
+    Escape/DecoderAlgorithms.hpp
     Unicode/UnicodeChars.hpp
-    Utf8/Utf8String.hpp
+    Escape/Escape.hpp
     Utilities/Endian.hpp
     Utilities/Iterators.hpp
     Utilities/Union16.hpp
@@ -60,7 +59,7 @@ set(SOURCE_FILES
     Conversion/Utf8Decoder.cpp
     Conversion/Utf8Encoder.cpp
     Encodings/EncodeUtf8.cpp
-    Utf8/Utf8String.cpp
+    Escape/Escape.cpp
     )
 
 add_library(

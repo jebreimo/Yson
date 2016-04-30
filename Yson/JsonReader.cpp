@@ -8,7 +8,7 @@
 #include "JsonReader.hpp"
 
 #include "../Ystring/Conversion.hpp"
-#include "../Ystring/Utf8.hpp"
+#include "../Ystring/Escape/Escape.hpp"
 #include "GetValueType.hpp"
 #include "ParseDouble.hpp"
 #include "ParseInteger.hpp"
