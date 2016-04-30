@@ -20,13 +20,6 @@ elseif(WIN32)
                     -DYSTRING_NO_AUTO_IMPORT)
 endif(APPLE)
 
-set(CMAKE_MODULE_PATH
-    "${CMAKE_SOURCE_DIR}/cmake/Modules"
-    ${CMAKE_MODULE_PATH})
-
-#find_package(Ystring REQUIRED)
-#include_directories(${YSTRING_INCLUDE_DIR})
-
 add_subdirectory(Ystring)
 
 set(PUBLIC_HEADERS
@@ -77,10 +70,6 @@ set_target_properties(
     PROPERTIES
         MACOSX_RPATH ON
         DEBUG_OUTPUT_NAME "${PROJECT_NAME}.debug")
-
-#target_link_libraries(${PROJECT_NAME}
-#                      optimized ${YSTRING_LIBRARY}
-#                      debug ${YSTRING_DEBUG_LIBRARY})
 
 if (HAS_YTEST)
      set(CTEST_OUTPUT_ON_FAILURE 1)
