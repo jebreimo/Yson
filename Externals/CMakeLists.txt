@@ -7,9 +7,8 @@
 ##****************************************************************************
 cmake_minimum_required(VERSION 2.8)
 
-#add_subdirectory(Ytest)
-
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Ytest/CMakeLists.txt")
+    remove_definitions(-DYstring=Yson_Ystring)
     add_subdirectory(Ytest)
     set(HAS_YTEST true PARENT_SCOPE)
 endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Ytest/CMakeLists.txt")

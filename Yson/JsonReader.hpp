@@ -12,7 +12,6 @@
 #include <memory>
 #include <stack>
 #include <string>
-#include "../Ystring/Encoding.hpp"
 #include "JsonReaderException.hpp"
 #include "JsonTokenizer.hpp"
 #include "LineNumberCounter.hpp"
