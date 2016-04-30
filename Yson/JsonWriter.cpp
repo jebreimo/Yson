@@ -10,7 +10,8 @@
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
-#include <Ystring/Utf8.hpp>
+#include "../Ystring/Conversion.hpp"
+#include "../Ystring/Utf8.hpp"
 
 #define JSONWRITER_THROW(msg) \
     throw std::logic_error(msg)
@@ -231,10 +232,10 @@ namespace Yson
         beginValue();
         *m_Stream << "\"";
         using namespace Ystring;
-        if (!Utf8::hasUnescapedCharacters(value, EscapeType::JSON))
+        if (!Utf8::hasUnescapedCharacters(value))
             *m_Stream << value;
         else
-            *m_Stream << Utf8::escape(value, EscapeType::JSON);
+            *m_Stream << Utf8::escape(value);
         *m_Stream << "\"";
         m_State = AT_END_OF_VALUE;
         return *this;
@@ -243,9 +244,11 @@ namespace Yson
     JsonWriter& JsonWriter::writeValue(const std::wstring& value)
     {
         beginValue();
-        *m_Stream << "\""
-                  << Ystring::Utf8::toUtf8(value, Ystring::Encoding::UTF_16)
-                  << "\"";
+        auto valueUtf8 = Ystring::Conversion::convert<std::string>(
+                value,
+                Ystring::Encoding::UTF_16,
+                Ystring::Encoding::UTF_8);
+        *m_Stream << "\"" << std::move(valueUtf8) << "\"";
         m_State = AT_END_OF_VALUE;
         return *this;
     }

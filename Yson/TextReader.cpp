@@ -9,7 +9,8 @@
 
 #include <algorithm>
 #include <istream>
-#include <Ystring/Conversion/Converter.hpp>
+#include "../Ystring/Conversion.hpp"
+#include "../Ystring/EncodingInfo.hpp"
 
 namespace Yson {
 
@@ -47,12 +48,14 @@ namespace Yson {
         auto initialBufferSize = m_Buffer.size();
         m_Buffer.resize(initialBufferSize + bytes);
         m_Stream->read(m_Buffer.data() + initialBufferSize, bytes);
+
         auto readBytes = static_cast<size_t>(m_Stream->gcount());
         if (readBytes < bytes)
             m_Buffer.resize(initialBufferSize + readBytes);
 
         if (m_Stream->bad() || readBytes == 0)
             return false;
+
         const char* bufferStart = m_Buffer.data();
         auto bufferSize = m_Buffer.size();
         if (!m_Converter)
@@ -65,6 +68,7 @@ namespace Yson {
             m_Converter.reset(new Conversion::Converter(
                     encoding.first, m_DestinationEncoding));
         }
+
         auto convertedBytes = m_Converter->convert(
                 bufferStart, bufferSize, destination);
         if (convertedBytes == bufferSize)

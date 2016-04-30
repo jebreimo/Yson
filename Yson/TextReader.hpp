@@ -8,8 +8,7 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include <Ystring/Encoding.hpp>
-#include <Ystring/EncodingInfo.hpp>
+#include "../Ystring/Encoding.hpp"
 #include "YsonDefinitions.hpp"
 
 namespace Ystring { namespace Conversion {

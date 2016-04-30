@@ -246,7 +246,6 @@ namespace Yson
             case ' ':
             case '\t':
                 return findEndOfWhitespace(secondPart, isEndOfFile);
-            case '0':
             default:
                 return findEndOfValue(secondPart, isEndOfFile);
             }

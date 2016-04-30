@@ -7,7 +7,8 @@
 //****************************************************************************
 #include "JsonReader.hpp"
 
-#include <Ystring/Utf8.hpp>
+#include "../Ystring/Conversion.hpp"
+#include "../Ystring/Utf8.hpp"
 #include "GetValueType.hpp"
 #include "ParseDouble.hpp"
 #include "ParseInteger.hpp"
@@ -71,15 +72,18 @@ namespace Yson
         }
     }
 
-    JsonReader::JsonReader(std::istream& stream, Encoding_t encoding)
-        : m_TextReader(new TextReader(stream, encoding, Encoding::UTF_8)),
+    JsonReader::JsonReader(std::istream& stream)
+        : m_TextReader(new TextReader(stream,
+                                      Ystring::Encoding::UNKNOWN,
+                                      Encoding::UTF_8)),
           m_State(INITIAL_STATE),
           m_LanguagExtentions(0),
           m_SkipElementDepth(0)
     {}
 
-    JsonReader::JsonReader(const std::string& fileName, Encoding_t encoding)
-        : m_TextReader(new TextFileReader(fileName, encoding,
+    JsonReader::JsonReader(const std::string& fileName)
+        : m_TextReader(new TextFileReader(fileName,
+                                          Ystring::Encoding::UNKNOWN,
                                           Encoding::UTF_8)),
           m_State(INITIAL_STATE),
           m_LanguagExtentions(0),
@@ -390,8 +394,8 @@ namespace Yson
         }
         value.assign(token.first, token.second);
         using namespace Ystring;
-        if (Utf8::hasEscapedCharacters(value, EscapeType::JSON))
-            value = Utf8::unescape(value, EscapeType::JSON);
+        if (Utf8::hasEscapedCharacters(value))
+            value = Utf8::unescape(value);
     }
 
     bool JsonReader::nextDocument()

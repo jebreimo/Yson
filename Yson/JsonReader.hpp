@@ -12,7 +12,7 @@
 #include <memory>
 #include <stack>
 #include <string>
-#include <Ystring/Encoding.hpp>
+#include "../Ystring/Encoding.hpp"
 #include "JsonReaderException.hpp"
 #include "JsonTokenizer.hpp"
 #include "LineNumberCounter.hpp"
@@ -32,11 +32,9 @@ namespace Yson {
     class YSON_API JsonReader
     {
     public:
-        JsonReader(std::istream& stream,
-                   Ystring::Encoding_t encoding = Ystring::Encoding::UNKNOWN);
+        JsonReader(std::istream& stream);
 
-        JsonReader(const std::string& fileName,
-                   Ystring::Encoding_t encoding = Ystring::Encoding::UNKNOWN);
+        JsonReader(const std::string& fileName);
 
         ~JsonReader();
 

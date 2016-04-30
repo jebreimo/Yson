@@ -10,6 +10,8 @@ project(Yson)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
 
+add_definitions(-DYstring=Yson_Ystring)
+
 if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
 elseif(WIN32)
@@ -22,8 +24,10 @@ set(CMAKE_MODULE_PATH
     "${CMAKE_SOURCE_DIR}/cmake/Modules"
     ${CMAKE_MODULE_PATH})
 
-find_package(Ystring REQUIRED)
-include_directories(${YSTRING_INCLUDE_DIR})
+#find_package(Ystring REQUIRED)
+#include_directories(${YSTRING_INCLUDE_DIR})
+
+add_subdirectory(Ystring)
 
 set(PUBLIC_HEADERS
     Yson/JsonReader.hpp
@@ -65,6 +69,7 @@ add_library(
     ${PUBLIC_HEADERS}
     ${PRIVATE_HEADERS}
     ${SOURCE_FILES}
+    $<TARGET_OBJECTS:Yson_Ystring>
     )
 
 set_target_properties(
@@ -73,9 +78,9 @@ set_target_properties(
         MACOSX_RPATH ON
         DEBUG_OUTPUT_NAME "${PROJECT_NAME}.debug")
 
-target_link_libraries(${PROJECT_NAME}
-                      optimized ${YSTRING_LIBRARY}
-                      debug ${YSTRING_DEBUG_LIBRARY})
+#target_link_libraries(${PROJECT_NAME}
+#                      optimized ${YSTRING_LIBRARY}
+#                      debug ${YSTRING_DEBUG_LIBRARY})
 
 if (HAS_YTEST)
      set(CTEST_OUTPUT_ON_FAILURE 1)
