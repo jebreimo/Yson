@@ -10,7 +10,7 @@
 #include "../Encodings/EncodeUtf8.hpp"
 #include "DecoderAlgorithms.hpp"
 
-namespace Ystring { namespace Utf8
+namespace Ystring
 {
     namespace
     {
@@ -157,4 +157,4 @@ namespace Ystring { namespace Utf8
             return true;
         }
     }
-}}
+}

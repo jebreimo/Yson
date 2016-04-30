@@ -121,6 +121,14 @@ namespace Yson
         JsonWriter& writeNewline();
 
         JsonWriter& writeSeparator(size_t count = 1);
+
+        int languageExtensions() const;
+
+        JsonWriter&  setLanguageExtensions(int value);
+
+        bool isExtendedFloatsEnabled() const;
+
+        JsonWriter& setExtendedFloatsEnabled(bool value);
     private:
         void beginValue();
         Formatting formatting() const;
@@ -133,6 +141,15 @@ namespace Yson
         JsonWriter& writeValueImpl(T value);
         template <typename T>
         JsonWriter& writeFloatValueImpl(T value);
+
+        enum LanguageExtensions
+        {
+            EXTENDED_FLOATS = 1
+        };
+
+        bool languageExtension(LanguageExtensions ext) const;
+        
+        JsonWriter& setLanguageExtension(LanguageExtensions ext, bool value);
 
         struct Context
         {
@@ -162,11 +179,6 @@ namespace Yson
             AFTER_COMMA
         };
 
-        enum LanguageExtensions
-        {
-          EXTENDED_FLOATS = 1
-        };
-
         std::unique_ptr<std::ostream> m_StreamPtr;
         std::ostream* m_Stream;
         std::stack<Context> m_Context;
@@ -174,7 +186,7 @@ namespace Yson
         State m_State;
         unsigned m_Indentation;
         unsigned m_IndentationWidth;
-        int m_LanguagExtentions;
+        int m_LanguagExtensions;
         bool m_FormattingEnabled;
         char m_IndentationCharacter;
     };

@@ -76,6 +76,12 @@ namespace Yson {
                 return ValueType::INTEGER;
             return getNumberValueType(first, last);
         }
+
+        if (last - first == 8 && std::equal(first, last, "infinity"))
+            return ValueType::EXTENDED_FLOAT;
+        if (last - first == 3 && std::equal(first, last, "nan"))
+            return ValueType::EXTENDED_FLOAT;
+
         if (assumedType != ValueType::UNKNOWN)
             return ValueType::INVALID;
 

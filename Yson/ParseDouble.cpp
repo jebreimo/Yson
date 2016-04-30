@@ -10,6 +10,7 @@
 #include <cmath>
 #include <cstdint>
 #include <limits>
+#include <algorithm>
 
 namespace Yson
 {
@@ -41,6 +42,20 @@ namespace Yson
         {
             if (++first == last)
                 return Result();
+        }
+
+        if (*first == 'i' && last - first == 8
+            && std::equal(first, last, "infinity"))
+        {
+            return Result(negative ? -std::numeric_limits<T>::infinity()
+                                   : std::numeric_limits<T>::infinity(),
+                          true);
+        }
+        if (*first == 'n' && last - first == 3
+            && std::equal(first, last, "nan"))
+        {
+            return std::make_pair(std::numeric_limits<T>::quiet_NaN(),
+                                  true);
         }
 
         // Get the integer value

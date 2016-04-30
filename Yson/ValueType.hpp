@@ -24,6 +24,7 @@ namespace Yson {
             TRUE_VALUE = 'T',
             FALSE_VALUE = 'F',
             NULL_VALUE = 'N',
+            EXTENDED_FLOAT = '#',
             UNKNOWN = '?',
             INVALID = '0'
         };

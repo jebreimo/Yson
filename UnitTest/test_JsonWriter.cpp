@@ -1,5 +1,6 @@
 #include "../Yson/JsonWriter.hpp"
 
+#include <limits>
 #include <sstream>
 #include "../Externals/Ytest/Ytest.hpp"
 
@@ -77,7 +78,19 @@ namespace
         Y_EQUAL(ss.str(), expected);
     }
 
+    void test_FloatingPointValues()
+    {
+        std::stringstream ss;
+        JsonWriter writer(ss);
+        Y_THROWS(writer.writeValue(std::numeric_limits<double>::infinity()),
+                 std::logic_error);
+        writer.setExtendedFloatsEnabled(true);
+        writer.writeValue(std::numeric_limits<double>::infinity());
+        Y_EQUAL(ss.str(), "infinity");
+    }
+
     Y_TEST(test_EscapedString,
            test_Newline,
-           test_SimpleObject);
+           test_SimpleObject,
+           test_FloatingPointValues);
 }

@@ -39,6 +39,14 @@ void testRead(const std::string& doc, T expectedValue)
     Y_EQUAL(n, expectedValue);
 }
 
+template <typename T, typename Predicate>
+void testReadWithPredicate(const std::string& doc, Predicate predicate)
+{
+    T n;
+    Y_CALL(read(doc, n));
+    Y_ASSERT(predicate(n));
+}
+
 void testRead(const std::string& doc, double expectedValue, double e = 1e-10)
 {
     double n;
@@ -74,6 +82,12 @@ void test_BlockString()
 void test_Double()
 {
     Y_CALL(testRead("21474.83647", 21474.83647));
+    Y_CALL(testReadWithPredicate<double>("infinity", std::isinf<double>));
+    Y_CALL(testReadWithPredicate<double>(
+            "+infinity", [](double v){return std::isinf(v) && v > 0;}));
+    Y_CALL(testReadWithPredicate<double>(
+            "-infinity", [](double v){return std::isinf(v) && v < 0;}));
+    Y_CALL(testReadWithPredicate<double>("nan", std::isnan<double>));
 }
 
 void test_EnterNull()

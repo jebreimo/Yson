@@ -16,7 +16,6 @@
 
 namespace Yson
 {
-    using namespace Ystring;
     const size_t CHUNK_SIZE = 16 * 1024;
 
     #define YSON_THROW(msg) \
@@ -75,18 +74,18 @@ namespace Yson
     JsonReader::JsonReader(std::istream& stream)
         : m_TextReader(new TextReader(stream,
                                       Ystring::Encoding::UNKNOWN,
-                                      Encoding::UTF_8)),
+                                      Ystring::Encoding::UTF_8)),
           m_State(INITIAL_STATE),
-          m_LanguagExtentions(0),
+          m_LanguagExtensions(0),
           m_SkipElementDepth(0)
     {}
 
     JsonReader::JsonReader(const std::string& fileName)
         : m_TextReader(new TextFileReader(fileName,
                                           Ystring::Encoding::UNKNOWN,
-                                          Encoding::UTF_8)),
+                                          Ystring::Encoding::UTF_8)),
           m_State(INITIAL_STATE),
-          m_LanguagExtentions(0),
+          m_LanguagExtensions(0),
           m_SkipElementDepth(0)
     {}
 
@@ -271,7 +270,11 @@ namespace Yson
         case ValueType::HEX_INTEGER:
             if (isExtendedIntegersEnabled())
                 return ValueType::INTEGER;
-            // No break here!
+            YSON_THROW("Invalid value.");
+        case ValueType::EXTENDED_FLOAT:
+            if (isExtendedFloatsEnabled())
+                return ValueType::FLOAT;
+            YSON_THROW("Invalid value.");
         case ValueType::INVALID:
             YSON_THROW("Invalid value.");
         default:
@@ -393,9 +396,8 @@ namespace Yson
             YSON_THROW("Current token is not a string.");
         }
         value.assign(token.first, token.second);
-        using namespace Ystring;
-        if (Utf8::hasEscapedCharacters(value))
-            value = Utf8::unescape(value);
+        if (Ystring::hasEscapedCharacters(value))
+            value = Ystring::unescape(value);
     }
 
     bool JsonReader::nextDocument()
@@ -506,30 +508,40 @@ namespace Yson
         return setLanguageExtension(BLOCK_STRINGS, value);
     }
 
+    bool JsonReader::isExtendedFloatsEnabled() const
+    {
+        return languageExtension(EXTENDED_FLOATS);
+    }
+
+    JsonReader& JsonReader::setExtendedFloatsEnabled(bool value)
+    {
+        return setLanguageExtension(EXTENDED_FLOATS, value);
+    }
+
     int JsonReader::languageExtensions() const
     {
-        return m_LanguagExtentions;
+        return m_LanguagExtensions;
     }
 
     JsonReader& JsonReader::setLanguageExtensions(int value)
     {
-        m_LanguagExtentions = value;
+        m_LanguagExtensions = value;
         return *this;
     }
 
     bool JsonReader::languageExtension(
             JsonReader::LanguageExtensions ext) const
     {
-        return (m_LanguagExtentions & ext) != 0;
+        return (m_LanguagExtensions & ext) != 0;
     }
 
     JsonReader& JsonReader::setLanguageExtension(
             JsonReader::LanguageExtensions ext, bool value)
     {
         if (value)
-            m_LanguagExtentions |= ext;
+            m_LanguagExtensions |= ext;
         else
-            m_LanguagExtentions &= ~ext;
+            m_LanguagExtensions &= ~ext;
         return *this;
     }
 

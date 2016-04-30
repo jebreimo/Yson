@@ -60,6 +60,10 @@ namespace {
         test("truf", ValueType::INVALID);
         test("falsf", ValueType::INVALID);
         test("nulm", ValueType::INVALID);
+        test("nan", ValueType::EXTENDED_FLOAT);
+        test("infinity", ValueType::EXTENDED_FLOAT);
+        test("-infinity", ValueType::EXTENDED_FLOAT);
+        test("+infinity", ValueType::EXTENDED_FLOAT);
     }
 
     Y_TEST(test_getValueType);

@@ -24,7 +24,7 @@ namespace Yson
           m_State(AT_START_OF_VALUE_NO_COMMA),
           m_Indentation(0),
           m_IndentationWidth(2),
-          m_LanguagExtentions(EXTENDED_FLOATS),
+          m_LanguagExtensions(0),
           m_FormattingEnabled(true),
           m_IndentationCharacter(' ')
     {}
@@ -34,7 +34,7 @@ namespace Yson
           m_State(AT_START_OF_VALUE_NO_COMMA),
           m_Indentation(0),
           m_IndentationWidth(2),
-          m_LanguagExtentions(EXTENDED_FLOATS),
+          m_LanguagExtensions(0),
           m_FormattingEnabled(true),
           m_IndentationCharacter(' ')
     {
@@ -46,7 +46,7 @@ namespace Yson
           m_State(AT_START_OF_VALUE_NO_COMMA),
           m_Indentation(0),
           m_IndentationWidth(2),
-          m_LanguagExtentions(EXTENDED_FLOATS),
+          m_LanguagExtensions(0),
           m_FormattingEnabled(true),
           m_IndentationCharacter(' ')
     {}
@@ -56,7 +56,7 @@ namespace Yson
           m_State(AT_START_OF_VALUE_NO_COMMA),
           m_Indentation(0),
           m_IndentationWidth(2),
-          m_LanguagExtentions(EXTENDED_FLOATS),
+          m_LanguagExtensions(0),
           m_FormattingEnabled(true),
           m_IndentationCharacter(' ')
     {
@@ -69,7 +69,7 @@ namespace Yson
           m_ValueName(std::move(rhs.m_ValueName)),
           m_Indentation(rhs.m_Indentation),
           m_IndentationWidth(rhs.m_IndentationWidth),
-          m_LanguagExtentions(EXTENDED_FLOATS),
+          m_LanguagExtensions(rhs.m_LanguagExtensions),
           m_FormattingEnabled(rhs.m_FormattingEnabled),
           m_IndentationCharacter(rhs.m_IndentationCharacter)
     {
@@ -249,11 +249,10 @@ namespace Yson
     {
         beginValue();
         *m_Stream << "\"";
-        using namespace Ystring;
-        if (!Utf8::hasUnescapedCharacters(value))
+        if (!Ystring::hasUnescapedCharacters(value))
             *m_Stream << value;
         else
-            *m_Stream << Utf8::escape(value);
+            *m_Stream << Ystring::escape(value);
         *m_Stream << "\"";
         m_State = AT_END_OF_VALUE;
         return *this;
@@ -389,6 +388,28 @@ namespace Yson
         for (size_t i = 0; i < count; ++i)
             *m_Stream << m_IndentationCharacter;
         return *this;
+    }
+
+    int JsonWriter::languageExtensions() const
+    {
+        return m_LanguagExtensions;
+    }
+
+    JsonWriter& JsonWriter::setLanguageExtensions(int value)
+    {
+
+        m_LanguagExtensions = value;
+        return *this;
+    }
+
+    bool JsonWriter::isExtendedFloatsEnabled() const
+    {
+        return languageExtension(EXTENDED_FLOATS);
+    }
+
+    JsonWriter& JsonWriter::setExtendedFloatsEnabled(bool value)
+    {
+        return setLanguageExtension(EXTENDED_FLOATS, value);
     }
 
     void JsonWriter::beginValue()
@@ -553,29 +574,44 @@ namespace Yson
     template <typename T>
     JsonWriter& JsonWriter::writeFloatValueImpl(T value)
     {
-        beginValue();
         if (std::isfinite(value))
         {
+            beginValue();
             *m_Stream << value;
         }
-        else if ((m_LanguagExtentions & EXTENDED_FLOATS) == 0)
+        else if ((m_LanguagExtensions & EXTENDED_FLOATS) == 0)
         {
             JSONWRITER_THROW(std::string("Illegal floating point value '")
                              + std::to_string(value) + "'");
         }
-        else if (std::isnan(value))
-        {
-            *m_Stream << "NaN";
-        }
-        else if (value < 0)
-        {
-            *m_Stream << "-infinity";
-        }
         else
         {
-            *m_Stream << "infinity";
+            beginValue();
+            if (std::isnan(value))
+                *m_Stream << "nan";
+            else if (value < 0)
+                *m_Stream << "-infinity";
+            else
+                *m_Stream << "infinity";
         }
         m_State = AT_END_OF_VALUE;
         return *this;
     }
+
+    bool JsonWriter::languageExtension(
+            JsonWriter::LanguageExtensions ext) const
+    {
+        return (m_LanguagExtensions & ext) != 0;
+    }
+
+    JsonWriter& JsonWriter::setLanguageExtension(
+            JsonWriter::LanguageExtensions ext, bool value)
+    {
+        if (value)
+            m_LanguagExtensions |= ext;
+        else
+            m_LanguagExtensions &= ~ext;
+        return *this;
+    }
+
 }

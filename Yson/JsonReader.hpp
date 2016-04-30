@@ -125,6 +125,10 @@ namespace Yson {
 
         JsonReader& setBlockStringsEnabled(bool value);
 
+        bool isExtendedFloatsEnabled() const;
+
+        JsonReader& setExtendedFloatsEnabled(bool value);
+
         int languageExtensions() const;
 
         JsonReader& setLanguageExtensions(int value);
@@ -220,7 +224,7 @@ namespace Yson {
         std::stack<State> m_StateStack;
         std::stack<ValueType_t> m_EnteredElements;
         LineNumberCounter m_LineNumberCounter;
-        int m_LanguagExtentions;
+        int m_LanguagExtensions;
         int m_SkipElementDepth;
     };
 

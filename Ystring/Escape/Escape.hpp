@@ -19,7 +19,7 @@
   * @brief The function library for UTF-8 encoded strings.
   */
 
-namespace Ystring { namespace Utf8
+namespace Ystring
 {
     /** @brief Returns a copy of @a str where control character etc. have
       *     been escaped.
@@ -45,4 +45,4 @@ namespace Ystring { namespace Utf8
       *     escape sequence.
       */
     YSTRING_API std::string unescape(const std::string& str);
-}}
+}

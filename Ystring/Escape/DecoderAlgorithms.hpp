@@ -11,7 +11,7 @@
 #include <utility>
 #include "../Encodings/DecodeUtf8.hpp"
 
-namespace Ystring { namespace Utf8
+namespace Ystring
 {
     bool nextCodePoint(char32_t& codePoint,
                        std::string::const_iterator& it,
@@ -55,4 +55,4 @@ namespace Ystring { namespace Utf8
         {}
         return it != last;
     }
-}}
+}
