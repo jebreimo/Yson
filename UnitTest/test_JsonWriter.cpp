@@ -84,9 +84,9 @@ namespace
         JsonWriter writer(ss);
         Y_THROWS(writer.writeValue(std::numeric_limits<double>::infinity()),
                  std::logic_error);
-        writer.setExtendedFloatsEnabled(true);
+        writer.setNonFiniteFloatsAsStringsEnabled(true);
         writer.writeValue(std::numeric_limits<double>::infinity());
-        Y_EQUAL(ss.str(), "infinity");
+        Y_EQUAL(ss.str(), "\"infinity\"");
     }
 
     Y_TEST(test_EscapedString,

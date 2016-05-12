@@ -51,8 +51,8 @@ namespace Yson
                                    : std::numeric_limits<T>::infinity(),
                           true);
         }
-        if (*first == 'n' && last - first == 3
-            && std::equal(first, last, "nan"))
+        if (*first == 'N' && last - first == 3
+            && std::equal(first, last, "NaN"))
         {
             return std::make_pair(std::numeric_limits<T>::quiet_NaN(),
                                   true);
@@ -142,6 +142,11 @@ namespace Yson
             value = -value;
 
         return Result(value, true);
+    }
+
+    std::pair<long double, bool> parseLongDouble(const char* first, const char* last)
+    {
+        return parseReal<long double>(first, last);
     }
 
     std::pair<double, bool> parseDouble(const char* first, const char* last)

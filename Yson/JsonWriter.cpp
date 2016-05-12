@@ -245,6 +245,11 @@ namespace Yson
         return writeFloatValueImpl(value);
     }
 
+    JsonWriter& JsonWriter::writeValue(long double value)
+    {
+        return writeFloatValueImpl(value);
+    }
+
     JsonWriter& JsonWriter::writeValue(const std::string& value)
     {
         beginValue();
@@ -402,14 +407,14 @@ namespace Yson
         return *this;
     }
 
-    bool JsonWriter::isExtendedFloatsEnabled() const
+    bool JsonWriter::isNonFiniteFloatsAsStringsEnabled() const
     {
-        return languageExtension(EXTENDED_FLOATS);
+        return languageExtension(NON_FINITE_FLOATS_AS_STRINGS);
     }
 
-    JsonWriter& JsonWriter::setExtendedFloatsEnabled(bool value)
+    JsonWriter& JsonWriter::setNonFiniteFloatsAsStringsEnabled(bool value)
     {
-        return setLanguageExtension(EXTENDED_FLOATS, value);
+        return setLanguageExtension(NON_FINITE_FLOATS_AS_STRINGS, value);
     }
 
     void JsonWriter::beginValue()
@@ -578,23 +583,22 @@ namespace Yson
         {
             beginValue();
             *m_Stream << value;
+            m_State = AT_END_OF_VALUE;
         }
-        else if ((m_LanguagExtensions & EXTENDED_FLOATS) == 0)
+        else if (!languageExtension(NON_FINITE_FLOATS_AS_STRINGS))
         {
             JSONWRITER_THROW(std::string("Illegal floating point value '")
                              + std::to_string(value) + "'");
         }
         else
         {
-            beginValue();
             if (std::isnan(value))
-                *m_Stream << "nan";
+                writeValue("NaN");
             else if (value < 0)
-                *m_Stream << "-infinity";
+                writeValue("-infinity");
             else
-                *m_Stream << "infinity";
+                writeValue("infinity");
         }
-        m_State = AT_END_OF_VALUE;
         return *this;
     }
 

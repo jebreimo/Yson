@@ -87,7 +87,13 @@ void test_Double()
             "+infinity", [](double v){return std::isinf(v) && v > 0;}));
     Y_CALL(testReadWithPredicate<double>(
             "-infinity", [](double v){return std::isinf(v) && v < 0;}));
-    Y_CALL(testReadWithPredicate<double>("nan", std::isnan<double>));
+    Y_CALL(testReadWithPredicate<double>("NaN", std::isnan<double>));
+    Y_CALL(testReadWithPredicate<double>("\"infinity\"", std::isinf<double>));
+    Y_CALL(testReadWithPredicate<double>(
+            "\"+infinity\"", [](double v) {return std::isinf(v) && v > 0;}));
+    Y_CALL(testReadWithPredicate<double>(
+            "\"-infinity\"", [](double v) {return std::isinf(v) && v < 0;}));
+    Y_CALL(testReadWithPredicate<double>("\"NaN\"", std::isnan<double>));
 }
 
 void test_EnterNull()
