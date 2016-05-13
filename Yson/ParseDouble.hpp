@@ -12,6 +12,9 @@
 
 namespace Yson
 {
+    YSON_API std::pair<long double, bool> parseLongDouble(
+            const char* first, const char* last);
+
     YSON_API std::pair<double, bool> parseDouble(
             const char* first, const char* last);
 

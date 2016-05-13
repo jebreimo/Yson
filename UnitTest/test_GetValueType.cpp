@@ -60,7 +60,7 @@ namespace {
         test("truf", ValueType::INVALID);
         test("falsf", ValueType::INVALID);
         test("nulm", ValueType::INVALID);
-        test("nan", ValueType::EXTENDED_FLOAT);
+        test("NaN", ValueType::EXTENDED_FLOAT);
         test("infinity", ValueType::EXTENDED_FLOAT);
         test("-infinity", ValueType::EXTENDED_FLOAT);
         test("+infinity", ValueType::EXTENDED_FLOAT);

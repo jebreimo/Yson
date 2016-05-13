@@ -377,6 +377,15 @@ namespace Yson
         value = parsedValue.first;
     }
 
+    void JsonReader::read(long double& value) const
+    {
+        auto token = getValueToken();
+        auto parsedValue = parseLongDouble(token.first, token.second);
+        if (!parsedValue.second)
+            YSON_THROW("Invalid floating point value");
+        value = parsedValue.first;
+    }
+
     void JsonReader::read(std::string& value) const
     {
         auto token = m_Tokenizer.rawToken();

@@ -79,7 +79,7 @@ namespace Yson {
 
         if (last - first == 8 && std::equal(first, last, "infinity"))
             return ValueType::EXTENDED_FLOAT;
-        if (last - first == 3 && std::equal(first, last, "nan"))
+        if (last - first == 3 && std::equal(first, last, "NaN"))
             return ValueType::EXTENDED_FLOAT;
 
         if (assumedType != ValueType::UNKNOWN)

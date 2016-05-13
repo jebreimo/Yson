@@ -92,6 +92,8 @@ namespace Yson
 
         JsonWriter& writeValue(double value);
 
+        JsonWriter& writeValue(long double value);
+
         JsonWriter& writeValue(const std::string& value);
 
         JsonWriter& writeValue(const std::wstring& value);
@@ -124,11 +126,20 @@ namespace Yson
 
         int languageExtensions() const;
 
-        JsonWriter&  setLanguageExtensions(int value);
+        JsonWriter& setLanguageExtensions(int value);
 
-        bool isExtendedFloatsEnabled() const;
+        /** @brief Returns true if special floating point values will be
+          *     written as strings.
+          *
+          * When this flag is enabled, the special values not-a-number and
+          * positive and negative infinity are written as "NaN", "infinity"
+          * and "-infinity" respectively. If it is disabled, the writeValue
+          * functions will throw an exception if it encounters any of these
+          * values.
+          */
+        bool isNonFiniteFloatsAsStringsEnabled() const;
 
-        JsonWriter& setExtendedFloatsEnabled(bool value);
+        JsonWriter& setNonFiniteFloatsAsStringsEnabled(bool value);
     private:
         void beginValue();
         Formatting formatting() const;
@@ -144,11 +155,11 @@ namespace Yson
 
         enum LanguageExtensions
         {
-            EXTENDED_FLOATS = 1
+            NON_FINITE_FLOATS_AS_STRINGS = 1
         };
 
         bool languageExtension(LanguageExtensions ext) const;
-        
+
         JsonWriter& setLanguageExtension(LanguageExtensions ext, bool value);
 
         struct Context

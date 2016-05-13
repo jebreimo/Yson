@@ -89,6 +89,8 @@ namespace Yson {
 
         void read(double& value) const;
 
+        void read(long double& value) const;
+
         void read(std::string& value) const;
 
         bool nextDocument();
