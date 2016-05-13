@@ -29,12 +29,15 @@ namespace {
         test("123", ValueType::INTEGER);
         test("0123", ValueType::INTEGER);
         test("0o123", ValueType::OCT_INTEGER);
+        test("0O123", ValueType::OCT_INTEGER);
         test("0x123", ValueType::HEX_INTEGER);
         test("+0x123", ValueType::HEX_INTEGER);
         test("-0x123", ValueType::HEX_INTEGER);
         test("*0x123", ValueType::INVALID);
+        test("*0X123", ValueType::INVALID);
         test("0b10", ValueType::BIN_INTEGER);
         test("0b00", ValueType::BIN_INTEGER);
+        test("0B01", ValueType::BIN_INTEGER);
         test("0b12", ValueType::INVALID);
         test("0b", ValueType::INVALID);
         test("0o", ValueType::INVALID);

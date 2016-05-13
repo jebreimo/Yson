@@ -47,7 +47,7 @@ namespace Yson {
         {
             if (++first == last)
                 return Result(0, false);
-            switch (*first)
+            switch (*first | 0x20)
             {
             case 'b':
                 if (++first == last)
