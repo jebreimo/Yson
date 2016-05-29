@@ -53,7 +53,7 @@ set(SOURCE_FILES
     Yson/ParseInteger.cpp
     Yson/TextFileReader.cpp
     Yson/TextReader.cpp
-    )
+    Yson/Base64.hpp Yson/Base64.cpp)
 
 add_subdirectory(Externals)
 

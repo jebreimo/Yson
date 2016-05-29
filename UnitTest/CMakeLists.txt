@@ -17,7 +17,7 @@ set(SOURCE_FILES
     test_JsonTokenizer.cpp
     test_JsonWriter.cpp
     test_ParseDouble.cpp
-    )
+    test_Base64.cpp)
 
 add_executable(${PROJECT_NAME}
                ${SOURCE_FILES})
