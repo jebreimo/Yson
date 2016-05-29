@@ -51,10 +51,13 @@ namespace Yson {
             switch (*first)
             {
             case 'b':
+            case 'B':
                 return getBinaryValueType(++first, last);
             case 'o':
+            case 'O':
                 return getOctalValueType(++first, last);
             case 'x':
+            case 'X':
                 return getHexadecimalValueType(++first, last);
             case '.':
             case 'e':
