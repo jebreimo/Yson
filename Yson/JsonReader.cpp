@@ -22,7 +22,8 @@ namespace Yson
         throw JsonReaderException((msg), __FILE__, __LINE__, __FUNCTION__, \
                                   lineNumber(), columnNumber())
 
-    namespace {
+    namespace
+    {
         std::pair<unsigned, unsigned> countRowsAndColumns(
                 std::pair<const char*, const char*> token)
         {

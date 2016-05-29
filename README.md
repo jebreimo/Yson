@@ -132,7 +132,7 @@ int main()
 * *tokenType()* returns the type of the current token.
 * *token()* returns the current token as string.
 
-### The following extensions to JSON are supported:
+### The following extensions to JSON are supported (most must be explicitly enabled):
 
 * comments, both //... and /*...*/
 * multi-line strings """...."""
@@ -140,21 +140,13 @@ int main()
 * non-string keys
 * single-word keys without quotes
 * multiple JSON top-level documents in a single file or stream (iterated over with *nextDocument()*).
+* support for the special floating point values NaN and positive and negative inifinity. 
 
 ### The following encodings are supported and automatically detected:
 
 * UTF-8 with and without BOM (plain ASCII is also treated as UTF-8)
 * UTF-16 little-endian and big-endian, with and without BOM
 * UTF-32 little-endian and big-endian, with and without BOM
-
-### In addition these encodings are supported, but must be specified:
-
-* ISO8859-1 (Latin-1)
-* ISO8859-10 (Latin-6)
-* ISO8859-15 (Latin-10)
-* IBM437 (The default MSDOS codepage)
-* IBM850 (Western European MSDOS codepage)
-* Windows1252 (The U.S. / Western European Windows codepage)
 
 JsonWriter
 ==========
