@@ -9,6 +9,7 @@
 
 #include "../Ystring/Conversion.hpp"
 #include "../Ystring/Escape/Escape.hpp"
+#include "Base64.hpp"
 #include "GetValueType.hpp"
 #include "ParseDouble.hpp"
 #include "ParseInteger.hpp"
@@ -408,6 +409,20 @@ namespace Yson
         value.assign(token.first, token.second);
         if (Ystring::hasEscapedCharacters(value))
             value = Ystring::unescape(value);
+    }
+
+    void JsonReader::readBase64(std::vector<uint8_t>& value) const
+    {
+        std::string rawValue;
+        read(rawValue);
+        try
+        {
+            value = fromBase64(rawValue);
+        }
+        catch (std::exception& ex)
+        {
+            YSON_THROW(ex.what());
+        }
     }
 
     bool JsonReader::nextDocument()

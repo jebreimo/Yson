@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include "../Ystring/Conversion.hpp"
 #include "../Ystring/Escape/Escape.hpp"
+#include "Base64.hpp"
 
 #define JSONWRITER_THROW(msg) \
     throw std::logic_error(msg)
@@ -292,6 +293,18 @@ namespace Yson
     {
         *m_Stream << text;
         return *this;
+    }
+
+    JsonWriter& JsonWriter::writeBase64(const void* data, size_t size)
+    {
+        return writeValue(toBase64(data, size));
+    }
+
+    JsonWriter& JsonWriter::writeBase64(const std::string& name,
+                                        const void* data, size_t size)
+    {
+        setValueName(name);
+        return writeValue(toBase64(data, size));
     }
 
     JsonWriter& JsonWriter::indent()

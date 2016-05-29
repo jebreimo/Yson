@@ -112,6 +112,11 @@ namespace Yson
 
         JsonWriter& writeRawText(const std::string& text);
 
+        JsonWriter& writeBase64(const void* data, size_t size);
+
+        JsonWriter& writeBase64(const std::string& name,
+                                const void* data, size_t size);
+
         JsonWriter& indent();
 
         JsonWriter& outdent();

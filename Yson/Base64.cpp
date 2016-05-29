@@ -93,7 +93,10 @@ namespace Yson
     std::vector<uint8_t> fromBase64(const std::string& text)
     {
         std::vector<uint8_t> result;
-        auto size = text.find_last_not_of('=');
+        auto last = text.find_last_not_of('=');
+        if (last == std::string::npos)
+            return result;
+        auto size = last + 1;
         result.reserve(getDecodedSize(size));
         auto tailSize = size % 4;
         auto mainSize = size - tailSize;

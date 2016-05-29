@@ -12,12 +12,12 @@ project(${PARENT_PROJECT}Test)
 
 set(SOURCE_FILES
     main.cpp
+    test_Base64.cpp
     test_GetValueType.cpp
     test_JsonReader.cpp
     test_JsonTokenizer.cpp
     test_JsonWriter.cpp
-    test_ParseDouble.cpp
-    test_Base64.cpp)
+    test_ParseDouble.cpp)
 
 add_executable(${PROJECT_NAME}
                ${SOURCE_FILES})

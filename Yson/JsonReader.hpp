@@ -93,6 +93,8 @@ namespace Yson {
 
         void read(std::string& value) const;
 
+        void readBase64(std::vector<uint8_t>& value) const;
+
         bool nextDocument();
 
         bool isStringsAsValuesEnabled() const;

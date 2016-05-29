@@ -34,6 +34,7 @@ set(PUBLIC_HEADERS
     )
 
 set(PRIVATE_HEADERS
+    Yson/Base64.hpp
     Yson/GetValueType.hpp
     Yson/ParseDouble.hpp
     Yson/ParseInteger.hpp
@@ -43,6 +44,7 @@ set(PRIVATE_HEADERS
     )
 
 set(SOURCE_FILES
+    Yson/Base64.cpp
     Yson/GetValueType.cpp
     Yson/JsonReader.cpp
     Yson/JsonReaderException.cpp
@@ -52,8 +54,7 @@ set(SOURCE_FILES
     Yson/ParseDouble.cpp
     Yson/ParseInteger.cpp
     Yson/TextFileReader.cpp
-    Yson/TextReader.cpp
-    Yson/Base64.hpp Yson/Base64.cpp)
+    Yson/TextReader.cpp)
 
 add_subdirectory(Externals)
 

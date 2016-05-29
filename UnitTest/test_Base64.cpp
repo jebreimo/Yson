@@ -9,9 +9,8 @@
 
 #include "../Externals/Ytest/Ytest.hpp"
 
-std::string toBase64(std::initializer_list<uint8_t> list)
+std::string toBase64(const std::vector<uint8_t>& data)
 {
-    std::vector<uint8_t> data(list);
     return Yson::toBase64(data.data(), data.size());
 }
 
@@ -21,6 +20,31 @@ void test_toBase64()
     Y_EQUAL(toBase64({0}), "AA==");
     Y_EQUAL(toBase64({0, 0}), "AAA=");
     Y_EQUAL(toBase64({0, 0, 0}), "AAAA");
+    Y_EQUAL(toBase64({0, 0, 0, 0}), "AAAAAA==");
+    Y_EQUAL(toBase64({1}), "AQ==");
+    Y_EQUAL(toBase64({7}), "Bw==");
 }
 
-Y_TEST(test_toBase64);
+
+void doTestFromBase64(const std::string& str,
+                      std::initializer_list<uint8_t> expected)
+{
+    Y_EQUAL_RANGES(Yson::fromBase64(str), std::vector<uint8_t>(expected));
+}
+
+void test_fromBase64()
+{
+    Y_CALL(doTestFromBase64("", {}));
+    Y_CALL(doTestFromBase64("====", {}));
+    Y_CALL(doTestFromBase64("A===", {}));
+    Y_CALL(doTestFromBase64("AA==", {0}));
+    Y_CALL(doTestFromBase64("AAA=", {0, 0}));
+    Y_CALL(doTestFromBase64("AAAA", {0, 0, 0}));
+    Y_CALL(doTestFromBase64("AAAAAA==", {0, 0, 0, 0}));
+    Y_CALL(doTestFromBase64("AQ==", {1}));
+    Y_CALL(doTestFromBase64("Bw==", {7}));
+    Y_THROWS(Yson::fromBase64("=A="), std::exception);
+}
+
+Y_TEST(test_toBase64,
+       test_fromBase64);
