@@ -73,11 +73,17 @@ namespace Yson {
         int64_t value = 0;
         while (first != last)
         {
-            value *= base;
-            auto digit = fromDigit(*first++);
-            if (digit >= base)
+            auto digit = fromDigit(*first);
+            if (digit < base)
+            {
+                value *= base;
+                value += digit;
+            }
+            else if (!detectBase || *first != '_')
+            {
                 return Result(0, false);
-            value += digit;
+            }
+            ++first;
         }
         return Result(value * sign, true);
     }
