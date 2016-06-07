@@ -17,7 +17,7 @@ namespace Yson {
                 return int64_t(c - '0');
             c &= 0xDF;
             if ('A' <= c && c <= 'Z')
-                return int64_t(c - 'A');
+                return int64_t(10 + c - 'A');
             return INT64_MAX;
         }
     }

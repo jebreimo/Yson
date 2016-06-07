@@ -21,6 +21,7 @@ namespace Yson
     {
     public:
         enum Formatting {DEFAULT, NONE, FLAT, FORMAT};
+        enum IntegerMode {DECIMAL, BINARY, OCTAL, HEXADECIMAL};
 
         JsonWriter();
 
@@ -145,6 +146,10 @@ namespace Yson
         bool isNonFiniteFloatsAsStringsEnabled() const;
 
         JsonWriter& setNonFiniteFloatsAsStringsEnabled(bool value);
+
+        IntegerMode integerMode() const;
+
+        JsonWriter& setIntegerMode(IntegerMode mode);
     private:
         void beginValue();
         Formatting formatting() const;
@@ -153,14 +158,19 @@ namespace Yson
                                         Formatting formatting);
         void writeEndStructure(char endChar);
         void writeIndentationImpl();
+
         template <typename T>
-        JsonWriter& writeValueImpl(T value);
+        JsonWriter& writeIntValueImpl(T value);
+
         template <typename T>
         JsonWriter& writeFloatValueImpl(T value);
 
         enum LanguageExtensions
         {
-            NON_FINITE_FLOATS_AS_STRINGS = 1
+            NON_FINITE_FLOATS_AS_STRINGS = 1,
+            INTEGERS_AS_BIN = 2,
+            INTEGERS_AS_OCT = 4,
+            INTEGERS_AS_HEX = 6
         };
 
         bool languageExtension(LanguageExtensions ext) const;

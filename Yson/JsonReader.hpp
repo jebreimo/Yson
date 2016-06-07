@@ -57,6 +57,8 @@ namespace Yson {
 
         ValueType_t valueType() const;
 
+        ValueType_t stringValueType() const;
+
         JsonTokenType_t tokenType() const;
 
         std::string token() const;
@@ -185,7 +187,7 @@ namespace Yson {
 
         void skipWhitespace();
 
-        std::pair<const char*, const char*> getValueToken() const;
+        std::tuple<const char*, const char*, bool> getValueToken() const;
 
         template <typename T>
         void readUnsignedInteger(T& value) const;
@@ -224,11 +226,10 @@ namespace Yson {
         std::unique_ptr<TextReader> m_TextReader;
         std::string m_Buffer;
         JsonTokenizer m_Tokenizer;
-        State m_State;
         std::stack<State> m_StateStack;
-        std::stack<ValueType_t> m_EnteredElements;
         LineNumberCounter m_LineNumberCounter;
-        int m_LanguagExtensions;
+        State m_State;
+        int m_LanguageExtensions;
         int m_SkipElementDepth;
     };
 

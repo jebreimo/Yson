@@ -10,7 +10,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
-#include <stdexcept>
+#include <type_traits>
 #include "../Ystring/Conversion.hpp"
 #include "../Ystring/Escape/Escape.hpp"
 #include "Base64.hpp"
@@ -198,42 +198,42 @@ namespace Yson
 
     JsonWriter& JsonWriter::writeValue(int8_t value)
     {
-        return writeValueImpl(value);
+        return writeIntValueImpl(value);
     }
 
     JsonWriter& JsonWriter::writeValue(int16_t value)
     {
-        return writeValueImpl(value);
+        return writeIntValueImpl(value);
     }
 
     JsonWriter& JsonWriter::writeValue(int32_t value)
     {
-        return writeValueImpl(value);
+        return writeIntValueImpl(value);
     }
 
     JsonWriter& JsonWriter::writeValue(int64_t value)
     {
-        return writeValueImpl(value);
+        return writeIntValueImpl(value);
     }
 
     JsonWriter& JsonWriter::writeValue(uint8_t value)
     {
-        return writeValueImpl(value);
+        return writeIntValueImpl(value);
     }
 
     JsonWriter& JsonWriter::writeValue(uint16_t value)
     {
-        return writeValueImpl(value);
+        return writeIntValueImpl(value);
     }
 
     JsonWriter& JsonWriter::writeValue(uint32_t value)
     {
-        return writeValueImpl(value);
+        return writeIntValueImpl(value);
     }
 
     JsonWriter& JsonWriter::writeValue(uint64_t value)
     {
-        return writeValueImpl(value);
+        return writeIntValueImpl(value);
     }
 
     JsonWriter& JsonWriter::writeValue(float value)
@@ -278,7 +278,10 @@ namespace Yson
 
     JsonWriter& JsonWriter::writeRawValue(const std::string& value)
     {
-        return writeValueImpl(value);
+        beginValue();
+        *m_Stream << value;
+        m_State = AT_END_OF_VALUE;
+        return *this;
     }
 
 
@@ -415,7 +418,6 @@ namespace Yson
 
     JsonWriter& JsonWriter::setLanguageExtensions(int value)
     {
-
         m_LanguagExtensions = value;
         return *this;
     }
@@ -428,6 +430,42 @@ namespace Yson
     JsonWriter& JsonWriter::setNonFiniteFloatsAsStringsEnabled(bool value)
     {
         return setLanguageExtension(NON_FINITE_FLOATS_AS_STRINGS, value);
+    }
+
+    JsonWriter::IntegerMode JsonWriter::integerMode() const
+    {
+        switch (m_LanguagExtensions & INTEGERS_AS_HEX)
+        {
+        case INTEGERS_AS_HEX:
+            return HEXADECIMAL;
+        case INTEGERS_AS_BIN:
+            return BINARY;
+        case INTEGERS_AS_OCT:
+            return OCTAL;
+        default:
+            return DECIMAL;
+        }
+    }
+
+    JsonWriter& JsonWriter::setIntegerMode(JsonWriter::IntegerMode mode)
+    {
+        auto newFlags = m_LanguagExtensions & ~INTEGERS_AS_HEX;
+        switch (mode)
+        {
+        case DECIMAL:
+            break;
+        case BINARY:
+            newFlags |= INTEGERS_AS_BIN;
+            break;
+        case OCTAL:
+            newFlags |= INTEGERS_AS_OCT;
+            break;
+        case HEXADECIMAL:
+            newFlags |= INTEGERS_AS_HEX;
+            break;
+        }
+        m_LanguagExtensions = newFlags;
+        return *this;
     }
 
     void JsonWriter::beginValue()
@@ -581,10 +619,44 @@ namespace Yson
     }
 
     template <typename T>
-    JsonWriter& JsonWriter::writeValueImpl(T value)
+    void writeBinary(std::ostream& stream, T value)
+    {
+        stream << "\"0b";
+        typedef typename std::make_unsigned<T>::type UnsignedT;
+        UnsignedT bit = UnsignedT(1) << (sizeof(UnsignedT) * CHAR_BIT - 1);
+        while (bit)
+        {
+            if (bit & value)
+                break;
+            bit >>= 1;
+        }
+        if (!bit)
+        {
+            stream << '0';
+        }
+        else
+        {
+            while (bit)
+            {
+                stream << ((bit & value) ? '1' : '0');
+                bit >>= 1;
+            }
+        }
+        stream << '"';
+    }
+
+    template <typename T>
+    JsonWriter& JsonWriter::writeIntValueImpl(T value)
     {
         beginValue();
-        *m_Stream << value;
+        if (!(m_LanguagExtensions & INTEGERS_AS_HEX))
+            *m_Stream << value;
+        else if ((m_LanguagExtensions & INTEGERS_AS_HEX) == INTEGERS_AS_HEX)
+            *m_Stream << "\"0x" << std::hex << std::uppercase << value << '"' << std::dec;
+        else if (m_LanguagExtensions & INTEGERS_AS_OCT)
+            *m_Stream << "\"0o" << std::oct << value << '"' << std::dec;
+        else if (m_LanguagExtensions & INTEGERS_AS_BIN)
+            writeBinary(*m_Stream, value);
         m_State = AT_END_OF_VALUE;
         return *this;
     }

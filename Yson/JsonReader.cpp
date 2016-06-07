@@ -17,6 +17,8 @@
 
 namespace Yson
 {
+    using std::get;
+
     const size_t CHUNK_SIZE = 16 * 1024;
 
     #define YSON_THROW(msg) \
@@ -48,22 +50,22 @@ namespace Yson
             return std::make_pair(rows, cols);
         }
 
-        bool equalsNull(const std::pair<const char*, const char*>& token)
+        bool equalsNull(const char* first, const char* last)
         {
-            return token.second - token.first == 4
-                   && std::equal(token.first, token.second, "null");
+            return last - first == 4
+                   && std::equal(first, last, "null");
         }
 
-        bool equalsTrue(const std::pair<const char*, const char*>& token)
+        bool equalsTrue(const char* first, const char* last)
         {
-            return token.second - token.first == 4
-                   && std::equal(token.first, token.second, "true");
+            return last - first == 4
+                   && std::equal(first, last, "true");
         }
 
-        bool equalsFalse(const std::pair<const char*, const char*>& token)
+        bool equalsFalse(const char* first, const char* last)
         {
-            return token.second - token.first == 5
-                   && std::equal(token.first, token.second, "false");
+            return last - first == 5
+                   && std::equal(first, last, "false");
         }
 
         bool isStartOfStructure(JsonTokenType_t tokenType)
@@ -78,7 +80,7 @@ namespace Yson
                                       Ystring::Encoding::UNKNOWN,
                                       Ystring::Encoding::UTF_8)),
           m_State(INITIAL_STATE),
-          m_LanguagExtensions(0),
+          m_LanguageExtensions(0),
           m_SkipElementDepth(0)
     {}
 
@@ -87,7 +89,7 @@ namespace Yson
                                           Ystring::Encoding::UNKNOWN,
                                           Ystring::Encoding::UTF_8)),
           m_State(INITIAL_STATE),
-          m_LanguagExtensions(0),
+          m_LanguageExtensions(0),
           m_SkipElementDepth(0)
     {}
 
@@ -284,6 +286,36 @@ namespace Yson
         }
     }
 
+    ValueType_t JsonReader::stringValueType() const
+    {
+        auto type = valueType();
+        if (type != ValueType::STRING)
+            return type;
+
+        auto token = m_Tokenizer.rawToken();
+        ++token.first;
+        --token.second;
+
+        auto valueType = getValueType(token);
+        switch (valueType)
+        {
+        case ValueType::INTEGER:
+        case ValueType::FLOAT:
+        case ValueType::TRUE_VALUE:
+        case ValueType::FALSE_VALUE:
+        case ValueType::NULL_VALUE:
+            return valueType;
+        case ValueType::BIN_INTEGER:
+        case ValueType::OCT_INTEGER:
+        case ValueType::HEX_INTEGER:
+            return ValueType::INTEGER;
+        case ValueType::EXTENDED_FLOAT:
+            return ValueType::FLOAT;
+        default:
+            return ValueType::STRING;
+        }
+    }
+
     JsonTokenType_t JsonReader::tokenType() const
     {
         return m_Tokenizer.tokenType();
@@ -307,15 +339,15 @@ namespace Yson
     bool JsonReader::isNull() const
     {
         auto token = getValueToken();
-        return equalsNull(token);
+        return equalsNull(get<0>(token), get<1>(token));
     }
 
     void JsonReader::read(bool& value) const
     {
         auto token = getValueToken();
-        if (equalsTrue(token))
+        if (equalsTrue(get<0>(token), get<1>(token)))
             value = true;
-        else if (equalsFalse(token))
+        else if (equalsFalse(get<0>(token), get<1>(token)))
             value = false;
         else
             YSON_THROW("Invalid boolean value");
@@ -364,7 +396,7 @@ namespace Yson
     void JsonReader::read(float& value) const
     {
         auto token = getValueToken();
-        auto parsedValue = parseFloat(token.first, token.second);
+        auto parsedValue = parseFloat(get<0>(token), get<1>(token));
         if (!parsedValue.second)
             YSON_THROW("Invalid floating point value");
         value = parsedValue.first;
@@ -373,7 +405,7 @@ namespace Yson
     void JsonReader::read(double& value) const
     {
         auto token = getValueToken();
-        auto parsedValue = parseDouble(token.first, token.second);
+        auto parsedValue = parseDouble(get<0>(token), get<1>(token));
         if (!parsedValue.second)
             YSON_THROW("Invalid floating point value");
         value = parsedValue.first;
@@ -382,7 +414,7 @@ namespace Yson
     void JsonReader::read(long double& value) const
     {
         auto token = getValueToken();
-        auto parsedValue = parseLongDouble(token.first, token.second);
+        auto parsedValue = parseLongDouble(get<0>(token), get<1>(token));
         if (!parsedValue.second)
             YSON_THROW("Invalid floating point value");
         value = parsedValue.first;
@@ -545,28 +577,28 @@ namespace Yson
 
     int JsonReader::languageExtensions() const
     {
-        return m_LanguagExtensions;
+        return m_LanguageExtensions;
     }
 
     JsonReader& JsonReader::setLanguageExtensions(int value)
     {
-        m_LanguagExtensions = value;
+        m_LanguageExtensions = value;
         return *this;
     }
 
     bool JsonReader::languageExtension(
             JsonReader::LanguageExtensions ext) const
     {
-        return (m_LanguagExtensions & ext) != 0;
+        return (m_LanguageExtensions & ext) != 0;
     }
 
     JsonReader& JsonReader::setLanguageExtension(
             JsonReader::LanguageExtensions ext, bool value)
     {
         if (value)
-            m_LanguagExtensions |= ext;
+            m_LanguageExtensions |= ext;
         else
-            m_LanguagExtensions &= ~ext;
+            m_LanguageExtensions &= ~ext;
         return *this;
     }
 
@@ -981,27 +1013,29 @@ namespace Yson
         }
     }
 
-    std::pair<const char*, const char*> JsonReader::getValueToken() const
+    std::tuple<const char*, const char*, bool> JsonReader::getValueToken() const
     {
         auto token = m_Tokenizer.rawToken();
+        auto isString = false;
         if (m_Tokenizer.tokenType() == JsonTokenType::STRING)
         {
             ++token.first;
             --token.second;
+            isString = true;
         }
         else if (m_Tokenizer.tokenType() != JsonTokenType::VALUE)
         {
             YSON_THROW("Current token is not a value.");
         }
-        return token;
+        return std::make_tuple(token.first, token.second, isString);
     }
 
     template<typename T>
     void JsonReader::readSignedInteger(T& value) const
     {
         auto token = getValueToken();
-        auto parsedValue = parseInteger(token.first, token.second,
-                                        isExtendedIntegersEnabled());
+        auto parsedValue = parseInteger(get<0>(token), get<1>(token),
+                                        get<2>(token) || isExtendedIntegersEnabled());
         if (!parsedValue.second)
             YSON_THROW("Invalid integer");
         value = static_cast<T>(parsedValue.first);
@@ -1013,13 +1047,11 @@ namespace Yson
     void JsonReader::readUnsignedInteger(T& value) const
     {
         auto token = getValueToken();
-        if (token.first != token.second && *token.first == '-')
-        {
-            YSON_THROW("Attempt to read a signed integer as "
-                               "an unsigned integer.");
-        }
-        auto parsedValue = parseInteger(token.first, token.second,
-                                        isExtendedIntegersEnabled());
+        if (get<0>(token) != get<1>(token) && *get<0>(token) == '-')
+            YSON_THROW("Attempt to read a signed integer as an unsigned integer.");
+
+        auto parsedValue = parseInteger(get<0>(token), get<1>(token),
+                                        get<2>(token) || isExtendedIntegersEnabled());
         if (!parsedValue.second)
             YSON_THROW("Invalid integer");
         auto unsignedValue = static_cast<uint64_t>(parsedValue.first);

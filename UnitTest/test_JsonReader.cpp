@@ -137,8 +137,10 @@ void test_Integer()
     Y_CALL(testRead<int32_t>("-2147483648", -2147483648));
     Y_CALL(testRead<uint32_t>("4294967295", 4294967295u));
     Y_CALL(testRead<int64_t>("9223372036854775807", 9223372036854775807LL));
-    Y_CALL(testRead<uint64_t>("18446744073709551615",
-                              18446744073709551615ULL));
+    Y_CALL(testRead<uint64_t>("18446744073709551615", 18446744073709551615ULL));
+    Y_CALL(testRead<uint16_t>("\"0b1001\"", 9));
+    Y_CALL(testRead<uint16_t>("\"0xC0A\"", 0xC0A));
+    Y_CALL(testRead<uint16_t>("\"0o7543\"", 07543));
 }
 
 void test_IntegerError()

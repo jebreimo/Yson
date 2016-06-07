@@ -78,6 +78,25 @@ namespace
         Y_EQUAL(ss.str(), expected);
     }
 
+    template <typename T>
+    void doTestInteger(T value,
+                       JsonWriter::IntegerMode mode,
+                       const std::string& expected)
+    {
+        std::stringstream ss;
+        JsonWriter writer(ss);
+        writer.setIntegerMode(mode);
+        writer.writeValue(value);
+        Y_EQUAL(ss.str(), expected);
+    }
+
+    void test_Integers()
+    {
+        doTestInteger(32, JsonWriter::HEXADECIMAL, R"("0x20")");
+        doTestInteger(20, JsonWriter::BINARY, R"("0b10100")");
+        doTestInteger(20, JsonWriter::OCTAL, R"("0o24")");
+    }
+
     void test_FloatingPointValues()
     {
         std::stringstream ss;
@@ -92,5 +111,6 @@ namespace
     Y_TEST(test_EscapedString,
            test_Newline,
            test_SimpleObject,
+           test_Integers,
            test_FloatingPointValues);
 }
