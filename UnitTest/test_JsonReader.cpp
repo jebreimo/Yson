@@ -138,6 +138,8 @@ void test_Integer()
     Y_CALL(testRead<uint32_t>("4294967295", 4294967295u));
     Y_CALL(testRead<int64_t>("9223372036854775807", 9223372036854775807LL));
     Y_CALL(testRead<uint64_t>("18446744073709551615", 18446744073709551615ULL));
+    Y_CALL(testRead<uint64_t>(R"("18_446_744_073_709_551_615")",
+                              18446744073709551615ULL));
     Y_CALL(testRead<uint16_t>("\"0b1001\"", 9));
     Y_CALL(testRead<uint16_t>("\"0xC0A\"", 0xC0A));
     Y_CALL(testRead<uint16_t>("\"0o7543\"", 07543));
@@ -254,6 +256,20 @@ void test_RecoverFromError()
     Y_ASSERT(!reader.nextValue());
 };
 
+void test_StringValueType()
+{
+    auto getType = [](const std::string& s) -> ValueType_t
+    {
+        std::istringstream ss(s);
+        JsonReader reader(ss);
+        Y_ASSERT(reader.nextValue());
+        return reader.stringValueType();
+    };
+
+    Y_EQUAL(getType(R"("ABCD")"), ValueType::STRING);
+    Y_EQUAL(getType(R"("0xABCD")"), ValueType::INTEGER);
+}
+
 void test_ValuesAsStrings()
 {
     std::string doc = "[null, 12.34, fooz, \"baz\"]";
@@ -293,4 +309,5 @@ Y_TEST(test_BlockString,
        test_NextDocument,
        test_NextDocument_comments,
        test_RecoverFromError,
+       test_StringValueType,
        test_ValuesAsStrings);
