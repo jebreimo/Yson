@@ -342,7 +342,7 @@ namespace Yson
         return equalsNull(get<0>(token), get<1>(token));
     }
 
-    void JsonReader::read(bool& value) const
+    void JsonReader::readValue(bool& value) const
     {
         auto token = getValueToken();
         if (equalsTrue(get<0>(token), get<1>(token)))
@@ -353,47 +353,47 @@ namespace Yson
             YSON_THROW("Invalid boolean value");
     }
 
-    void JsonReader::read(int8_t& value) const
+    void JsonReader::readValue(int8_t& value) const
     {
         readSignedInteger(value);
     }
 
-    void JsonReader::read(int16_t& value) const
+    void JsonReader::readValue(int16_t& value) const
     {
         readSignedInteger(value);
     }
 
-    void JsonReader::read(int32_t& value) const
+    void JsonReader::readValue(int32_t& value) const
     {
         readSignedInteger(value);
     }
 
-    void JsonReader::read(int64_t& value) const
+    void JsonReader::readValue(int64_t& value) const
     {
         readSignedInteger(value);
     }
 
-    void JsonReader::read(uint8_t& value) const
+    void JsonReader::readValue(uint8_t& value) const
     {
         readUnsignedInteger(value);
     }
 
-    void JsonReader::read(uint16_t& value) const
+    void JsonReader::readValue(uint16_t& value) const
     {
         readUnsignedInteger(value);
     }
 
-    void JsonReader::read(uint32_t& value) const
+    void JsonReader::readValue(uint32_t& value) const
     {
         readUnsignedInteger(value);
     }
 
-    void JsonReader::read(uint64_t& value) const
+    void JsonReader::readValue(uint64_t& value) const
     {
         readUnsignedInteger(value);
     }
 
-    void JsonReader::read(float& value) const
+    void JsonReader::readValue(float& value) const
     {
         auto token = getValueToken();
         auto parsedValue = parseFloat(get<0>(token), get<1>(token));
@@ -402,7 +402,7 @@ namespace Yson
         value = parsedValue.first;
     }
 
-    void JsonReader::read(double& value) const
+    void JsonReader::readValue(double& value) const
     {
         auto token = getValueToken();
         auto parsedValue = parseDouble(get<0>(token), get<1>(token));
@@ -411,7 +411,7 @@ namespace Yson
         value = parsedValue.first;
     }
 
-    void JsonReader::read(long double& value) const
+    void JsonReader::readValue(long double& value) const
     {
         auto token = getValueToken();
         auto parsedValue = parseLongDouble(get<0>(token), get<1>(token));
@@ -420,7 +420,7 @@ namespace Yson
         value = parsedValue.first;
     }
 
-    void JsonReader::read(std::string& value) const
+    void JsonReader::readValue(std::string& value) const
     {
         auto token = m_Tokenizer.rawToken();
         if (m_Tokenizer.tokenType() == JsonTokenType::STRING)
@@ -446,7 +446,7 @@ namespace Yson
     void JsonReader::readBase64(std::vector<uint8_t>& value) const
     {
         std::string rawValue;
-        read(rawValue);
+        readValue(rawValue);
         try
         {
             value = fromBase64(rawValue);

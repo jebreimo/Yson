@@ -69,31 +69,31 @@ namespace Yson {
 
         bool isNull() const;
 
-        void read(bool& value) const;
+        void readValue(bool& value) const;
 
-        void read(int8_t& value) const;
+        void readValue(int8_t& value) const;
 
-        void read(int16_t& value) const;
+        void readValue(int16_t& value) const;
 
-        void read(int32_t& value) const;
+        void readValue(int32_t& value) const;
 
-        void read(int64_t& value) const;
+        void readValue(int64_t& value) const;
 
-        void read(uint8_t& value) const;
+        void readValue(uint8_t& value) const;
 
-        void read(uint16_t& value) const;
+        void readValue(uint16_t& value) const;
 
-        void read(uint32_t& value) const;
+        void readValue(uint32_t& value) const;
 
-        void read(uint64_t& value) const;
+        void readValue(uint64_t& value) const;
 
-        void read(float& value) const;
+        void readValue(float& value) const;
 
-        void read(double& value) const;
+        void readValue(double& value) const;
 
-        void read(long double& value) const;
+        void readValue(long double& value) const;
 
-        void read(std::string& value) const;
+        void readValue(std::string& value) const;
 
         void readBase64(std::vector<uint8_t>& value) const;
 
@@ -237,7 +237,7 @@ namespace Yson {
     T read(JsonReader& reader)
     {
         T value;
-        reader.read(value);
+        reader.readValue(value);
         return value;
     }
 }

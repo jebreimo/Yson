@@ -20,7 +20,7 @@ The high-level interface of JsonReader consists of the following members:
 * *nextValue()* for advancing to the next value in a JSON-array or JSON-object.
 * *enter()* for entering the JSON-array or JSON-object starting at the current position in the file. nextKey() and nextValue() will only advance through the most recently entered structure, structures that haven been entered will be skipped entirely by next time either of the two functions is called.
 * *leave()* for leaving the most recently *entered* JSON-array or JSON-object.
-* *read(...)* for reading the current key or value.
+* *readValue(...)* for reading the current key or value.
 * *valueType()* returns the value type of the current key or value.
 
 Example
@@ -69,20 +69,20 @@ Person deserializePerson(Yson::JsonReader& reader)
     while (reader.nextKey())
     {
         // Read the key
-        auto key = read<std::string>(reader);
+        auto key = readValue<std::string>(reader);
 
         // Advance the reader from the key to the value
         reader.nextValue();
 
         // Depending on the key, read the corresponding value
         if (key == "first-name")
-            reader.read(person.firstName);
+            reader.readValue(person.firstName);
         else if (key == "last-name")
-            reader.read(person.lastName);
+            reader.readValue(person.lastName);
         else if (key == "year-of-birth")
-            reader.read(person.yearOfBirth);
+            reader.readValue(person.yearOfBirth);
         else if (key == "score")
-            reader.read(person.score);
+            reader.readValue(person.score);
     }
 
     // Leave the JSON object an make nextKey/nextValue apply to the parent structure.

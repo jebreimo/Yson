@@ -19,7 +19,7 @@ void testReadFails(const std::string& doc)
     JsonReader reader(ss);
     Y_ASSERT(reader.nextValue());
     T n;
-    Y_THROWS(reader.read(n), JsonReaderException);
+    Y_THROWS(reader.readValue(n), JsonReaderException);
 }
 
 template <typename T>
@@ -28,7 +28,7 @@ void read(const std::string& doc, T& value)
     std::istringstream ss(doc);
     JsonReader reader(ss);
     Y_ASSERT(reader.nextValue());
-    Y_NO_THROW(reader.read(value), JsonReaderException);
+    Y_NO_THROW(reader.readValue(value), JsonReaderException);
 }
 
 template<typename T>
