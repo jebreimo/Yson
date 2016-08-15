@@ -36,6 +36,7 @@ set(PUBLIC_HEADERS
 set(PRIVATE_HEADERS
     Yson/Base64.hpp
     Yson/GetValueType.hpp
+    Yson/IsJavaScriptIdentifier.hpp
     Yson/ParseDouble.hpp
     Yson/ParseInteger.hpp
     Yson/Span.hpp
@@ -46,6 +47,7 @@ set(PRIVATE_HEADERS
 set(SOURCE_FILES
     Yson/Base64.cpp
     Yson/GetValueType.cpp
+    Yson/IsJavaScriptIdentifier.cpp
     Yson/JsonReader.cpp
     Yson/JsonReaderException.cpp
     Yson/JsonTokenizer.cpp

@@ -147,6 +147,10 @@ namespace Yson
 
         JsonWriter& setNonFiniteFloatsAsStringsEnabled(bool value);
 
+        bool isUnquotedValueNamesEnabled() const;
+
+        JsonWriter& setUnquotedValueNamesEnabled(bool value);
+
         IntegerMode integerMode() const;
 
         JsonWriter& setIntegerMode(IntegerMode mode);
@@ -170,7 +174,8 @@ namespace Yson
             NON_FINITE_FLOATS_AS_STRINGS = 1,
             INTEGERS_AS_BIN = 2,
             INTEGERS_AS_OCT = 4,
-            INTEGERS_AS_HEX = 6
+            INTEGERS_AS_HEX = 6,
+            UNQUOTED_VALUE_NAMES = 8
         };
 
         bool languageExtension(LanguageExtensions ext) const;

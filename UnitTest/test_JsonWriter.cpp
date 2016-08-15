@@ -108,9 +108,26 @@ namespace
         Y_EQUAL(ss.str(), "\"infinity\"");
     }
 
+    void test_UnquotedValueNames()
+    {
+        std::stringstream ss;
+        JsonWriter writer(ss);
+        writer.setUnquotedValueNamesEnabled(true).setFormattingEnabled(false);
+        writer.writeBeginObject()
+                .writeValue("Key1", 0)
+                .writeValue("$Key2_", 1)
+                .writeValue("_Key$3", 2)
+                .writeValue("4Key4", 3)
+                .writeValue("Key 5", 4)
+                .writeEndObject();
+        Y_EQUAL(ss.str(),
+                "{Key1:0,$Key2_:1,_Key$3:2,\"4Key4\":3,\"Key 5\":4}");
+    }
+
     Y_TEST(test_EscapedString,
            test_Newline,
            test_SimpleObject,
            test_Integers,
-           test_FloatingPointValues);
+           test_FloatingPointValues,
+           test_UnquotedValueNames);
 }

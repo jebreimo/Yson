@@ -14,6 +14,7 @@
 #include "../Ystring/Conversion.hpp"
 #include "../Ystring/Escape/Escape.hpp"
 #include "Base64.hpp"
+#include "IsJavaScriptIdentifier.hpp"
 
 #define JSONWRITER_THROW(msg) \
     throw std::logic_error(msg)
@@ -432,6 +433,16 @@ namespace Yson
         return setLanguageExtension(NON_FINITE_FLOATS_AS_STRINGS, value);
     }
 
+    bool JsonWriter::isUnquotedValueNamesEnabled() const
+    {
+        return languageExtension(UNQUOTED_VALUE_NAMES);
+    }
+
+    JsonWriter& JsonWriter::setUnquotedValueNamesEnabled(bool value)
+    {
+        return setLanguageExtension(UNQUOTED_VALUE_NAMES, value);
+    }
+
     JsonWriter::IntegerMode JsonWriter::integerMode() const
     {
         switch (m_LanguagExtensions & INTEGERS_AS_HEX)
@@ -538,7 +549,15 @@ namespace Yson
         }
 
         if (isInsideObject())
-            *m_Stream << "\"" << m_ValueName << "\": ";
+        {
+            if (!isUnquotedValueNamesEnabled()
+                || !isJavaScriptIdentifier(m_ValueName))
+                *m_Stream << "\"" << m_ValueName
+                          << (formatting() != NONE ? "\": " : "\":");
+            else
+                *m_Stream << m_ValueName
+                          << (formatting() != NONE ? ": " : ":");
+        }
     }
 
     JsonWriter::Formatting JsonWriter::formatting() const
