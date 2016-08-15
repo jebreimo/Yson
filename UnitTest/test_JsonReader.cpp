@@ -143,6 +143,10 @@ void test_Integer()
     Y_CALL(testRead<uint16_t>("\"0b1001\"", 9));
     Y_CALL(testRead<uint16_t>("\"0xC0A\"", 0xC0A));
     Y_CALL(testRead<uint16_t>("\"0o7543\"", 07543));
+    Y_CALL(testRead<uint16_t>("\"0\"", 0));
+    Y_CALL(testRead<uint16_t>("false", 0));
+    Y_CALL(testRead<int8_t>("true", 1));
+    Y_CALL(testRead<int64_t>("null", 0));
 }
 
 void test_IntegerError()
@@ -160,6 +164,7 @@ void test_IntegerError()
     Y_CALL(testReadFails<uint32_t>("4294967296"));
     Y_CALL(testReadFails<uint32_t>("-1"));
     Y_CALL(testReadFails<uint64_t>("-1"));
+    Y_CALL(testReadFails<int64_t>("-2false"));
 }
 
 void test_LineAndColumnNumbers()

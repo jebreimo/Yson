@@ -5,6 +5,7 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
+#include <string>
 #include "ParseInteger.hpp"
 
 namespace Yson {
@@ -29,6 +30,8 @@ namespace Yson {
         if (first == last)
             return Result(0, false);
 
+        auto originalFirst = first;
+
         int64_t sign = 1;
         if (*first == '-')
         {
@@ -46,7 +49,7 @@ namespace Yson {
         if (*first == '0' && detectBase)
         {
             if (++first == last)
-                return Result(0, false);
+                return Result(0, true);
             switch (*first | 0x20)
             {
             case 'b':
@@ -81,6 +84,16 @@ namespace Yson {
             }
             else if (!detectBase || *first != '_')
             {
+                if (first == originalFirst)
+                {
+                    auto asString = std::string(first, last);
+                    if (asString == "false")
+                        return Result(0, true);
+                    if (asString == "null")
+                        return Result(0, true);
+                    if (asString == "true")
+                        return Result(1, true);
+                }
                 return Result(0, false);
             }
             ++first;

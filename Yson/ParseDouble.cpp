@@ -10,7 +10,7 @@
 #include <cmath>
 #include <cstdint>
 #include <limits>
-#include <algorithm>
+#include <string>
 
 namespace Yson
 {
@@ -28,7 +28,7 @@ namespace Yson
     {
         typedef std::pair<T, bool> Result;
         if (first == last)
-            return Result();
+            return Result(0, false);
 
         // Get the sign of the number
         bool negative = false;
@@ -36,32 +36,28 @@ namespace Yson
         {
             negative = true;
             if (++first == last)
-                return Result();
+                return Result(0, false);
         }
         else if (*first == '+')
         {
             if (++first == last)
-                return Result();
-        }
-
-        if (*first == 'i' && last - first == 8
-            && std::equal(first, last, "infinity"))
-        {
-            return Result(negative ? -std::numeric_limits<T>::infinity()
-                                   : std::numeric_limits<T>::infinity(),
-                          true);
-        }
-        if (*first == 'N' && last - first == 3
-            && std::equal(first, last, "NaN"))
-        {
-            return std::make_pair(std::numeric_limits<T>::quiet_NaN(),
-                                  true);
+                return Result(0, false);
         }
 
         // Get the integer value
         auto value = T(getDigit(*first));
         if (value > 9)
-            return Result();
+        {
+            auto asString = std::string(first, last);
+            if (asString == "infinity")
+                return Result(negative ? -std::numeric_limits<T>::infinity()
+                                       : std::numeric_limits<T>::infinity(),
+                              true);
+            if (asString == "NaN" || asString == "null")
+                return Result(std::numeric_limits<T>::quiet_NaN(), true);
+            return Result(0, false);
+        }
+
         while (true)
         {
             if (++first == last)
@@ -95,27 +91,27 @@ namespace Yson
         if (first != last)
         {
             if ((*first & 0xDF) != 'E')
-                return Result();
+                return Result(0, false);
 
             if (++first == last)
-                return Result();
+                return Result(0, false);
 
             bool negativeExponent = false;
             if (*first == '-')
             {
                 negativeExponent = true;
                 if (++first == last)
-                    return Result();
+                    return Result(0, false);
             }
             else if (*first == '+')
             {
                 if (++first == last)
-                    return Result();
+                    return Result(0, false);
             }
 
             int explicitExponent = getDigit(*first);
             if (explicitExponent > 9)
-                return Result();
+                return Result(0, false);
 
             while (++first != last)
             {
@@ -124,7 +120,7 @@ namespace Yson
                 explicitExponent *= 10;
                 explicitExponent += getDigit(*first);
                 if (explicitExponent > std::numeric_limits<T>::max_exponent10)
-                    return Result();
+                    return Result(0, false);
             }
 
             if (negativeExponent)

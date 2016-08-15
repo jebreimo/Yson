@@ -25,6 +25,21 @@ namespace {
         Y_EQUAL(result.second, false);
     }
 
+    void isNotANumber(const std::string& s)
+    {
+        auto result = parseDouble(s.data(), s.data() + s.size());
+        Y_EQUAL(result.second, true);
+        Y_ASSERT(isnan(result.first));
+    }
+
+    void isInfinite(const std::string& s, bool negative)
+    {
+        auto result = parseDouble(s.data(), s.data() + s.size());
+        Y_EQUAL(result.second, true);
+        Y_ASSERT(isinf(result.first));
+        Y_EQUAL(result.first < 0, negative);
+    }
+
     void test_parseDouble()
     {
         Y_CALL(failure(""));
@@ -63,6 +78,11 @@ namespace {
         Y_CALL(failure("1e309"));
         Y_CALL(success("1e-308", 1e-308));
         Y_CALL(failure("1e-309"));
+        Y_CALL(isNotANumber("NaN"));
+        Y_CALL(isNotANumber("null"));
+        Y_CALL(isInfinite("infinity", false));
+        Y_CALL(isInfinite("+infinity", false));
+        Y_CALL(isInfinite("-infinity", true));
     }
 
     Y_TEST(test_parseDouble);
