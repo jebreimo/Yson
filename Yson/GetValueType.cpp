@@ -17,27 +17,27 @@ namespace Yson {
         bool isHexDigit(char c);
 
         template<typename Predicate>
-        ValueType_t getValueType(const char* first, const char* last,
-                                 Predicate isDigit, ValueType_t type);
+        ValueType getValueType(const char* first, const char* last,
+                                 Predicate isDigit, ValueType type);
 
-        ValueType_t getBinaryValueType(const char* first, const char* last);
+        ValueType getBinaryValueType(const char* first, const char* last);
 
-        ValueType_t getOctalValueType(const char* first, const char* last);
+        ValueType getOctalValueType(const char* first, const char* last);
 
-        ValueType_t getHexadecimalValueType(const char* first,
+        ValueType getHexadecimalValueType(const char* first,
                                             const char* last);
 
-        ValueType_t getFloatingPointValueType(const char* first,
+        ValueType getFloatingPointValueType(const char* first,
                                               const char* last);
 
-        ValueType_t getNumberValueType(const char* first, const char* last);
+        ValueType getNumberValueType(const char* first, const char* last);
     }
 
-    ValueType_t getValueType(const char* first, const char* last)
+    ValueType getValueType(const char* first, const char* last)
     {
         if (first == last)
             return ValueType::INVALID;
-        auto assumedType = ValueType_t(ValueType::UNKNOWN);
+        auto assumedType = ValueType::UNKNOWN;
         if (*first == '-' || *first == '+')
         {
             if (++first == last)
@@ -98,12 +98,12 @@ namespace Yson {
         return ValueType::INVALID;
     }
 
-    ValueType_t getValueType(const std::pair<const char*, const char*>& value)
+    ValueType getValueType(const std::pair<const char*, const char*>& value)
     {
         return getValueType(value.first, value.second);
     }
 
-    ValueType_t getValueType(const std::string& s)
+    ValueType getValueType(const std::string& s)
     {
         return getValueType(s.data(), s.data() + s.size());
     }
@@ -123,8 +123,8 @@ namespace Yson {
         }
 
         template<typename Predicate>
-        ValueType_t getValueType(const char* first, const char* last,
-                                 Predicate isDigit, ValueType_t type)
+        ValueType getValueType(const char* first, const char* last,
+                               Predicate isDigit, ValueType type)
         {
             if (first == last)
                 return ValueType::INVALID;
@@ -136,21 +136,21 @@ namespace Yson {
             return ValueType::INVALID;
         }
 
-        ValueType_t getBinaryValueType(const char* first, const char* last)
+        ValueType getBinaryValueType(const char* first, const char* last)
         {
             return getValueType(first, last,
                                 [](char c) { return getDigit(c) <= 1; },
                                 ValueType::BIN_INTEGER);
         }
 
-        ValueType_t getOctalValueType(const char* first, const char* last)
+        ValueType getOctalValueType(const char* first, const char* last)
         {
             return getValueType(first, last,
                                 [](char c) { return getDigit(c) <= 7; },
                                 ValueType::OCT_INTEGER);
         }
 
-        ValueType_t getHexadecimalValueType(const char* first,
+        ValueType getHexadecimalValueType(const char* first,
                                             const char* last)
         {
             return getValueType(first, last,
@@ -158,7 +158,7 @@ namespace Yson {
                                 ValueType::HEX_INTEGER);
         }
 
-        ValueType_t getFloatingPointValueType(const char* first,
+        ValueType getFloatingPointValueType(const char* first,
                                               const char* last)
         {
             if (*first == '.')
@@ -188,7 +188,7 @@ namespace Yson {
             return ValueType::INVALID;
         }
 
-        ValueType_t getNumberValueType(const char* first, const char* last)
+        ValueType getNumberValueType(const char* first, const char* last)
         {
             while (getDigit(*first) <= 9)
             {

@@ -13,10 +13,10 @@
 
 namespace Yson {
 
-    YSON_API ValueType_t getValueType(const char* first, const char* last);
+    YSON_API ValueType getValueType(const char* first, const char* last);
 
-    YSON_API ValueType_t getValueType(
+    YSON_API ValueType getValueType(
             const std::pair<const char*, const char*>& value);
 
-    YSON_API ValueType_t getValueType(const std::string& value);
+    YSON_API ValueType getValueType(const std::string& value);
 }

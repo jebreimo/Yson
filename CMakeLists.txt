@@ -23,11 +23,11 @@ endif(APPLE)
 add_subdirectory(Ystring)
 
 set(PUBLIC_HEADERS
-    Yson/JsonReader.hpp
-    Yson/JsonReaderException.hpp
-    Yson/JsonTokenType.hpp
-    Yson/JsonTokenizer.hpp
-    Yson/JsonWriter.hpp
+    Yson/Reader.hpp
+    Yson/ReaderException.hpp
+    Yson/TokenType.hpp
+    Yson/Tokenizer.hpp
+    Yson/Writer.hpp
     Yson/LineNumberCounter.hpp
     Yson/ValueType.hpp
     Yson/YsonDefinitions.hpp
@@ -48,10 +48,10 @@ set(SOURCE_FILES
     Yson/Base64.cpp
     Yson/GetValueType.cpp
     Yson/IsJavaScriptIdentifier.cpp
-    Yson/JsonReader.cpp
-    Yson/JsonReaderException.cpp
-    Yson/JsonTokenizer.cpp
-    Yson/JsonWriter.cpp
+    Yson/Reader.cpp
+    Yson/ReaderException.cpp
+    Yson/Tokenizer.cpp
+    Yson/Writer.cpp
     Yson/LineNumberCounter.cpp
     Yson/ParseDouble.cpp
     Yson/ParseInteger.cpp

@@ -14,9 +14,9 @@ set(SOURCE_FILES
     main.cpp
     test_Base64.cpp
     test_GetValueType.cpp
-    test_JsonReader.cpp
-    test_JsonTokenizer.cpp
-    test_JsonWriter.cpp
+    test_Reader.cpp
+    test_Tokenizer.cpp
+    test_Writer.cpp
     test_ParseDouble.cpp)
 
 add_executable(${PROJECT_NAME}

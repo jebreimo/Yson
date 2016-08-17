@@ -1,4 +1,4 @@
-#include "../Yson/JsonWriter.hpp"
+#include "../Yson/Writer.hpp"
 
 #include <limits>
 #include <sstream>
@@ -11,7 +11,7 @@ namespace
     void test_EscapedString()
     {
         std::stringstream ss;
-        JsonWriter(ss)
+        Writer(ss)
             .writeValue("\"foo\nbar\t\\x89baz\"");
         std::string expected = "\"\\\"foo\\nbar\\t\\\\x89baz\\\"\"";
         Y_EQUAL(ss.str(), expected);
@@ -20,8 +20,8 @@ namespace
     void test_Newline()
     {
         std::stringstream ss;
-        JsonWriter(ss)
-            .writeBeginArray(JsonWriter::FLAT)
+        Writer(ss)
+            .writeBeginArray(Writer::FLAT)
             .writeNewline()
             .indent()
 
@@ -65,7 +65,7 @@ namespace
     void test_SimpleObject()
     {
         std::stringstream ss;
-        JsonWriter(ss)
+        Writer(ss)
             .writeBeginObject()
             .setValueName("name")
             .writeBeginObject()
@@ -80,11 +80,11 @@ namespace
 
     template <typename T>
     void doTestInteger(T value,
-                       JsonWriter::IntegerMode mode,
+                       Writer::IntegerMode mode,
                        const std::string& expected)
     {
         std::stringstream ss;
-        JsonWriter writer(ss);
+        Writer writer(ss);
         writer.setIntegerMode(mode);
         writer.writeValue(value);
         Y_EQUAL(ss.str(), expected);
@@ -92,15 +92,15 @@ namespace
 
     void test_Integers()
     {
-        doTestInteger(32, JsonWriter::HEXADECIMAL, R"("0x20")");
-        doTestInteger(20, JsonWriter::BINARY, R"("0b10100")");
-        doTestInteger(20, JsonWriter::OCTAL, R"("0o24")");
+        doTestInteger(32, Writer::HEXADECIMAL, R"("0x20")");
+        doTestInteger(20, Writer::BINARY, R"("0b10100")");
+        doTestInteger(20, Writer::OCTAL, R"("0o24")");
     }
 
     void test_FloatingPointValues()
     {
         std::stringstream ss;
-        JsonWriter writer(ss);
+        Writer writer(ss);
         Y_THROWS(writer.writeValue(std::numeric_limits<double>::infinity()),
                  std::logic_error);
         writer.setNonFiniteFloatsAsStringsEnabled(true);
@@ -111,7 +111,7 @@ namespace
     void test_UnquotedValueNames()
     {
         std::stringstream ss;
-        JsonWriter writer(ss);
+        Writer writer(ss);
         writer.setUnquotedValueNamesEnabled(true).setFormattingEnabled(false);
         writer.writeBeginObject()
                 .writeValue("Key1", 0)

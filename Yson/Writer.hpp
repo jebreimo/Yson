@@ -17,122 +17,122 @@
 namespace Yson
 {
 
-    class YSON_API JsonWriter
+    class YSON_API Writer
     {
     public:
         enum Formatting {DEFAULT, NONE, FLAT, FORMAT};
         enum IntegerMode {DECIMAL, BINARY, OCTAL, HEXADECIMAL};
 
-        JsonWriter();
+        Writer();
 
-        JsonWriter(const std::string& fileName);
+        Writer(const std::string& fileName);
 
-        JsonWriter(std::ostream& stream);
+        Writer(std::ostream& stream);
 
-        JsonWriter(std::unique_ptr<std::ostream>&& stream);
+        Writer(std::unique_ptr<std::ostream>&& stream);
 
-        JsonWriter(JsonWriter&& rhs);
+        Writer(Writer&& rhs);
 
-        ~JsonWriter();
+        ~Writer();
 
-        JsonWriter& operator=(JsonWriter&& rhs);
+        Writer& operator=(Writer&& rhs);
 
         bool isFormattingEnabled() const;
 
-        JsonWriter& setFormattingEnabled(bool value);
+        Writer& setFormattingEnabled(bool value);
 
         std::pair<char, unsigned> indentation() const;
 
-        JsonWriter& setIndentation(char character, unsigned width);
+        Writer& setIndentation(char character, unsigned width);
 
         std::ostream* stream();
 
         const std::string& valueName() const;
 
-        JsonWriter& setValueName(const std::string& name);
+        Writer& setValueName(const std::string& name);
 
-        JsonWriter& writeBeginArray(Formatting formatting = DEFAULT);
+        Writer& writeBeginArray(Formatting formatting = DEFAULT);
 
-        JsonWriter& writeBeginArray(const std::string& name,
+        Writer& writeBeginArray(const std::string& name,
                                     Formatting formatting = DEFAULT);
 
-        JsonWriter& writeEndArray();
+        Writer& writeEndArray();
 
-        JsonWriter& writeBeginObject(Formatting formatting = DEFAULT);
+        Writer& writeBeginObject(Formatting formatting = DEFAULT);
 
-        JsonWriter& writeBeginObject(const std::string& name,
+        Writer& writeBeginObject(const std::string& name,
                                      Formatting formatting = DEFAULT);
 
-        JsonWriter& writeEndObject();
+        Writer& writeEndObject();
 
-        JsonWriter& writeNull();
+        Writer& writeNull();
 
-        JsonWriter& writeNull(const std::string& name);
+        Writer& writeNull(const std::string& name);
 
-        JsonWriter& writeBool(bool value);
+        Writer& writeBool(bool value);
 
-        JsonWriter& writeBool(const std::string& name, bool value);
+        Writer& writeBool(const std::string& name, bool value);
 
-        JsonWriter& writeValue(int8_t value);
+        Writer& writeValue(int8_t value);
 
-        JsonWriter& writeValue(int16_t value);
+        Writer& writeValue(int16_t value);
 
-        JsonWriter& writeValue(int32_t value);
+        Writer& writeValue(int32_t value);
 
-        JsonWriter& writeValue(int64_t value);
+        Writer& writeValue(int64_t value);
 
-        JsonWriter& writeValue(uint8_t value);
+        Writer& writeValue(uint8_t value);
 
-        JsonWriter& writeValue(uint16_t value);
+        Writer& writeValue(uint16_t value);
 
-        JsonWriter& writeValue(uint32_t value);
+        Writer& writeValue(uint32_t value);
 
-        JsonWriter& writeValue(uint64_t value);
+        Writer& writeValue(uint64_t value);
 
-        JsonWriter& writeValue(float value);
+        Writer& writeValue(float value);
 
-        JsonWriter& writeValue(double value);
+        Writer& writeValue(double value);
 
-        JsonWriter& writeValue(long double value);
+        Writer& writeValue(long double value);
 
-        JsonWriter& writeValue(const std::string& value);
+        Writer& writeValue(const std::string& value);
 
-        JsonWriter& writeValue(const std::wstring& value);
+        Writer& writeValue(const std::wstring& value);
 
         template <typename T>
-        JsonWriter& writeValue(const std::string& name, const T& value)
+        Writer& writeValue(const std::string& name, const T& value)
         {
             setValueName(name);
             return this->writeValue(value);
         }
 
-        JsonWriter& writeRawValue(const std::string& value);
+        Writer& writeRawValue(const std::string& value);
 
-        JsonWriter& writeRawValue(const std::string& name,
+        Writer& writeRawValue(const std::string& name,
                                   const std::string& value);
 
-        JsonWriter& writeRawText(const std::string& text);
+        Writer& writeRawText(const std::string& text);
 
-        JsonWriter& writeBase64(const void* data, size_t size);
+        Writer& writeBase64(const void* data, size_t size);
 
-        JsonWriter& writeBase64(const std::string& name,
+        Writer& writeBase64(const std::string& name,
                                 const void* data, size_t size);
 
-        JsonWriter& indent();
+        Writer& indent();
 
-        JsonWriter& outdent();
+        Writer& outdent();
 
-        JsonWriter& writeComma();
+        Writer& writeComma();
 
-        JsonWriter& writeIndentation();
+        Writer& writeIndentation();
 
-        JsonWriter& writeNewline();
+        Writer& writeNewline();
 
-        JsonWriter& writeSeparator(size_t count = 1);
+        Writer& writeSeparator(size_t count = 1);
 
         int languageExtensions() const;
 
-        JsonWriter& setLanguageExtensions(int value);
+        Writer& setLanguageExtensions(int value);
 
         /** @brief Returns true if special floating point values will be
           *     written as strings.
@@ -145,29 +145,29 @@ namespace Yson
           */
         bool isNonFiniteFloatsAsStringsEnabled() const;
 
-        JsonWriter& setNonFiniteFloatsAsStringsEnabled(bool value);
+        Writer& setNonFiniteFloatsAsStringsEnabled(bool value);
 
         bool isUnquotedValueNamesEnabled() const;
 
-        JsonWriter& setUnquotedValueNamesEnabled(bool value);
+        Writer& setUnquotedValueNamesEnabled(bool value);
 
         IntegerMode integerMode() const;
 
-        JsonWriter& setIntegerMode(IntegerMode mode);
+        Writer& setIntegerMode(IntegerMode mode);
     private:
         void beginValue();
         Formatting formatting() const;
         bool isInsideObject() const;
-        JsonWriter& writeBeginStructure(char startChar, char endChar,
+        Writer& writeBeginStructure(char startChar, char endChar,
                                         Formatting formatting);
         void writeEndStructure(char endChar);
         void writeIndentationImpl();
 
         template <typename T>
-        JsonWriter& writeIntValueImpl(T value);
+        Writer& writeIntValueImpl(T value);
 
         template <typename T>
-        JsonWriter& writeFloatValueImpl(T value);
+        Writer& writeFloatValueImpl(T value);
 
         enum LanguageExtensions
         {
@@ -180,7 +180,7 @@ namespace Yson
 
         bool languageExtension(LanguageExtensions ext) const;
 
-        JsonWriter& setLanguageExtension(LanguageExtensions ext, bool value);
+        Writer& setLanguageExtension(LanguageExtensions ext, bool value);
 
         struct Context
         {

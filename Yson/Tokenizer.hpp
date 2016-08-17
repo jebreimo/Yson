@@ -9,21 +9,22 @@
 
 #include <string>
 #include <vector>
-#include "JsonTokenType.hpp"
+#include "TokenType.hpp"
 #include "YsonDefinitions.hpp"
 
 namespace Yson
 {
-    class YSON_API JsonTokenizer
+    class YSON_API Tokenizer
     {
     public:
-        JsonTokenizer();
-        ~JsonTokenizer();
+        Tokenizer();
+        ~Tokenizer();
 
         bool hasNext() const;
         void next();
-        std::pair<JsonTokenType_t, bool> peek() const;
-        JsonTokenType_t tokenType() const;
+        std::pair<TokenType, bool> peek() const;
+
+        TokenType tokenType() const;
 
         const char* buffer() const;
         void setBuffer(const char* buffer, size_t size);
@@ -43,7 +44,7 @@ namespace Yson
         const char* m_BufferEnd;
         const char* m_TokenStart;
         const char* m_TokenEnd;
-        JsonTokenType_t m_TokenType;
+        TokenType m_TokenType;
         std::vector<char> m_InternalBuffer;
     };
 }

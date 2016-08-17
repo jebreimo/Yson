@@ -5,25 +5,25 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include "JsonReaderException.hpp"
+#include "ReaderException.hpp"
 
 #include <sstream>
 
 namespace Yson
 {
-    JsonReaderException::JsonReaderException()
+    ReaderException::ReaderException()
         : std::logic_error("Unspecified error."),
           m_LineNumber(0),
           m_ColumnNumber(0)
     {}
 
-    JsonReaderException::JsonReaderException(const std::string& msg)
+    ReaderException::ReaderException(const std::string& msg)
         : std::logic_error(msg),
           m_LineNumber(0),
           m_ColumnNumber(0)
     {}
 
-    JsonReaderException::JsonReaderException(
+    ReaderException::ReaderException(
             const std::string& msg,
             const std::string& sourceFileName,
             int sourceFileLineNumber,
@@ -41,7 +41,7 @@ namespace Yson
     }
 
 
-    JsonReaderException::JsonReaderException(
+    ReaderException::ReaderException(
             const std::string& msg,
             const std::string& sourceFileName,
             int sourceFileLineNumber,
@@ -64,7 +64,7 @@ namespace Yson
         m_Message = ss.str();
     }
 
-    const char* JsonReaderException::what() const _NOEXCEPT
+    const char* ReaderException::what() const _NOEXCEPT
     {
         if (!m_Message.empty())
             return m_Message.c_str();

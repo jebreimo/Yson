@@ -5,7 +5,7 @@
 // This file is distributed under the Simplified BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include "JsonWriter.hpp"
+#include "Writer.hpp"
 
 #include <cmath>
 #include <fstream>
@@ -21,7 +21,7 @@
 
 namespace Yson
 {
-    JsonWriter::JsonWriter()
+    Writer::Writer()
         : m_Stream(&std::cout),
           m_State(AT_START_OF_VALUE_NO_COMMA),
           m_Indentation(0),
@@ -31,7 +31,7 @@ namespace Yson
           m_IndentationCharacter(' ')
     {}
 
-    JsonWriter::JsonWriter(const std::string& fileName)
+    Writer::Writer(const std::string& fileName)
         : m_StreamPtr(new std::ofstream(fileName)),
           m_State(AT_START_OF_VALUE_NO_COMMA),
           m_Indentation(0),
@@ -43,7 +43,7 @@ namespace Yson
         m_Stream = m_StreamPtr.get();
     }
 
-    JsonWriter::JsonWriter(std::ostream& stream)
+    Writer::Writer(std::ostream& stream)
         : m_Stream(&stream),
           m_State(AT_START_OF_VALUE_NO_COMMA),
           m_Indentation(0),
@@ -53,7 +53,7 @@ namespace Yson
           m_IndentationCharacter(' ')
     {}
 
-    JsonWriter::JsonWriter(std::unique_ptr<std::ostream>&& stream)
+    Writer::Writer(std::unique_ptr<std::ostream>&& stream)
         : m_StreamPtr(std::move(stream)),
           m_State(AT_START_OF_VALUE_NO_COMMA),
           m_Indentation(0),
@@ -65,7 +65,7 @@ namespace Yson
         m_Stream = m_StreamPtr.get();
     }
 
-    JsonWriter::JsonWriter(JsonWriter&& rhs)
+    Writer::Writer(Writer&& rhs)
         : m_StreamPtr(std::move(rhs.m_StreamPtr)),
           m_Context(std::move(rhs.m_Context)),
           m_ValueName(std::move(rhs.m_ValueName)),
@@ -79,10 +79,10 @@ namespace Yson
         rhs.m_Stream = nullptr;
     }
 
-    JsonWriter::~JsonWriter()
+    Writer::~Writer()
     {}
 
-    JsonWriter& JsonWriter::operator=(JsonWriter&& rhs)
+    Writer& Writer::operator=(Writer&& rhs)
     {
         m_StreamPtr = std::move(rhs.m_StreamPtr);
         m_Stream = rhs.m_Stream;
@@ -96,51 +96,51 @@ namespace Yson
         return *this;
     }
 
-    bool JsonWriter::isFormattingEnabled() const
+    bool Writer::isFormattingEnabled() const
     {
         return m_FormattingEnabled;
     }
 
-    JsonWriter& JsonWriter::setFormattingEnabled(bool value)
+    Writer& Writer::setFormattingEnabled(bool value)
     {
         m_FormattingEnabled = value;
         return *this;
     }
 
-    std::pair<char, unsigned> JsonWriter::indentation() const
+    std::pair<char, unsigned> Writer::indentation() const
     {
         return std::make_pair(m_IndentationCharacter, m_IndentationWidth);
     }
 
-    JsonWriter& JsonWriter::setIndentation(char character, unsigned count)
+    Writer& Writer::setIndentation(char character, unsigned count)
     {
         m_IndentationCharacter = character;
         m_IndentationWidth = count;
         return *this;
     }
 
-    std::ostream* JsonWriter::stream()
+    std::ostream* Writer::stream()
     {
         return m_Stream;
     }
 
-    const std::string& JsonWriter::valueName() const
+    const std::string& Writer::valueName() const
     {
         return m_ValueName;
     }
 
-    JsonWriter& JsonWriter::setValueName(const std::string& name)
+    Writer& Writer::setValueName(const std::string& name)
     {
         m_ValueName = name;
         return *this;
     }
 
-    JsonWriter& JsonWriter::writeBeginArray(Formatting formatting)
+    Writer& Writer::writeBeginArray(Formatting formatting)
     {
         return writeBeginStructure('[', ']', formatting);
     }
 
-    JsonWriter& JsonWriter::writeBeginArray(const std::string& name,
+    Writer& Writer::writeBeginArray(const std::string& name,
                                             Formatting formatting)
     {
         setValueName(name);
@@ -148,18 +148,18 @@ namespace Yson
         return *this;
     }
 
-    JsonWriter& JsonWriter::writeEndArray()
+    Writer& Writer::writeEndArray()
     {
         writeEndStructure(']');
         return *this;
     }
 
-    JsonWriter& JsonWriter::writeBeginObject(Formatting formatting)
+    Writer& Writer::writeBeginObject(Formatting formatting)
     {
       return writeBeginStructure('{', '}', formatting);
     }
 
-    JsonWriter& JsonWriter::writeBeginObject(const std::string& name,
+    Writer& Writer::writeBeginObject(const std::string& name,
                                              Formatting formatting)
     {
         setValueName(name);
@@ -167,92 +167,92 @@ namespace Yson
         return *this;
     }
 
-    JsonWriter& JsonWriter::writeEndObject()
+    Writer& Writer::writeEndObject()
     {
         writeEndStructure('}');
         return *this;
     }
 
-    JsonWriter& JsonWriter::writeNull()
+    Writer& Writer::writeNull()
     {
         writeValue("null");
         return *this;
     }
 
-    JsonWriter& JsonWriter::writeNull(const std::string& name)
+    Writer& Writer::writeNull(const std::string& name)
     {
         setValueName(name);
         return writeNull();
     }
 
-    JsonWriter& JsonWriter::writeBool(bool value)
+    Writer& Writer::writeBool(bool value)
     {
         writeValue(value ? "true" : "false");
         return *this;
     }
 
-    JsonWriter& JsonWriter::writeBool(const std::string& name, bool value)
+    Writer& Writer::writeBool(const std::string& name, bool value)
     {
         setValueName(name);
         return writeBool(value);
     }
 
-    JsonWriter& JsonWriter::writeValue(int8_t value)
+    Writer& Writer::writeValue(int8_t value)
     {
         return writeIntValueImpl(value);
     }
 
-    JsonWriter& JsonWriter::writeValue(int16_t value)
+    Writer& Writer::writeValue(int16_t value)
     {
         return writeIntValueImpl(value);
     }
 
-    JsonWriter& JsonWriter::writeValue(int32_t value)
+    Writer& Writer::writeValue(int32_t value)
     {
         return writeIntValueImpl(value);
     }
 
-    JsonWriter& JsonWriter::writeValue(int64_t value)
+    Writer& Writer::writeValue(int64_t value)
     {
         return writeIntValueImpl(value);
     }
 
-    JsonWriter& JsonWriter::writeValue(uint8_t value)
+    Writer& Writer::writeValue(uint8_t value)
     {
         return writeIntValueImpl(value);
     }
 
-    JsonWriter& JsonWriter::writeValue(uint16_t value)
+    Writer& Writer::writeValue(uint16_t value)
     {
         return writeIntValueImpl(value);
     }
 
-    JsonWriter& JsonWriter::writeValue(uint32_t value)
+    Writer& Writer::writeValue(uint32_t value)
     {
         return writeIntValueImpl(value);
     }
 
-    JsonWriter& JsonWriter::writeValue(uint64_t value)
+    Writer& Writer::writeValue(uint64_t value)
     {
         return writeIntValueImpl(value);
     }
 
-    JsonWriter& JsonWriter::writeValue(float value)
+    Writer& Writer::writeValue(float value)
     {
         return writeFloatValueImpl(value);
     }
 
-    JsonWriter& JsonWriter::writeValue(double value)
+    Writer& Writer::writeValue(double value)
     {
         return writeFloatValueImpl(value);
     }
 
-    JsonWriter& JsonWriter::writeValue(long double value)
+    Writer& Writer::writeValue(long double value)
     {
         return writeFloatValueImpl(value);
     }
 
-    JsonWriter& JsonWriter::writeValue(const std::string& value)
+    Writer& Writer::writeValue(const std::string& value)
     {
         beginValue();
         *m_Stream << "\"";
@@ -265,7 +265,7 @@ namespace Yson
         return *this;
     }
 
-    JsonWriter& JsonWriter::writeValue(const std::wstring& value)
+    Writer& Writer::writeValue(const std::wstring& value)
     {
         beginValue();
         auto valueUtf8 = Ystring::Conversion::convert<std::string>(
@@ -277,7 +277,7 @@ namespace Yson
         return *this;
     }
 
-    JsonWriter& JsonWriter::writeRawValue(const std::string& value)
+    Writer& Writer::writeRawValue(const std::string& value)
     {
         beginValue();
         *m_Stream << value;
@@ -286,38 +286,38 @@ namespace Yson
     }
 
 
-    JsonWriter& JsonWriter::writeRawValue(const std::string& name,
+    Writer& Writer::writeRawValue(const std::string& name,
                                           const std::string& value)
     {
         setValueName(name);
         return writeRawValue(value);
     }
 
-    JsonWriter& JsonWriter::writeRawText(const std::string& text)
+    Writer& Writer::writeRawText(const std::string& text)
     {
         *m_Stream << text;
         return *this;
     }
 
-    JsonWriter& JsonWriter::writeBase64(const void* data, size_t size)
+    Writer& Writer::writeBase64(const void* data, size_t size)
     {
         return writeValue(toBase64(data, size));
     }
 
-    JsonWriter& JsonWriter::writeBase64(const std::string& name,
+    Writer& Writer::writeBase64(const std::string& name,
                                         const void* data, size_t size)
     {
         setValueName(name);
         return writeValue(toBase64(data, size));
     }
 
-    JsonWriter& JsonWriter::indent()
+    Writer& Writer::indent()
     {
         ++m_Indentation;
         return *this;
     }
 
-    JsonWriter& JsonWriter::outdent()
+    Writer& Writer::outdent()
     {
         if (m_Indentation == 0)
             JSONWRITER_THROW("Can't outdent, indentation level is 0.");
@@ -325,7 +325,7 @@ namespace Yson
         return *this;
     }
 
-    JsonWriter& JsonWriter::writeComma()
+    Writer& Writer::writeComma()
     {
         switch (m_State)
         {
@@ -343,7 +343,7 @@ namespace Yson
         return *this;
     }
 
-    JsonWriter& JsonWriter::writeIndentation()
+    Writer& Writer::writeIndentation()
     {
         switch (m_State)
         {
@@ -365,7 +365,7 @@ namespace Yson
         return *this;
     }
 
-    JsonWriter& JsonWriter::writeNewline()
+    Writer& Writer::writeNewline()
     {
         *m_Stream << "\n";
         switch (m_State)
@@ -387,7 +387,7 @@ namespace Yson
         return *this;
     }
 
-    JsonWriter& JsonWriter::writeSeparator(size_t count)
+    Writer& Writer::writeSeparator(size_t count)
     {
         if (count == 0)
             return *this;
@@ -412,38 +412,38 @@ namespace Yson
         return *this;
     }
 
-    int JsonWriter::languageExtensions() const
+    int Writer::languageExtensions() const
     {
         return m_LanguagExtensions;
     }
 
-    JsonWriter& JsonWriter::setLanguageExtensions(int value)
+    Writer& Writer::setLanguageExtensions(int value)
     {
         m_LanguagExtensions = value;
         return *this;
     }
 
-    bool JsonWriter::isNonFiniteFloatsAsStringsEnabled() const
+    bool Writer::isNonFiniteFloatsAsStringsEnabled() const
     {
         return languageExtension(NON_FINITE_FLOATS_AS_STRINGS);
     }
 
-    JsonWriter& JsonWriter::setNonFiniteFloatsAsStringsEnabled(bool value)
+    Writer& Writer::setNonFiniteFloatsAsStringsEnabled(bool value)
     {
         return setLanguageExtension(NON_FINITE_FLOATS_AS_STRINGS, value);
     }
 
-    bool JsonWriter::isUnquotedValueNamesEnabled() const
+    bool Writer::isUnquotedValueNamesEnabled() const
     {
         return languageExtension(UNQUOTED_VALUE_NAMES);
     }
 
-    JsonWriter& JsonWriter::setUnquotedValueNamesEnabled(bool value)
+    Writer& Writer::setUnquotedValueNamesEnabled(bool value)
     {
         return setLanguageExtension(UNQUOTED_VALUE_NAMES, value);
     }
 
-    JsonWriter::IntegerMode JsonWriter::integerMode() const
+    Writer::IntegerMode Writer::integerMode() const
     {
         switch (m_LanguagExtensions & INTEGERS_AS_HEX)
         {
@@ -458,7 +458,7 @@ namespace Yson
         }
     }
 
-    JsonWriter& JsonWriter::setIntegerMode(JsonWriter::IntegerMode mode)
+    Writer& Writer::setIntegerMode(Writer::IntegerMode mode)
     {
         auto newFlags = m_LanguagExtensions & ~INTEGERS_AS_HEX;
         switch (mode)
@@ -479,7 +479,7 @@ namespace Yson
         return *this;
     }
 
-    void JsonWriter::beginValue()
+    void Writer::beginValue()
     {
         switch (m_State)
         {
@@ -560,7 +560,7 @@ namespace Yson
         }
     }
 
-    JsonWriter::Formatting JsonWriter::formatting() const
+    Writer::Formatting Writer::formatting() const
     {
         if (!m_FormattingEnabled)
             return NONE;
@@ -569,12 +569,12 @@ namespace Yson
         return m_Context.top().formatting;
     }
 
-    bool JsonWriter::isInsideObject() const
+    bool Writer::isInsideObject() const
     {
         return !m_Context.empty() && m_Context.top().endChar == '}';
     }
 
-    JsonWriter& JsonWriter::writeBeginStructure(char startChar, char endChar,
+    Writer& Writer::writeBeginStructure(char startChar, char endChar,
                                                 Formatting formatting)
     {
         beginValue();
@@ -591,7 +591,7 @@ namespace Yson
         return *this;
     }
 
-    void JsonWriter::writeEndStructure(char endChar)
+    void Writer::writeEndStructure(char endChar)
     {
         if (m_Context.empty() || m_Context.top().endChar != endChar)
             JSONWRITER_THROW(std::string("Incorrect position for '")
@@ -630,7 +630,7 @@ namespace Yson
         m_State = AT_END_OF_VALUE;
     }
 
-    void JsonWriter::writeIndentationImpl()
+    void Writer::writeIndentationImpl()
     {
         auto n = m_Indentation * m_IndentationWidth;
         for (size_t i = 0; i < n; ++i)
@@ -665,7 +665,7 @@ namespace Yson
     }
 
     template <typename T>
-    JsonWriter& JsonWriter::writeIntValueImpl(T value)
+    Writer& Writer::writeIntValueImpl(T value)
     {
         beginValue();
         if (!(m_LanguagExtensions & INTEGERS_AS_HEX))
@@ -681,7 +681,7 @@ namespace Yson
     }
 
     template <typename T>
-    JsonWriter& JsonWriter::writeFloatValueImpl(T value)
+    Writer& Writer::writeFloatValueImpl(T value)
     {
         if (std::isfinite(value))
         {
@@ -706,14 +706,14 @@ namespace Yson
         return *this;
     }
 
-    bool JsonWriter::languageExtension(
-            JsonWriter::LanguageExtensions ext) const
+    bool Writer::languageExtension(
+            Writer::LanguageExtensions ext) const
     {
         return (m_LanguagExtensions & ext) != 0;
     }
 
-    JsonWriter& JsonWriter::setLanguageExtension(
-            JsonWriter::LanguageExtensions ext, bool value)
+    Writer& Writer::setLanguageExtension(
+            Writer::LanguageExtensions ext, bool value)
     {
         if (value)
             m_LanguagExtensions |= ext;

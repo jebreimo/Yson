@@ -5,7 +5,7 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include "../Yson/JsonReader.hpp"
+#include "../Yson/Reader.hpp"
 
 #include <sstream>
 #include "../Externals/Ytest/Ytest.hpp"
@@ -16,19 +16,19 @@ template <typename T>
 void testReadFails(const std::string& doc)
 {
     std::istringstream ss(doc);
-    JsonReader reader(ss);
+    Reader reader(ss);
     Y_ASSERT(reader.nextValue());
     T n;
-    Y_THROWS(reader.readValue(n), JsonReaderException);
+    Y_THROWS(reader.readValue(n), ReaderException);
 }
 
 template <typename T>
 void read(const std::string& doc, T& value)
 {
     std::istringstream ss(doc);
-    JsonReader reader(ss);
+    Reader reader(ss);
     Y_ASSERT(reader.nextValue());
-    Y_NO_THROW(reader.readValue(value), JsonReaderException);
+    Y_NO_THROW(reader.readValue(value), ReaderException);
 }
 
 template<typename T>
@@ -66,16 +66,16 @@ void test_BlockString()
     std::string doc = "{\"multi-line text\": \"\"\"This is a\n"
             "multi-line text!\"\"\"}";
     std::istringstream ss(doc);
-    JsonReader reader(ss);
+    Reader reader(ss);
     reader.setBlockStringsEnabled(true);
     Y_ASSERT(reader.nextValue());
-    Y_NO_THROW(reader.enter(), JsonReaderException);
+    Y_NO_THROW(reader.enter(), ReaderException);
     Y_ASSERT(reader.nextKey());
     Y_EQUAL(read<std::string>(reader), "multi-line text");
     Y_ASSERT(reader.nextValue());
     Y_EQUAL(read<std::string>(reader), "This is a\nmulti-line text!");
     Y_ASSERT(!reader.nextKey());
-    Y_NO_THROW(reader.leave(), JsonReaderException);
+    Y_NO_THROW(reader.leave(), ReaderException);
     Y_ASSERT(!reader.nextValue());
 }
 
@@ -100,13 +100,13 @@ void test_EnterNull()
 {
     std::string doc = "null";
     std::istringstream ss(doc);
-    JsonReader reader(ss);
+    Reader reader(ss);
     reader.setEnterNullEnabled(true);
     Y_ASSERT(reader.nextValue());
-    Y_NO_THROW(reader.enter(), JsonReaderException);
+    Y_NO_THROW(reader.enter(), ReaderException);
     Y_ASSERT(!reader.nextKey());
     Y_ASSERT(!reader.nextValue());
-    Y_NO_THROW(reader.leave(), JsonReaderException);
+    Y_NO_THROW(reader.leave(), ReaderException);
     Y_ASSERT(!reader.nextValue());
 }
 
@@ -114,7 +114,7 @@ void test_EscapedString()
 {
     std::string doc = "\"AB\\\"\\n\\t\\/\\k\\\\g\\u0123\"";
     std::istringstream ss(doc);
-    JsonReader reader(ss);
+    Reader reader(ss);
     Y_ASSERT(reader.nextValue());
     Y_EQUAL(read<std::string>(reader), "AB\"\n\t/k\\g\xC4\xA3");
     Y_ASSERT(!reader.nextValue());
@@ -171,14 +171,14 @@ void test_LineAndColumnNumbers()
 {
     std::string doc = "{\n  \"foo\": 34, \"bar\": /* as df\ngh*/    64\n}";
     std::istringstream ss(doc);
-    JsonReader reader(ss);
+    Reader reader(ss);
     reader.setCommentsEnabled(true);
     Y_EQUAL(reader.lineNumber(), 1);
     Y_EQUAL(reader.columnNumber(), 1);
     Y_ASSERT(reader.nextValue());
     Y_EQUAL(reader.lineNumber(), 1);
     Y_EQUAL(reader.columnNumber(), 1);
-    Y_NO_THROW(reader.enter(), JsonReaderException);
+    Y_NO_THROW(reader.enter(), ReaderException);
     Y_ASSERT(reader.nextKey());
     Y_EQUAL(reader.lineNumber(), 2);
     Y_EQUAL(reader.columnNumber(), 3);
@@ -191,7 +191,7 @@ void test_LineAndColumnNumbers()
     Y_ASSERT(reader.nextValue());
     Y_EQUAL(reader.lineNumber(), 3);
     Y_EQUAL(reader.columnNumber(), 9);
-    Y_NO_THROW(reader.leave(), JsonReaderException);
+    Y_NO_THROW(reader.leave(), ReaderException);
     Y_EQUAL(reader.lineNumber(), 4);
     Y_EQUAL(reader.columnNumber(), 1);
 }
@@ -200,7 +200,7 @@ void test_NextDocument()
 {
     std::string doc = "1 {\"2\": []} 3";
     std::istringstream ss(doc);
-    JsonReader reader(ss);
+    Reader reader(ss);
     Y_ASSERT(reader.nextDocument());
     Y_ASSERT(reader.nextValue());
     Y_EQUAL(read<int32_t>(reader), 1);
@@ -208,11 +208,11 @@ void test_NextDocument()
 
     Y_ASSERT(reader.nextDocument());
     Y_ASSERT(reader.nextValue());
-    Y_NO_THROW(reader.enter(), JsonReaderException);
+    Y_NO_THROW(reader.enter(), ReaderException);
     Y_ASSERT(reader.nextKey());
     Y_EQUAL(read<std::string>(reader), "2");
     Y_ASSERT(reader.nextValue());
-    Y_NO_THROW(reader.enter(), JsonReaderException);
+    Y_NO_THROW(reader.enter(), ReaderException);
 
     Y_ASSERT(reader.nextDocument());
     Y_ASSERT(reader.nextValue());
@@ -226,7 +226,7 @@ void test_NextDocument_comments()
 {
     std::string doc = "/* foo */ 7 /* bar */ 8 /* baz */";
     std::istringstream ss(doc);
-    JsonReader reader(ss);
+    Reader reader(ss);
     reader.setCommentsEnabled(true);
     Y_ASSERT(reader.nextDocument());
     Y_ASSERT(reader.nextValue());
@@ -245,28 +245,28 @@ void test_RecoverFromError()
 {
     std::string doc = "[{\"1\": [{23: 4, : 4}],,}, {\"2\": 3}]";
     std::istringstream ss(doc);
-    JsonReader reader(ss);
+    Reader reader(ss);
     Y_ASSERT(reader.nextValue());
-    Y_NO_THROW(reader.enter(), JsonReaderException);
-    Y_NO_THROW(reader.nextValue(), JsonReaderException);
-    Y_THROWS(reader.nextValue(), JsonReaderException);
-    Y_THROWS(reader.nextValue(), JsonReaderException);
-    Y_THROWS(reader.nextValue(), JsonReaderException);
-    Y_THROWS(reader.nextValue(), JsonReaderException);
-    Y_NO_THROW(reader.nextValue(), JsonReaderException);
-    Y_NO_THROW(reader.enter(), JsonReaderException);
-    Y_NO_THROW(reader.nextKey(), JsonReaderException);
+    Y_NO_THROW(reader.enter(), ReaderException);
+    Y_NO_THROW(reader.nextValue(), ReaderException);
+    Y_THROWS(reader.nextValue(), ReaderException);
+    Y_THROWS(reader.nextValue(), ReaderException);
+    Y_THROWS(reader.nextValue(), ReaderException);
+    Y_THROWS(reader.nextValue(), ReaderException);
+    Y_NO_THROW(reader.nextValue(), ReaderException);
+    Y_NO_THROW(reader.enter(), ReaderException);
+    Y_NO_THROW(reader.nextKey(), ReaderException);
     Y_EQUAL(read<std::string>(reader), "2");
-    Y_NO_THROW(reader.leave(), JsonReaderException);
+    Y_NO_THROW(reader.leave(), ReaderException);
     Y_ASSERT(!reader.nextValue());
 };
 
 void test_StringValueType()
 {
-    auto getType = [](const std::string& s) -> ValueType_t
+    auto getType = [](const std::string& s) -> ValueType
     {
         std::istringstream ss(s);
-        JsonReader reader(ss);
+        Reader reader(ss);
         Y_ASSERT(reader.nextValue());
         return reader.stringValueType();
     };
@@ -279,10 +279,10 @@ void test_ValuesAsStrings()
 {
     std::string doc = "[null, 12.34, fooz, \"baz\"]";
     std::istringstream ss(doc);
-    JsonReader reader(ss);
+    Reader reader(ss);
     reader.setValuesAsStringsEnabled(true);
     Y_ASSERT(reader.nextValue());
-    Y_NO_THROW(reader.enter(), JsonReaderException);
+    Y_NO_THROW(reader.enter(), ReaderException);
     Y_ASSERT(reader.nextValue());
     Y_EQUAL(read<std::string>(reader), "null");
     Y_ASSERT(reader.nextValue());
@@ -292,15 +292,15 @@ void test_ValuesAsStrings()
     Y_ASSERT(reader.nextValue());
     Y_EQUAL(read<std::string>(reader), "baz");
     Y_ASSERT(!reader.nextValue());
-    Y_NO_THROW(reader.leave(), JsonReaderException);
+    Y_NO_THROW(reader.leave(), ReaderException);
     Y_ASSERT(!reader.nextValue());
 
     std::istringstream ss2(doc);
-    JsonReader reader2(ss2);
+    Reader reader2(ss2);
     Y_ASSERT(reader2.nextValue());
-    Y_NO_THROW(reader2.enter(), JsonReaderException);
+    Y_NO_THROW(reader2.enter(), ReaderException);
     Y_ASSERT(reader2.nextValue());
-    Y_THROWS(read<std::string>(reader2), JsonReaderException);
+    Y_THROWS(read<std::string>(reader2), ReaderException);
 }
 
 Y_TEST(test_BlockString,

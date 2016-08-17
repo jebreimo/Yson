@@ -24,18 +24,18 @@ namespace Yson
     /** @brief JsonReader throws instances of this class when it
       *   encounters errors.
       */
-    class YSON_API JsonReaderException : public std::logic_error
+    class YSON_API ReaderException : public std::logic_error
     {
     public:
         /** @brief Constructs a JsonReaderException with an unspecific
           *   error message and no file location.
           */
-        JsonReaderException();
+        ReaderException();
 
         /** @brief Constructs a JsonReaderException with the given error
           *   message, but no file location.
           */
-        JsonReaderException(const std::string& msg);
+        ReaderException(const std::string& msg);
 
         /** @brief Constructs a JsonReaderException with the given error
           *   message.
@@ -43,7 +43,7 @@ namespace Yson
           * The error message will include a reference to the file, function
           * and line in the source code from where the exception was thrown.
           */
-        JsonReaderException(const std::string& msg,
+        ReaderException(const std::string& msg,
                             const std::string& sourceFileName,
                             int sourceFileLineNumber,
                             const std::string& funcName);
@@ -56,7 +56,7 @@ namespace Yson
           * as well as the line and column in the JSON text where the error
           * was encountered.
           */
-        JsonReaderException(const std::string& msg,
+        ReaderException(const std::string& msg,
                             const std::string& sourceFileName,
                             int sourceFileLineNumber,
                             const std::string& funcName,

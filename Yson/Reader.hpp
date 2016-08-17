@@ -12,8 +12,8 @@
 #include <memory>
 #include <stack>
 #include <string>
-#include "JsonReaderException.hpp"
-#include "JsonTokenizer.hpp"
+#include "ReaderException.hpp"
+#include "Tokenizer.hpp"
 #include "LineNumberCounter.hpp"
 #include "ValueType.hpp"
 
@@ -28,38 +28,67 @@ namespace Yson {
     /** @brief A class for iterating efficiently over the contents of a JSON
       *   file.
       */
-    class YSON_API JsonReader
+    class YSON_API Reader
     {
     public:
-        JsonReader(std::istream& stream);
+        Reader(std::istream& stream);
 
-        JsonReader(const std::string& fileName);
+        Reader(const std::string& fileName);
 
-        ~JsonReader();
+        ~Reader();
 
         /** @brief Advances the reader to the next key in the most recently
           *     entered JSON object.
           * @throws JsonReaderException if it encounters an error in the JSON
           *     file or the most recently entered object isn't an object.
+          * @return false if the reader has reached the end of the most
+          *     recently entered object.
+          *
+          *
           */
         bool nextKey();
 
         /** @brief Advances the reader to the next value in the most recently
-          *     entered JSON array or JSON object.
+          *     entered JSON array or object.
+          * @return false if the reader has reached the end of the array or
+          *     object.
           */
         bool nextValue();
 
+        /** @brief Advances the reader to the next token in the most recently
+          *     entered JSON array or object.
+          * @return false if the reader has reached the end of the array or
+          *     object.
+          *
+          * This function combined with the tokenType and token functions
+          * provides low-level access to JSON contents such as commas,
+          * colons, whitespace and comments.
+          */
         bool nextToken();
 
+        /** @brief Enters the current JSON array or object.
+          *
+          */
         void enter();
 
+        /** @brief Leaves the current array or object.
+          *
+          */
         void leave();
 
-        ValueType_t valueType() const;
+        /** @brief Returns the type of the current value.
+          *
+          * @return The type of the current value.
+          */
+        ValueType valueType() const;
 
-        ValueType_t stringValueType() const;
+        /** @brief Tries to determine the Returns the type of the current value.
+          *
+          * @return The type of the current value.
+          */
+        ValueType stringValueType() const;
 
-        JsonTokenType_t tokenType() const;
+        TokenType tokenType() const;
 
         std::string token() const;
 
@@ -67,6 +96,9 @@ namespace Yson {
 
         size_t columnNumber() const;
 
+        /** @brief Returns true if the current value is null.
+          * @return
+          */
         bool isNull() const;
 
         void readValue(bool& value) const;
@@ -101,43 +133,43 @@ namespace Yson {
 
         bool isStringsAsValuesEnabled() const;
 
-        JsonReader& setStringsAsValuesEnabled(bool value);
+        Reader& setStringsAsValuesEnabled(bool value);
 
         bool isValuesAsStringsEnabled() const;
 
-        JsonReader& setValuesAsStringsEnabled(bool value);
+        Reader& setValuesAsStringsEnabled(bool value);
 
         bool isEndElementAfterCommaEnabled() const;
 
-        JsonReader& setEndElementAfterCommaEnabled(bool value);
+        Reader& setEndElementAfterCommaEnabled(bool value);
 
         bool isCommentsEnabled() const;
 
-        JsonReader& setCommentsEnabled(bool value);
+        Reader& setCommentsEnabled(bool value);
 
         bool isEnterNullEnabled() const;
 
-        JsonReader& setEnterNullEnabled(bool value);
+        Reader& setEnterNullEnabled(bool value);
 
         bool isValuesAsKeysEnabled() const;
 
-        JsonReader& setValuesAsKeysEnabled(bool value);
+        Reader& setValuesAsKeysEnabled(bool value);
 
         bool isExtendedIntegersEnabled() const;
 
-        JsonReader& setExtendedIntegersEnabled(bool value);
+        Reader& setExtendedIntegersEnabled(bool value);
 
         bool isBlockStringsEnabled() const;
 
-        JsonReader& setBlockStringsEnabled(bool value);
+        Reader& setBlockStringsEnabled(bool value);
 
         bool isExtendedFloatsEnabled() const;
 
-        JsonReader& setExtendedFloatsEnabled(bool value);
+        Reader& setExtendedFloatsEnabled(bool value);
 
         int languageExtensions() const;
 
-        JsonReader& setLanguageExtensions(int value);
+        Reader& setLanguageExtensions(int value);
 
     private:
         enum LanguageExtensions
@@ -155,7 +187,7 @@ namespace Yson {
 
         bool languageExtension(LanguageExtensions ext) const;
 
-        JsonReader& setLanguageExtension(LanguageExtensions ext, bool value);
+        Reader& setLanguageExtension(LanguageExtensions ext, bool value);
 
         bool fillBuffer();
 
@@ -225,7 +257,7 @@ namespace Yson {
 
         std::unique_ptr<TextReader> m_TextReader;
         std::string m_Buffer;
-        JsonTokenizer m_Tokenizer;
+        Tokenizer m_Tokenizer;
         std::stack<State> m_StateStack;
         LineNumberCounter m_LineNumberCounter;
         State m_State;
@@ -234,7 +266,7 @@ namespace Yson {
     };
 
     template <typename T>
-    T read(JsonReader& reader)
+    T read(Reader& reader)
     {
         T value;
         reader.readValue(value);

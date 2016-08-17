@@ -12,7 +12,7 @@
 namespace {
     using namespace Yson;
 
-    void test(const std::string& s, ValueType_t expectedType)
+    void test(const std::string& s, ValueType expectedType)
     {
         auto result = getValueType(s);
         Y_EQUAL(result, expectedType);
