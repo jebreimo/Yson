@@ -11,12 +11,13 @@
 #include "../Ystring/Encoding.hpp"
 #include "YsonDefinitions.hpp"
 
-namespace Ystring { namespace Conversion {
+namespace Ystring { namespace Conversion
+{
     class Converter;
 }}
 
-namespace Yson {
-
+namespace Yson
+{
     class YSON_API TextReader
     {
     public:

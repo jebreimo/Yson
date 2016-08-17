@@ -16,11 +16,11 @@
 
 namespace Yson
 {
-
     class YSON_API Writer
     {
     public:
         enum Formatting {DEFAULT, NONE, FLAT, FORMAT};
+
         enum IntegerMode {DECIMAL, BINARY, OCTAL, HEXADECIMAL};
 
         Writer();
@@ -54,14 +54,14 @@ namespace Yson
         Writer& writeBeginArray(Formatting formatting = DEFAULT);
 
         Writer& writeBeginArray(const std::string& name,
-                                    Formatting formatting = DEFAULT);
+                                Formatting formatting = DEFAULT);
 
         Writer& writeEndArray();
 
         Writer& writeBeginObject(Formatting formatting = DEFAULT);
 
         Writer& writeBeginObject(const std::string& name,
-                                     Formatting formatting = DEFAULT);
+                                 Formatting formatting = DEFAULT);
 
         Writer& writeEndObject();
 
@@ -109,14 +109,14 @@ namespace Yson
         Writer& writeRawValue(const std::string& value);
 
         Writer& writeRawValue(const std::string& name,
-                                  const std::string& value);
+                              const std::string& value);
 
         Writer& writeRawText(const std::string& text);
 
         Writer& writeBase64(const void* data, size_t size);
 
         Writer& writeBase64(const std::string& name,
-                                const void* data, size_t size);
+                            const void* data, size_t size);
 
         Writer& indent();
 
@@ -156,11 +156,16 @@ namespace Yson
         Writer& setIntegerMode(IntegerMode mode);
     private:
         void beginValue();
+
         Formatting formatting() const;
+
         bool isInsideObject() const;
+
         Writer& writeBeginStructure(char startChar, char endChar,
-                                        Formatting formatting);
+                                    Formatting formatting);
+
         void writeEndStructure(char endChar);
+
         void writeIndentationImpl();
 
         template <typename T>

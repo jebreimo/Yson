@@ -10,8 +10,8 @@
 #include <fstream>
 #include "TextReader.hpp"
 
-namespace Yson {
-
+namespace Yson
+{
     class YSON_API TextFileReader : public TextReader
     {
     public:

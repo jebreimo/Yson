@@ -21,8 +21,8 @@
   * @brief Defines the JsonReader class.
   */
 
-namespace Yson {
-
+namespace Yson
+{
     class TextReader;
 
     /** @brief A class for iterating efficiently over the contents of a JSON

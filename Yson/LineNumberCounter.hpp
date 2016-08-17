@@ -8,8 +8,8 @@
 #pragma once
 #include "YsonDefinitions.hpp"
 
-namespace Yson {
-
+namespace Yson
+{
     class YSON_API LineNumberCounter
     {
     public:

@@ -141,7 +141,7 @@ namespace Yson
     }
 
     Writer& Writer::writeBeginArray(const std::string& name,
-                                            Formatting formatting)
+                                    Formatting formatting)
     {
         setValueName(name);
         writeBeginArray(formatting);
@@ -160,7 +160,7 @@ namespace Yson
     }
 
     Writer& Writer::writeBeginObject(const std::string& name,
-                                             Formatting formatting)
+                                     Formatting formatting)
     {
         setValueName(name);
         writeBeginObject(formatting);
@@ -287,7 +287,7 @@ namespace Yson
 
 
     Writer& Writer::writeRawValue(const std::string& name,
-                                          const std::string& value)
+                                  const std::string& value)
     {
         setValueName(name);
         return writeRawValue(value);
@@ -305,7 +305,7 @@ namespace Yson
     }
 
     Writer& Writer::writeBase64(const std::string& name,
-                                        const void* data, size_t size)
+                                const void* data, size_t size)
     {
         setValueName(name);
         return writeValue(toBase64(data, size));
@@ -575,7 +575,7 @@ namespace Yson
     }
 
     Writer& Writer::writeBeginStructure(char startChar, char endChar,
-                                                Formatting formatting)
+                                        Formatting formatting)
     {
         beginValue();
         *m_Stream << startChar;
@@ -706,14 +706,13 @@ namespace Yson
         return *this;
     }
 
-    bool Writer::languageExtension(
-            Writer::LanguageExtensions ext) const
+    bool Writer::languageExtension(Writer::LanguageExtensions ext) const
     {
         return (m_LanguagExtensions & ext) != 0;
     }
 
-    Writer& Writer::setLanguageExtension(
-            Writer::LanguageExtensions ext, bool value)
+    Writer& Writer::setLanguageExtension(Writer::LanguageExtensions ext,
+                                         bool value)
     {
         if (value)
             m_LanguagExtensions |= ext;

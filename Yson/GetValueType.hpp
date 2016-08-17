@@ -11,8 +11,8 @@
 #include "ValueType.hpp"
 #include "YsonDefinitions.hpp"
 
-namespace Yson {
-
+namespace Yson
+{
     YSON_API ValueType getValueType(const char* first, const char* last);
 
     YSON_API ValueType getValueType(

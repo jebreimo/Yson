@@ -7,8 +7,8 @@
 //****************************************************************************
 #include "TextFileReader.hpp"
 
-namespace Yson {
-
+namespace Yson
+{
     TextFileReader::TextFileReader(
             const std::string& fileName,
             Ystring::Encoding_t destinationEncoding)

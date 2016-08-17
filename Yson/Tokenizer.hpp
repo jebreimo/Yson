@@ -18,17 +18,23 @@ namespace Yson
     {
     public:
         Tokenizer();
+
         ~Tokenizer();
 
         bool hasNext() const;
+
         void next();
+
         std::pair<TokenType, bool> peek() const;
 
         TokenType tokenType() const;
 
         const char* buffer() const;
+
         void setBuffer(const char* buffer, size_t size);
+
         size_t bufferSize() const;
+
         size_t currentPosition() const;
 
         std::string token() const;
@@ -38,6 +44,7 @@ namespace Yson
         void reset();
     private:
         void appendTokenToInternalBuffer();
+
         bool isEndOfFile() const;
 
         const char* m_BufferStart;

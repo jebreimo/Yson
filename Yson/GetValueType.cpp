@@ -9,26 +9,27 @@
 
 #include <cstdint>
 
-namespace Yson {
-
-    namespace {
+namespace Yson
+{
+    namespace
+    {
         int getDigit(char c);
 
         bool isHexDigit(char c);
 
         template<typename Predicate>
         ValueType getValueType(const char* first, const char* last,
-                                 Predicate isDigit, ValueType type);
+                               Predicate isDigit, ValueType type);
 
         ValueType getBinaryValueType(const char* first, const char* last);
 
         ValueType getOctalValueType(const char* first, const char* last);
 
         ValueType getHexadecimalValueType(const char* first,
-                                            const char* last);
+                                          const char* last);
 
         ValueType getFloatingPointValueType(const char* first,
-                                              const char* last);
+                                            const char* last);
 
         ValueType getNumberValueType(const char* first, const char* last);
     }
@@ -108,8 +109,8 @@ namespace Yson {
         return getValueType(s.data(), s.data() + s.size());
     }
 
-    namespace {
-
+    namespace
+    {
         int getDigit(char c)
         {
             return uint8_t(c) ^ 0x30;
@@ -150,8 +151,7 @@ namespace Yson {
                                 ValueType::OCT_INTEGER);
         }
 
-        ValueType getHexadecimalValueType(const char* first,
-                                            const char* last)
+        ValueType getHexadecimalValueType(const char* first, const char* last)
         {
             return getValueType(first, last,
                                 [](char c) { return isHexDigit(c); },
@@ -159,7 +159,7 @@ namespace Yson {
         }
 
         ValueType getFloatingPointValueType(const char* first,
-                                              const char* last)
+                                            const char* last)
         {
             if (*first == '.')
             {

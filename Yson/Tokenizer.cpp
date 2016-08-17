@@ -18,7 +18,8 @@ namespace Yson
 
     typedef Span<const char*> TokenSpan;
 
-    namespace {
+    namespace
+    {
         struct Result
         {
             Result(TokenType tokenType, const char* endOfToken)
@@ -81,7 +82,7 @@ namespace Yson
         size_t countQuotesAtEnd(TokenSpan span);
 
         TokenType determineCommentType(TokenSpan span,
-                                           bool precededBySlash);
+                                       bool precededBySlash);
 
         std::pair<TokenType, bool> determineStringType(
                 TokenSpan span,
@@ -146,8 +147,8 @@ namespace Yson
         {
             auto result = completeToken(
                     TokenSpan(m_InternalBuffer.data(),
-                               m_InternalBuffer.data()
-                               + m_InternalBuffer.size()),
+                              m_InternalBuffer.data()
+                              + m_InternalBuffer.size()),
                     makeSpan(m_TokenEnd, m_BufferEnd),
                     isEndOfFile());
             return std::make_pair(result.tokenType, !result.isIncomplete);
@@ -229,7 +230,8 @@ namespace Yson
         return m_BufferStart == m_BufferEnd;
     }
 
-    namespace {
+    namespace
+    {
         Result completeToken(TokenSpan firstPart, TokenSpan secondPart,
                              bool isEndOfFile)
         {
@@ -283,8 +285,8 @@ namespace Yson
             return result;
         }
 
-        Result completeStringToken(TokenSpan firstPart,
-                                   TokenSpan secondPart, bool isEndOfFile)
+        Result completeStringToken(TokenSpan firstPart, TokenSpan secondPart,
+                                   bool isEndOfFile)
         {
             auto tokenType = determineStringType(firstPart, 0, false);
             if (!tokenType.second)
@@ -561,10 +563,9 @@ namespace Yson
             return size_t(quotes) - (escaped ? 1 : 0);
         }
 
-        std::pair<TokenType, bool> determineStringType(
-                TokenSpan span,
-                size_t precedingQuotes,
-                bool isEndOfFile)
+        std::pair<TokenType, bool> determineStringType(TokenSpan span,
+                                                       size_t precedingQuotes,
+                                                       bool isEndOfFile)
         {
             assert((!isEmpty(span) && span.front() == '"')
                    || precedingQuotes != 0);
@@ -593,7 +594,7 @@ namespace Yson
         }
 
         TokenType determineCommentType(TokenSpan span,
-                                           bool precededBySlash)
+                                       bool precededBySlash)
         {
             assert(precededBySlash
                    || (!isEmpty(span) && span.front() == '/'));

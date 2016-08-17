@@ -8,8 +8,8 @@
 #include <string>
 #include "ParseInteger.hpp"
 
-namespace Yson {
-
+namespace Yson
+{
     namespace
     {
         int64_t fromDigit(char c)

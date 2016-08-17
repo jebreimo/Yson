@@ -1034,8 +1034,9 @@ namespace Yson
     void Reader::readSignedInteger(T& value) const
     {
         auto token = getValueToken();
-        auto parsedValue = parseInteger(get<0>(token), get<1>(token),
-                                        get<2>(token) || isExtendedIntegersEnabled());
+        auto parsedValue = parseInteger(
+                get<0>(token), get<1>(token),
+                get<2>(token) || isExtendedIntegersEnabled());
         if (!parsedValue.second)
             YSON_THROW("Invalid integer");
         value = static_cast<T>(parsedValue.first);
