@@ -27,8 +27,9 @@ namespace Yson
     std::pair<T, bool> parseReal(const char* first, const char* last)
     {
         typedef std::pair<T, bool> Result;
+        constexpr Result BadResult(T(0), false);
         if (first == last)
-            return Result(0, false);
+            return BadResult;
 
         // Get the sign of the number
         bool negative = false;
@@ -36,12 +37,12 @@ namespace Yson
         {
             negative = true;
             if (++first == last)
-                return Result(0, false);
+                return BadResult;
         }
         else if (*first == '+')
         {
             if (++first == last)
-                return Result(0, false);
+                return BadResult;
         }
 
         // Get the integer value
@@ -55,7 +56,7 @@ namespace Yson
                               true);
             if (asString == "NaN" || asString == "null")
                 return Result(std::numeric_limits<T>::quiet_NaN(), true);
-            return Result(0, false);
+            return BadResult;
         }
 
         while (true)
@@ -91,27 +92,27 @@ namespace Yson
         if (first != last)
         {
             if ((*first & 0xDF) != 'E')
-                return Result(0, false);
+                return BadResult;
 
             if (++first == last)
-                return Result(0, false);
+                return BadResult;
 
             bool negativeExponent = false;
             if (*first == '-')
             {
                 negativeExponent = true;
                 if (++first == last)
-                    return Result(0, false);
+                    return BadResult;
             }
             else if (*first == '+')
             {
                 if (++first == last)
-                    return Result(0, false);
+                    return BadResult;
             }
 
             int explicitExponent = getDigit(*first);
             if (explicitExponent > 9)
-                return Result(0, false);
+                return BadResult;
 
             while (++first != last)
             {
@@ -120,7 +121,7 @@ namespace Yson
                 explicitExponent *= 10;
                 explicitExponent += getDigit(*first);
                 if (explicitExponent > std::numeric_limits<T>::max_exponent10)
-                    return Result(0, false);
+                    return BadResult;
             }
 
             if (negativeExponent)
