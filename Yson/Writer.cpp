@@ -267,14 +267,10 @@ namespace Yson
 
     Writer& Writer::writeValue(const std::wstring& value)
     {
-        beginValue();
-        auto valueUtf8 = Ystring::Conversion::convert<std::string>(
+        return writeValue(Ystring::Conversion::convert<std::string>(
                 value,
                 Ystring::Encoding::UTF_16,
-                Ystring::Encoding::UTF_8);
-        *m_Stream << "\"" << std::move(valueUtf8) << "\"";
-        m_State = AT_END_OF_VALUE;
-        return *this;
+                Ystring::Encoding::UTF_8));
     }
 
     Writer& Writer::writeRawValue(const std::string& value)
@@ -594,8 +590,13 @@ namespace Yson
     void Writer::writeEndStructure(char endChar)
     {
         if (m_Context.empty() || m_Context.top().endChar != endChar)
-            JSONWRITER_THROW(std::string("Incorrect position for '")
-                             + endChar + "'");
+        {
+            if (!std::uncaught_exception())
+                JSONWRITER_THROW(std::string("Incorrect position for '")
+                                 + endChar + "'");
+            else
+                return;
+        }
 
         switch (m_State)
         {

@@ -14,7 +14,6 @@
 
 namespace Yson
 {
-
     namespace
     {
         int getDigit(char c)
