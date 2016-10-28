@@ -1,0 +1,7 @@
+- Create a class for pre-tokenized JSON contents.
+	- Add functions to Reader that returns pre-tokenized JSON contents.
+	- Add a function to Writer that writes pre-tokenized JSON contents.
+- Create an exception class YsonException for exceptions outside the Reader.
+	- Make use of this class in the Writer and Token classes.
+- Enable/disable escaping characters in JsonWriter
+- Make an efficient memory buffer reader

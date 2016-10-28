@@ -9,7 +9,8 @@
 
 #include "../Externals/Ytest/Ytest.hpp"
 
-namespace {
+namespace
+{
     using namespace Yson;
 
     void test(const std::string& s, ValueType expectedType)
