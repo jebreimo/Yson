@@ -11,8 +11,11 @@
 #include "../Ystring/Escape/Escape.hpp"
 #include "Base64.hpp"
 #include "GetValueType.hpp"
+#include "JsonArray.hpp"
+#include "JsonObject.hpp"
 #include "ParseDouble.hpp"
 #include "ParseInteger.hpp"
+#include "JsonSingleValue.hpp"
 #include "TextFileReader.hpp"
 
 namespace Yson
@@ -21,7 +24,7 @@ namespace Yson
 
     const size_t CHUNK_SIZE = 16 * 1024;
 
-    #define YSON_THROW(msg) \
+    #define READER_THROW(msg) \
         throw ReaderException((msg), __FILE__, __LINE__, __FUNCTION__, \
                                   lineNumber(), columnNumber())
 
@@ -117,7 +120,7 @@ namespace Yson
         case AT_END_OF_NULL:
             return false;
         default:
-            YSON_THROW("nextKey() can only be called inside an object.");
+            READER_THROW("nextKey() can only be called inside an object.");
         }
         while (nextTokenImpl())
         {
@@ -213,7 +216,7 @@ namespace Yson
             pushState = AFTER_VALUE_IN_OBJECT;
             break;
         default:
-            YSON_THROW("There's no array or object to enter.");
+            READER_THROW("There's no array or object to enter.");
         }
         if (m_Tokenizer.tokenType() == TokenType::START_OBJECT)
             m_State = AT_START_OF_OBJECT;
@@ -222,7 +225,7 @@ namespace Yson
         else if (isEnterNullEnabled() && isNull())
             m_State = AT_END_OF_NULL;
         else
-            YSON_THROW("Only arrays and objects can be entered.");
+            READER_THROW("Only arrays and objects can be entered.");
         m_StateStack.push(pushState);
     }
 
@@ -235,7 +238,7 @@ namespace Yson
         case AT_VALUE_OF_DOCUMENT:
         case AT_END_OF_DOCUMENT:
         case AT_END_OF_STREAM:
-            YSON_THROW("leave() wasn't preceded by enter().");
+            READER_THROW("leave() wasn't preceded by enter().");
         case AT_END_OF_ARRAY:
         case AT_END_OF_OBJECT:
         case AT_END_OF_NULL:
@@ -263,7 +266,7 @@ namespace Yson
         case TokenType::VALUE:
             break;
         default:
-            YSON_THROW("Current token has no value type.");
+            READER_THROW("Current token has no value type.");
         }
 
         auto valueType = getValueType(m_Tokenizer.rawToken());
@@ -274,13 +277,13 @@ namespace Yson
         case ValueType::HEX_INTEGER:
             if (isExtendedIntegersEnabled())
                 return ValueType::INTEGER;
-            YSON_THROW("Invalid value.");
+            READER_THROW("Invalid value.");
         case ValueType::EXTENDED_FLOAT:
             if (isExtendedFloatsEnabled())
                 return ValueType::FLOAT;
-            YSON_THROW("Invalid value.");
+            READER_THROW("Invalid value.");
         case ValueType::INVALID:
-            YSON_THROW("Invalid value.");
+            READER_THROW("Invalid value.");
         default:
             return valueType;
         }
@@ -326,6 +329,11 @@ namespace Yson
         return m_Tokenizer.token();
     }
 
+    std::pair<const char*, const char*> Reader::rawToken() const
+    {
+        return m_Tokenizer.rawToken();
+    }
+
     size_t Reader::lineNumber() const
     {
         return m_LineNumberCounter.line();
@@ -350,7 +358,7 @@ namespace Yson
         else if (equalsFalse(get<0>(token), get<1>(token)))
             value = false;
         else
-            YSON_THROW("Invalid boolean value");
+            READER_THROW("Invalid boolean value");
     }
 
     void Reader::readValue(int8_t& value) const
@@ -398,7 +406,7 @@ namespace Yson
         auto token = getValueToken();
         auto parsedValue = parseFloat(get<0>(token), get<1>(token));
         if (!parsedValue.second)
-            YSON_THROW("Invalid floating point value");
+            READER_THROW("Invalid floating point value");
         value = parsedValue.first;
     }
 
@@ -407,7 +415,7 @@ namespace Yson
         auto token = getValueToken();
         auto parsedValue = parseDouble(get<0>(token), get<1>(token));
         if (!parsedValue.second)
-            YSON_THROW("Invalid floating point value");
+            READER_THROW("Invalid floating point value");
         value = parsedValue.first;
     }
 
@@ -416,7 +424,7 @@ namespace Yson
         auto token = getValueToken();
         auto parsedValue = parseLongDouble(get<0>(token), get<1>(token));
         if (!parsedValue.second)
-            YSON_THROW("Invalid floating point value");
+            READER_THROW("Invalid floating point value");
         value = parsedValue.first;
     }
 
@@ -436,7 +444,7 @@ namespace Yson
         else if (!isValuesAsStringsEnabled()
                  || m_Tokenizer.tokenType() != TokenType::VALUE)
         {
-            YSON_THROW("Current token is not a string.");
+            READER_THROW("Current token is not a string.");
         }
         value.assign(token.first, token.second);
         if (Ystring::hasEscapedCharacters(value))
@@ -453,8 +461,105 @@ namespace Yson
         }
         catch (std::exception& ex)
         {
-            YSON_THROW(ex.what());
+            READER_THROW(ex.what());
         }
+    }
+
+
+    std::unique_ptr<JsonValue> Reader::readStructure()
+    {
+        switch (m_State)
+        {
+        case AT_VALUE_OF_DOCUMENT:
+        case AT_VALUE_IN_OBJECT:
+        case AT_VALUE_IN_ARRAY:
+            break;
+        case AT_END_OF_DOCUMENT:
+            if (!nextDocument() || !nextValue())
+                return std::unique_ptr<JsonValue>();
+            break;
+        case INITIAL_STATE:
+        case AT_START_OF_DOCUMENT:
+        case AT_START_OF_OBJECT:
+        case AT_START_OF_ARRAY:
+        case AT_KEY_IN_OBJECT:
+        case AFTER_KEY_IN_OBJECT:
+        case AT_COLON_IN_OBJECT:
+        case AFTER_VALUE_IN_OBJECT:
+        case AT_COMMA_IN_OBJECT:
+        case AFTER_VALUE_IN_ARRAY:
+        case AT_COMMA_IN_ARRAY:
+            if (!nextValue())
+                return std::unique_ptr<JsonValue>();
+            break;
+        case AT_END_OF_STREAM:
+        case UNRECOVERABLE_ERROR:
+        case AT_END_OF_ARRAY:
+        case AT_END_OF_NULL:
+        case AT_END_OF_OBJECT:
+            return std::unique_ptr<JsonValue>();
+        }
+
+        auto buffer = std::make_shared<std::string>();
+        auto result = readCompleteValue(buffer);
+        result->updateStringRef(0);
+        return result;
+    }
+
+    std::unique_ptr<JsonValue>
+    Reader::readCompleteArray(const std::shared_ptr<std::string>& buffer)
+    {
+        std::vector<std::unique_ptr<JsonValue>> tokens;
+        enter();
+        while (nextValue())
+            tokens.push_back(readCompleteValue(buffer));
+        leave();
+        return std::unique_ptr<JsonValue>(new JsonArray(move(tokens)));
+    }
+
+    std::unique_ptr<JsonValue>
+    Reader::readCompleteObject(const std::shared_ptr<std::string>& buffer)
+    {
+        std::vector<std::pair<std::string, std::unique_ptr<JsonValue>>> tokens;
+        enter();
+        while (nextKey())
+        {
+            auto key = read<std::string>(*this);
+            nextValue();
+            tokens.push_back({key, readCompleteValue(buffer)});
+        }
+        leave();
+        return std::unique_ptr<JsonValue>(new JsonObject(move(tokens)));
+    }
+
+    std::unique_ptr<JsonValue>
+    Reader::readCompleteValue(const std::shared_ptr<std::string>& buffer)
+    {
+        std::unique_ptr<JsonValue> token;
+        auto tokType = tokenType();
+        switch (tokType)
+        {
+        case TokenType::START_ARRAY:
+            token = readCompleteArray(buffer);
+            break;
+        case TokenType::START_OBJECT:
+            token = readCompleteObject(buffer);
+            break;
+        case TokenType::VALUE:
+        case TokenType::STRING:
+        case TokenType::BLOCK_STRING:
+        {
+            auto rawToken = getValueToken();
+            buffer->append(std::get<0>(rawToken), std::get<1>(rawToken));
+            auto size = std::get<1>(rawToken) - std::get<0>(rawToken);
+            token = std::unique_ptr<JsonValue>(new JsonSingleValue(
+                    StringRef(nullptr, size), buffer, tokType));
+            break;
+        }
+        default:
+            break;
+        }
+        return token;
     }
 
     bool Reader::nextDocument()
@@ -617,7 +722,7 @@ namespace Yson
         switch (m_State)
         {
         case UNRECOVERABLE_ERROR:
-            YSON_THROW("Can't continue reading the current stream.");
+            READER_THROW("Can't continue reading the current stream.");
         case INITIAL_STATE:
             fillBuffer();
             m_State = AT_START_OF_DOCUMENT;
@@ -697,13 +802,13 @@ namespace Yson
             }
             case TokenType::COMMENT:
                 if (!isCommentsEnabled())
-                    YSON_THROW("Invalid token.");
+                    READER_THROW("Invalid token.");
                 processWhitespace();
                 break;
             case TokenType::BLOCK_COMMENT:
             {
                 if (!isCommentsEnabled())
-                    YSON_THROW("Invalid token.");
+                    READER_THROW("Invalid token.");
                 processWhitespace();
                 auto lineCol = countRowsAndColumns(m_Tokenizer.rawToken());
                 m_LineNumberCounter.setNextLineAndColumnOffsets(
@@ -718,7 +823,7 @@ namespace Yson
                 m_LineNumberCounter.setNextLineAndColumnOffsets(1, 0);
                 break;
             case TokenType::INVALID_TOKEN:
-                YSON_THROW("Invalid token.");
+                READER_THROW("Invalid token.");
             }
         } while (filledBuffer);
         return true;
@@ -727,7 +832,7 @@ namespace Yson
     void Reader::processBlockString()
     {
         if (!isBlockStringsEnabled())
-            YSON_THROW("Invalid token.");
+            READER_THROW("Invalid token.");
 
         switch (m_State)
         {
@@ -742,7 +847,7 @@ namespace Yson
             m_State = AT_VALUE_IN_OBJECT;
             break;
         default:
-            YSON_THROW("Unexpected block string.");
+            READER_THROW("Unexpected block string.");
         }
     }
 
@@ -759,10 +864,10 @@ namespace Yson
         case AT_VALUE_IN_OBJECT:
         case AFTER_VALUE_IN_OBJECT:
             m_State = AT_COLON_IN_OBJECT;
-            YSON_THROW("Unexpected colon.");
+            READER_THROW("Unexpected colon.");
         default:
             m_State = UNRECOVERABLE_ERROR;
-            YSON_THROW("Unexpected colon.");
+            READER_THROW("Unexpected colon.");
         }
     }
 
@@ -781,16 +886,16 @@ namespace Yson
         case AT_START_OF_ARRAY:
         case AT_COMMA_IN_ARRAY:
             m_State = AT_COMMA_IN_ARRAY;
-            YSON_THROW("Unexpected comma.");
+            READER_THROW("Unexpected comma.");
         case AT_START_OF_OBJECT:
         case AT_COMMA_IN_OBJECT:
         case AT_KEY_IN_OBJECT:
         case AFTER_KEY_IN_OBJECT:
             m_State = AT_COMMA_IN_OBJECT;
-            YSON_THROW("Unexpected comma.");
+            READER_THROW("Unexpected comma.");
         default:
             m_State = UNRECOVERABLE_ERROR;
-            YSON_THROW("Unexpected comma.");
+            READER_THROW("Unexpected comma.");
         }
     }
 
@@ -806,11 +911,11 @@ namespace Yson
         case AT_COMMA_IN_ARRAY:
             m_State = AT_END_OF_ARRAY;
             if (!isEndElementAfterCommaEnabled())
-                YSON_THROW("Unexpected ']'");
+                READER_THROW("Unexpected ']'");
             break;
         default:
             m_State = UNRECOVERABLE_ERROR;
-            YSON_THROW("Unexpected ']'");
+            READER_THROW("Unexpected ']'");
         }
     }
 
@@ -826,11 +931,11 @@ namespace Yson
         case AT_COMMA_IN_OBJECT:
             m_State = AT_END_OF_OBJECT;
             if (!isEndElementAfterCommaEnabled())
-                YSON_THROW("Unexpected '}'");
+                READER_THROW("Unexpected '}'");
             break;
         default:
             m_State = UNRECOVERABLE_ERROR;
-            YSON_THROW("Unexpected '}'");
+            READER_THROW("Unexpected '}'");
         }
     }
 
@@ -846,7 +951,7 @@ namespace Yson
             break;
         default:
             m_State = UNRECOVERABLE_ERROR;
-            YSON_THROW("Unexpected end of document.");
+            READER_THROW("Unexpected end of document.");
         }
     }
 
@@ -866,7 +971,7 @@ namespace Yson
             break;
         default:
             m_State = UNRECOVERABLE_ERROR;
-            YSON_THROW("Unexpected '['.");
+            READER_THROW("Unexpected '['.");
         }
     }
 
@@ -886,7 +991,7 @@ namespace Yson
             break;
         default:
             m_State = UNRECOVERABLE_ERROR;
-            YSON_THROW("Unexpected '{'");
+            READER_THROW("Unexpected '{'");
         }
     }
 
@@ -909,7 +1014,7 @@ namespace Yson
             m_State = AT_VALUE_IN_OBJECT;
             break;
         default:
-            YSON_THROW("Unexpected string.");
+            READER_THROW("Unexpected string.");
         }
     }
 
@@ -934,10 +1039,10 @@ namespace Yson
             m_State = AT_KEY_IN_OBJECT;
             if (isValuesAsKeysEnabled())
                 break;
-            YSON_THROW("Unexpected value: " + m_Tokenizer.token());
+            READER_THROW("Unexpected value: " + m_Tokenizer.token());
         default:
             m_State = UNRECOVERABLE_ERROR;
-            YSON_THROW("Unexpected value: " + m_Tokenizer.token());
+            READER_THROW("Unexpected value: " + m_Tokenizer.token());
         }
     }
 
@@ -1017,15 +1122,22 @@ namespace Yson
     {
         auto token = m_Tokenizer.rawToken();
         auto isString = false;
-        if (m_Tokenizer.tokenType() == TokenType::STRING)
+        switch (m_Tokenizer.tokenType())
         {
+        case TokenType::STRING:
             ++token.first;
             --token.second;
             isString = true;
-        }
-        else if (m_Tokenizer.tokenType() != TokenType::VALUE)
-        {
-            YSON_THROW("Current token is not a value.");
+            break;
+        case TokenType::VALUE:
+            break;
+        case TokenType::BLOCK_STRING:
+            token.first += 3;
+            token.second -= 3;
+            isString = true;
+            break;
+        default:
+            READER_THROW("Current token is not a value.");
         }
         return std::make_tuple(token.first, token.second, isString);
     }
@@ -1038,10 +1150,10 @@ namespace Yson
                 get<0>(token), get<1>(token),
                 get<2>(token) || isExtendedIntegersEnabled());
         if (!parsedValue.second)
-            YSON_THROW("Invalid integer");
+            READER_THROW("Invalid integer");
         value = static_cast<T>(parsedValue.first);
         if (value != parsedValue.first)
-            YSON_THROW("Overflow error while reading integer value.");
+            READER_THROW("Overflow error while reading integer value.");
     }
 
     template<typename T>
@@ -1049,15 +1161,15 @@ namespace Yson
     {
         auto token = getValueToken();
         if (get<0>(token) != get<1>(token) && *get<0>(token) == '-')
-            YSON_THROW("Attempt to read a signed integer as an unsigned integer.");
+            READER_THROW("Attempt to read a signed integer as an unsigned integer.");
 
         auto parsedValue = parseInteger(get<0>(token), get<1>(token),
                                         get<2>(token) || isExtendedIntegersEnabled());
         if (!parsedValue.second)
-            YSON_THROW("Invalid integer");
+            READER_THROW("Invalid integer");
         auto unsignedValue = static_cast<uint64_t>(parsedValue.first);
         value = static_cast<T>(unsignedValue);
         if (value != unsignedValue)
-            YSON_THROW("Overflow error while reading integer value.");
+            READER_THROW("Overflow error while reading integer value.");
     }
 }

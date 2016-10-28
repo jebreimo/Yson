@@ -13,7 +13,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
 add_definitions(-DYstring=Yson_Ystring)
 
 if(APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
 elseif(WIN32)
     add_definitions(-D_SCL_SECURE_NO_WARNINGS
                     -DYSON_EXPORTS
@@ -49,14 +49,13 @@ set(SOURCE_FILES
     Yson/GetValueType.cpp
     Yson/IsJavaScriptIdentifier.cpp
     Yson/Reader.cpp
-    Yson/ReaderException.cpp
     Yson/Tokenizer.cpp
     Yson/Writer.cpp
     Yson/LineNumberCounter.cpp
     Yson/ParseDouble.cpp
     Yson/ParseInteger.cpp
     Yson/TextFileReader.cpp
-    Yson/TextReader.cpp)
+    Yson/TextReader.cpp Yson/JsonSingleValue.cpp Yson/JsonValue.cpp Yson/JsonValue.hpp Yson/JsonObject.cpp Yson/JsonObject.hpp Yson/JsonArray.cpp Yson/JsonArray.hpp Yson/YsonException.hpp Yson/JsonInvalidValue.cpp Yson/JsonInvalidValue.hpp)
 
 add_subdirectory(Externals)
 

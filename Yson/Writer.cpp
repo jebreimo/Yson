@@ -15,9 +15,7 @@
 #include "../Ystring/Escape/Escape.hpp"
 #include "Base64.hpp"
 #include "IsJavaScriptIdentifier.hpp"
-
-#define JSONWRITER_THROW(msg) \
-    throw std::logic_error(msg)
+#include "YsonException.hpp"
 
 namespace Yson
 {
@@ -316,7 +314,7 @@ namespace Yson
     Writer& Writer::outdent()
     {
         if (m_Indentation == 0)
-            JSONWRITER_THROW("Can't outdent, indentation level is 0.");
+            YSON_THROW("Can't outdent, indentation level is 0.");
         --m_Indentation;
         return *this;
     }
@@ -332,7 +330,7 @@ namespace Yson
                 writeIndentationImpl();
             break;
         default:
-            JSONWRITER_THROW("A comma has already been added.");
+            YSON_THROW("A comma has already been added.");
         }
         *m_Stream << ',';
         m_State = AFTER_COMMA;
@@ -592,8 +590,8 @@ namespace Yson
         if (m_Context.empty() || m_Context.top().endChar != endChar)
         {
             if (!std::uncaught_exception())
-                JSONWRITER_THROW(std::string("Incorrect position for '")
-                                 + endChar + "'");
+                YSON_THROW(std::string("Incorrect position for '")
+                           + endChar + "'");
             else
                 return;
         }
@@ -622,8 +620,8 @@ namespace Yson
             }
             break;
         default:
-            JSONWRITER_THROW(std::string("Incorrect position for '")
-                             + endChar + "'");
+            YSON_THROW(std::string("Incorrect position for '")
+                       + endChar + "'");
         }
 
         m_Context.pop();
@@ -692,8 +690,8 @@ namespace Yson
         }
         else if (!languageExtension(NON_FINITE_FLOATS_AS_STRINGS))
         {
-            JSONWRITER_THROW(std::string("Illegal floating point value '")
-                             + std::to_string(value) + "'");
+            YSON_THROW(std::string("Illegal floating point value '")
+                       + std::to_string(value) + "'");
         }
         else
         {

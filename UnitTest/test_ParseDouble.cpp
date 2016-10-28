@@ -9,7 +9,8 @@
 
 #include "../Externals/Ytest/Ytest.hpp"
 
-namespace {
+namespace
+{
     using namespace Yson;
 
     void success(const std::string& s, double expectedValue, double e = 1e-10)

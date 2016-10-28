@@ -12,9 +12,10 @@
 #include <memory>
 #include <stack>
 #include <string>
-#include "ReaderException.hpp"
-#include "Tokenizer.hpp"
 #include "LineNumberCounter.hpp"
+#include "ReaderException.hpp"
+#include "JsonValue.hpp"
+#include "Tokenizer.hpp"
 #include "ValueType.hpp"
 
 /** @file
@@ -92,6 +93,8 @@ namespace Yson
 
         std::string token() const;
 
+        std::pair<const char*, const char*> rawToken() const;
+
         size_t lineNumber() const;
 
         size_t columnNumber() const;
@@ -128,6 +131,8 @@ namespace Yson
         void readValue(std::string& value) const;
 
         void readBase64(std::vector<uint8_t>& value) const;
+
+        std::unique_ptr<JsonValue> readStructure();
 
         bool nextDocument();
 
@@ -226,6 +231,15 @@ namespace Yson
 
         template<typename T>
         void readSignedInteger(T& value) const;
+
+        std::unique_ptr<JsonValue> readCompleteArray(
+                const std::shared_ptr<std::string>& buffer);
+
+        std::unique_ptr<JsonValue> readCompleteObject(
+                const std::shared_ptr<std::string>& buffer);
+
+        std::unique_ptr<JsonValue> readCompleteValue(
+                const std::shared_ptr<std::string>& buffer);
 
         enum State
         {
