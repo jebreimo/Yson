@@ -13,8 +13,8 @@
 #include <type_traits>
 #include "../Ystring/Conversion.hpp"
 #include "../Ystring/Escape/Escape.hpp"
-#include "Base64.hpp"
-#include "IsJavaScriptIdentifier.hpp"
+#include "Detail/Base64.hpp"
+#include "Detail/IsJavaScriptIdentifier.hpp"
 #include "YsonException.hpp"
 
 namespace Yson

@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <cassert>
 #include <functional>
-#include "Span.hpp"
+#include "Detail/Span.hpp"
 
 namespace Yson
 {

@@ -1,7 +1,18 @@
-- Create a class for pre-tokenized JSON contents.
-	- Add functions to Reader that returns pre-tokenized JSON contents.
-	- Add a function to Writer that writes pre-tokenized JSON contents.
-- Create an exception class YsonException for exceptions outside the Reader.
-	- Make use of this class in the Writer and Token classes.
++2 Make an efficient memory buffer reader
 - Enable/disable escaping characters in JsonWriter
-- Make an efficient memory buffer reader
+
+Support reading and writing complete structures
+    + Create a class for pre-tokenized JSON contents.
+    + Add functions to Reader that returns pre-tokenized JSON contents.
+    - Add a function to Writer that writes pre-tokenized JSON contents.
+
++ Create an exception class YsonException for exceptions outside the Reader.
+	+ Make use of this class in the Writer and Token classes.
+
+Include Byson in Yson
+- Give the Byson Reader the same interface as Yson Reader.
+	- Add functions for reading structures.
+- Give the Byson Writer the same interface as Yson Writer.
+- Create inteface class for Reader, IReader.
+- Create inteface class for Writer, IWriter.
+- Rename Byson Reader and Writer classes.

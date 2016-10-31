@@ -7,11 +7,11 @@
 //****************************************************************************
 #include "JsonSingleValue.hpp"
 
-#include "GetValueType.hpp"
-#include "ParseDouble.hpp"
-#include "ParseInteger.hpp"
+#include "Detail/GetValueType.hpp"
+#include "Detail/ParseDouble.hpp"
+#include "Detail/ParseInteger.hpp"
 #include "YsonException.hpp"
-#include "Base64.hpp"
+#include "Detail/Base64.hpp"
 
 namespace Yson
 {
@@ -178,7 +178,7 @@ namespace Yson
                                         m_StringRef.end(),
                                         true);
         if (!parsedValue.second)
-            false;
+            return false;
         auto unsignedValue = static_cast<uint64_t>(parsedValue.first);
         auto actualValue = static_cast<T>(unsignedValue);
         if (actualValue == unsignedValue)

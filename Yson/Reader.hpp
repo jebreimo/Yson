@@ -36,6 +36,8 @@ namespace Yson
 
         Reader(const std::string& fileName);
 
+        Reader(const char* buffer, size_t bufferSize);
+
         ~Reader();
 
         /** @brief Advances the reader to the next key in the most recently
@@ -274,6 +276,7 @@ namespace Yson
         Tokenizer m_Tokenizer;
         std::stack<State> m_StateStack;
         LineNumberCounter m_LineNumberCounter;
+        size_t m_ChunkSize;
         State m_State;
         int m_LanguageExtensions;
         int m_SkipElementDepth;

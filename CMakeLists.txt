@@ -23,39 +23,55 @@ endif(APPLE)
 add_subdirectory(Ystring)
 
 set(PUBLIC_HEADERS
+    Yson/JsonArray.hpp
+    Yson/YsonException.hpp
+    Yson/JsonInvalidValue.hpp
+    Yson/JsonObject.hpp
+    Yson/JsonSingleValue.hpp
+    Yson/JsonValue.hpp
+    Yson/LineNumberCounter.hpp
     Yson/Reader.hpp
     Yson/ReaderException.hpp
     Yson/TokenType.hpp
     Yson/Tokenizer.hpp
-    Yson/Writer.hpp
-    Yson/LineNumberCounter.hpp
     Yson/ValueType.hpp
+    Yson/Writer.hpp
     Yson/YsonDefinitions.hpp
     )
 
 set(PRIVATE_HEADERS
-    Yson/Base64.hpp
-    Yson/GetValueType.hpp
-    Yson/IsJavaScriptIdentifier.hpp
-    Yson/ParseDouble.hpp
-    Yson/ParseInteger.hpp
-    Yson/Span.hpp
-    Yson/TextFileReader.hpp
-    Yson/TextReader.hpp
+    Yson/Detail/Base64.hpp
+    Yson/Detail/GetValueType.hpp
+    Yson/Detail/IsJavaScriptIdentifier.hpp
+    Yson/Detail/ParseDouble.hpp
+    Yson/Detail/ParseInteger.hpp
+    Yson/Detail/Span.hpp
+    Yson/Detail/TextBufferReader.hpp
+    Yson/Detail/TextFileReader.hpp
+    Yson/Detail/TextReader.hpp
+    Yson/Detail/TextStreamReader.hpp
     )
 
 set(SOURCE_FILES
-    Yson/Base64.cpp
-    Yson/GetValueType.cpp
-    Yson/IsJavaScriptIdentifier.cpp
+    Yson/JsonArray.cpp
+    Yson/JsonInvalidValue.cpp
+    Yson/JsonObject.cpp
+    Yson/JsonSingleValue.cpp
+    Yson/JsonValue.cpp
+    Yson/LineNumberCounter.cpp
     Yson/Reader.cpp
     Yson/Tokenizer.cpp
     Yson/Writer.cpp
-    Yson/LineNumberCounter.cpp
-    Yson/ParseDouble.cpp
-    Yson/ParseInteger.cpp
-    Yson/TextFileReader.cpp
-    Yson/TextReader.cpp Yson/JsonSingleValue.cpp Yson/JsonValue.cpp Yson/JsonValue.hpp Yson/JsonObject.cpp Yson/JsonObject.hpp Yson/JsonArray.cpp Yson/JsonArray.hpp Yson/YsonException.hpp Yson/JsonInvalidValue.cpp Yson/JsonInvalidValue.hpp)
+    Yson/Detail/Base64.cpp
+    Yson/Detail/GetValueType.cpp
+    Yson/Detail/IsJavaScriptIdentifier.cpp
+    Yson/Detail/ParseDouble.cpp
+    Yson/Detail/ParseInteger.cpp
+    Yson/Detail/TextBufferReader.cpp
+    Yson/Detail/TextFileReader.cpp
+    Yson/Detail/TextReader.cpp
+    Yson/Detail/TextStreamReader.cpp
+    )
 
 add_subdirectory(Externals)
 

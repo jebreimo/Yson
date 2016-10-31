@@ -8,7 +8,7 @@
 #pragma once
 
 #include <utility>
-#include "YsonDefinitions.hpp"
+#include "../YsonDefinitions.hpp"
 
 namespace Yson
 {

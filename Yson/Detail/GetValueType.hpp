@@ -8,8 +8,8 @@
 #pragma once
 
 #include <string>
-#include "ValueType.hpp"
-#include "YsonDefinitions.hpp"
+#include "../ValueType.hpp"
+#include "../YsonDefinitions.hpp"
 
 namespace Yson
 {

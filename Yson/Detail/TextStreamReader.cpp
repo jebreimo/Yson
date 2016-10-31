@@ -5,45 +5,36 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include "TextReader.hpp"
+#include "TextStreamReader.hpp"
 
 #include <algorithm>
 #include <istream>
-#include "../Ystring/Conversion.hpp"
-#include "../Ystring/EncodingInfo.hpp"
+#include "../../Ystring/Conversion.hpp"
+#include "../../Ystring/EncodingInfo.hpp"
 
-namespace Yson {
-
+namespace Yson
+{
     using namespace Ystring;
 
-    TextReader::TextReader()
-            : m_Stream(),
-              m_DestinationEncoding()
+    TextStreamReader::TextStreamReader()
+            : m_Stream()
     {}
 
-    TextReader::TextReader(std::istream& stream,
-                           Encoding_t destinationEncoding)
-            : m_Stream(&stream),
-              m_DestinationEncoding(destinationEncoding)
-    {}
-
-    TextReader::TextReader(std::istream& stream,
-                           Encoding_t sourceEncoding,
-                           Encoding_t destinationEncoding)
-            : m_Stream(&stream),
-              m_DestinationEncoding(destinationEncoding)
+    TextStreamReader::TextStreamReader(std::istream& stream,
+                                       Encoding_t sourceEncoding)
+            : m_Stream(&stream)
     {
         if (sourceEncoding != Encoding::UNKNOWN)
         {
-            m_Converter.reset(new Conversion::Converter(sourceEncoding,
-                                                        destinationEncoding));
+            m_Converter.reset(new Conversion::Converter(
+                    sourceEncoding, Ystring::Encoding::UTF_8));
         }
     }
 
-    TextReader::~TextReader()
+    TextStreamReader::~TextStreamReader()
     {}
 
-    bool TextReader::read(std::string& destination, size_t bytes)
+    bool TextStreamReader::read(std::string& destination, size_t bytes)
     {
         auto initialBufferSize = m_Buffer.size();
         m_Buffer.resize(initialBufferSize + bytes);
@@ -66,7 +57,7 @@ namespace Yson {
             bufferStart = encoding.second;
             bufferSize -= bufferStart - m_Buffer.data();
             m_Converter.reset(new Conversion::Converter(
-                    encoding.first, m_DestinationEncoding));
+                    encoding.first, Ystring::Encoding::UTF_8));
         }
 
         auto convertedBytes = m_Converter->convert(
@@ -84,16 +75,14 @@ namespace Yson {
         return true;
     }
 
-    void TextReader::init(std::istream& stream,
-                          Encoding_t sourceEncoding,
-                          Encoding_t destinationEncoding)
+    void TextStreamReader::init(std::istream& stream,
+                                Encoding_t sourceEncoding)
     {
         m_Stream = &stream;
-        m_DestinationEncoding = destinationEncoding;
         if (sourceEncoding != Encoding::UNKNOWN)
         {
-            m_Converter.reset(new Conversion::Converter(sourceEncoding,
-                                                        destinationEncoding));
+            m_Converter.reset(new Conversion::Converter(
+                    sourceEncoding, Ystring::Encoding::UTF_8));
         }
         else if (m_Converter)
         {

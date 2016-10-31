@@ -8,20 +8,15 @@
 #pragma once
 
 #include <fstream>
-#include "TextReader.hpp"
+#include "TextStreamReader.hpp"
 
 namespace Yson
 {
-    class YSON_API TextFileReader : public TextReader
+    class YSON_API TextFileReader : public TextStreamReader
     {
     public:
         TextFileReader(const std::string& fileName,
-                       Ystring::Encoding_t destinationEncoding);
-
-        TextFileReader(const std::string& fileName,
-                       Ystring::Encoding_t sourceEncoding,
-                       Ystring::Encoding_t destinationEncoding);
-
+                       Ystring::Encoding_t sourceEncoding = Ystring::Encoding::UNKNOWN);
     private:
         std::ifstream m_FileStream;
     };

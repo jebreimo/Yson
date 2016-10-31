@@ -1,18 +1,20 @@
 //****************************************************************************
-// Copyright © 2015 Jan Erik Breimo. All rights reserved.
-// Created by Jan Erik Breimo on 2015-12-06.
+// Copyright © 2016 Jan Erik Breimo. All rights reserved.
+// Created by Jan Erik Breimo on 30.10.2016.
 //
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
-
-#include <cstdint>
-#include <utility>
-#include "YsonDefinitions.hpp"
+#include <string>
 
 namespace Yson
 {
-    YSON_API std::pair<int64_t, bool> parseInteger(
-            const char* first, const char* last, bool detectBase);
+    class TextReader
+    {
+    public:
+        virtual ~TextReader() = default;
+        virtual bool read(std::string& destination, size_t bytes) = 0;
+    };
 }
+

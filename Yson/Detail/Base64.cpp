@@ -6,7 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "Base64.hpp"
-#include "../Ystring/Utilities/Union32.hpp"
+#include "../../Ystring/Utilities/Union32.hpp"
 
 namespace Yson
 {

@@ -9,20 +9,21 @@
 
 #include "../Ystring/Conversion.hpp"
 #include "../Ystring/Escape/Escape.hpp"
-#include "Base64.hpp"
-#include "GetValueType.hpp"
+#include "Detail/Base64.hpp"
+#include "Detail/GetValueType.hpp"
 #include "JsonArray.hpp"
 #include "JsonObject.hpp"
-#include "ParseDouble.hpp"
-#include "ParseInteger.hpp"
+#include "Detail/ParseDouble.hpp"
+#include "Detail/ParseInteger.hpp"
 #include "JsonSingleValue.hpp"
-#include "TextFileReader.hpp"
+#include "Detail/TextBufferReader.hpp"
+#include "Detail/TextFileReader.hpp"
 
 namespace Yson
 {
     using std::get;
 
-    const size_t CHUNK_SIZE = 16 * 1024;
+    const size_t DEFAULT_CHUNK_SIZE = 16 * 1024;
 
     #define READER_THROW(msg) \
         throw ReaderException((msg), __FILE__, __LINE__, __FUNCTION__, \
@@ -79,21 +80,27 @@ namespace Yson
     }
 
     Reader::Reader(std::istream& stream)
-        : m_TextReader(new TextReader(stream,
-                                      Ystring::Encoding::UNKNOWN,
-                                      Ystring::Encoding::UTF_8)),
+        : m_TextReader(new TextStreamReader(stream)),
+          m_ChunkSize(DEFAULT_CHUNK_SIZE),
           m_State(INITIAL_STATE),
           m_LanguageExtensions(0),
           m_SkipElementDepth(0)
     {}
 
     Reader::Reader(const std::string& fileName)
-        : m_TextReader(new TextFileReader(fileName,
-                                          Ystring::Encoding::UNKNOWN,
-                                          Ystring::Encoding::UTF_8)),
+        : m_TextReader(new TextFileReader(fileName)),
+          m_ChunkSize(DEFAULT_CHUNK_SIZE),
           m_State(INITIAL_STATE),
           m_LanguageExtensions(0),
           m_SkipElementDepth(0)
+    {}
+
+    Reader::Reader(const char* buffer, size_t bufferSize)
+            : m_TextReader(new TextBufferReader(buffer, bufferSize)),
+              m_ChunkSize(DEFAULT_CHUNK_SIZE),
+              m_State(INITIAL_STATE),
+              m_LanguageExtensions(0),
+              m_SkipElementDepth(0)
     {}
 
     Reader::~Reader()
@@ -711,7 +718,7 @@ namespace Yson
     {
         auto initialSize = m_Buffer.size();
         m_Buffer.clear();
-        if (!m_TextReader->read(m_Buffer, CHUNK_SIZE) && initialSize == 0)
+        if (!m_TextReader->read(m_Buffer, m_ChunkSize) && initialSize == 0)
             return false;
         m_Tokenizer.setBuffer(m_Buffer.data(), m_Buffer.size());
         return true;

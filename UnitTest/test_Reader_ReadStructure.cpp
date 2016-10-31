@@ -14,7 +14,7 @@ namespace
 {
     using namespace Yson;
 
-    void test()
+    void test_fromStream()
     {
         auto doc = R"({"int": 1234, "array": [1, 2, {"float": 1.234}]})";
         std::istringstream iss(doc);
@@ -26,5 +26,16 @@ namespace
         Y_EQUAL(getValue<double>((*object)["array"][2]["float"]), 1.234);
     }
 
-    Y_TEST(test);
+    void test_fromBuffer()
+    {
+        auto doc = R"({"int": 1234, "array": [1, 2, {"float": 1.234}]})";
+        Reader reader(doc, strlen(doc));
+        auto object = reader.readStructure();
+        Y_EQUAL(getValue<int>((*object)["int"]), 1234);
+        Y_EQUAL(getValue<unsigned>((*object)["array"][0]), 1);
+        Y_EQUAL(getValue<unsigned>((*object)["array"][1]), 2);
+        Y_EQUAL(getValue<double>((*object)["array"][2]["float"]), 1.234);
+    }
+
+    Y_TEST(test_fromStream, test_fromBuffer);
 }

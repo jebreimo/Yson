@@ -8,8 +8,9 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "../Ystring/Encoding.hpp"
-#include "YsonDefinitions.hpp"
+#include "../../Ystring/Encoding.hpp"
+#include "TextReader.hpp"
+#include "../YsonDefinitions.hpp"
 
 namespace Ystring { namespace Conversion
 {
@@ -18,31 +19,24 @@ namespace Ystring { namespace Conversion
 
 namespace Yson
 {
-    class YSON_API TextReader
+    class YSON_API TextStreamReader : public TextReader
     {
     public:
-        TextReader(std::istream& stream,
-                   Ystring::Encoding_t destinationEncoding);
+        TextStreamReader(std::istream& stream,
+                         Ystring::Encoding_t sourceEncoding = Ystring::Encoding::UNKNOWN);
 
-        TextReader(std::istream& stream,
-                   Ystring::Encoding_t sourceEncoding,
-                   Ystring::Encoding_t destinationEncoding);
+        virtual ~TextStreamReader();
 
-        virtual ~TextReader();
-
-        bool read(std::string& destination, size_t bytes);
+        bool read(std::string& destination, size_t bytes) override;
 
     protected:
-        TextReader();
+        TextStreamReader();
 
-        void init(std::istream& stream,
-                  Ystring::Encoding_t sourceEncoding,
-                  Ystring::Encoding_t destinationEncoding);
+        void init(std::istream& stream, Ystring::Encoding_t sourceEncoding);
 
     private:
         std::istream* m_Stream;
         std::unique_ptr<Ystring::Conversion::Converter> m_Converter;
-        Ystring::Encoding_t m_DestinationEncoding;
         std::vector<char> m_Buffer;
     };
 }
