@@ -26,7 +26,7 @@ namespace Yson
 {
     class TextReader;
 
-    /** @brief A class for iterating efficiently over the contents of a JSON
+    /** @brief A class for iterating over and reading the contents of a JSON
       *   file.
       */
     class YSON_API Reader
@@ -40,14 +40,24 @@ namespace Yson
 
         ~Reader();
 
+        /** @brief Reads and returns the complete value at the current
+          *     position in the JSON document.
+          * @throws JsonReaderException if it encounters an error in the JSON
+          *     file.
+          * @return A pointer to the top-level value.
+          *
+          * If the current position is at the start of the document (there
+          * has been no calls to nextValue etc.) then the entire document is
+          * returned a a single structure.
+          */
+        std::unique_ptr<JsonValue> read();
+
         /** @brief Advances the reader to the next key in the most recently
           *     entered JSON object.
           * @throws JsonReaderException if it encounters an error in the JSON
           *     file or the most recently entered object isn't an object.
           * @return false if the reader has reached the end of the most
           *     recently entered object.
-          *
-          *
           */
         bool nextKey();
 
@@ -102,7 +112,7 @@ namespace Yson
         size_t columnNumber() const;
 
         /** @brief Returns true if the current value is null.
-          * @return
+          * @return true if the current JSON value is "null".
           */
         bool isNull() const;
 
@@ -134,8 +144,11 @@ namespace Yson
 
         void readBase64(std::vector<uint8_t>& value) const;
 
-        std::unique_ptr<JsonValue> readStructure();
-
+        /** @brief Moves to the next document in a multi-document file or
+          *     buffer.
+          * @return true if there is another document, false if the reader
+          *     encountered the end of the file or buffer.
+          */
         bool nextDocument();
 
         bool isStringsAsValuesEnabled() const;
@@ -177,7 +190,6 @@ namespace Yson
         int languageExtensions() const;
 
         Reader& setLanguageExtensions(int value);
-
     private:
         enum LanguageExtensions
         {

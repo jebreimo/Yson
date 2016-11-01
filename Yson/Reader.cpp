@@ -473,7 +473,7 @@ namespace Yson
     }
 
 
-    std::unique_ptr<JsonValue> Reader::readStructure()
+    std::unique_ptr<JsonValue> Reader::read()
     {
         switch (m_State)
         {
@@ -531,7 +531,7 @@ namespace Yson
         enter();
         while (nextKey())
         {
-            auto key = read<std::string>(*this);
+            auto key = Yson::read<std::string>(*this);
             nextValue();
             tokens.push_back({key, readCompleteValue(buffer)});
         }
