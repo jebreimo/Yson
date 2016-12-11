@@ -20,6 +20,11 @@ namespace Yson
         return value;
     }
 
+    bool JsonInvalidValue::isValid() const
+    {
+        return false;
+    }
+
     ValueType JsonInvalidValue::valueType() const
     {
         return ValueType::INVALID;

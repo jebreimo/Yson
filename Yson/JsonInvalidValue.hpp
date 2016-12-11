@@ -15,6 +15,7 @@ namespace Yson
     public:
         static const JsonInvalidValue& instance();
 
+        bool isValid() const final;
 
         ValueType valueType() const final;
 

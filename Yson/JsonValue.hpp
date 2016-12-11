@@ -20,6 +20,8 @@ namespace Yson
     public:
         virtual ~JsonValue() = default;
 
+        virtual bool isValid() const;
+
         virtual ValueType valueType() const = 0;
 
         virtual const std::string& typeName() const = 0;

@@ -13,6 +13,11 @@ namespace Yson
 {
     JsonValue::JsonValue() = default;
 
+    bool JsonValue::isValid() const
+    {
+        return true;
+    }
+
     bool JsonValue::value(std::string& value) const
     {
         YSON_THROW("Unsupported function for values of type " + typeName());
