@@ -12,5 +12,5 @@
 namespace Yson
 {
     std::string toBase64(const void* data, size_t size);
-    std::vector<uint8_t> fromBase64(const std::string& text);
+    std::vector<char> fromBase64(const std::string& text);
 }

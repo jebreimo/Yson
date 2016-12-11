@@ -90,9 +90,9 @@ namespace Yson
         return result;
     }
 
-    std::vector<uint8_t> fromBase64(const std::string& text)
+    std::vector<char> fromBase64(const std::string& text)
     {
-        std::vector<uint8_t> result;
+        std::vector<char> result;
         auto last = text.find_last_not_of('=');
         if (last == std::string::npos)
             return result;
@@ -107,17 +107,17 @@ namespace Yson
                             | (decodeCharacter(text[i + 1]) << 12)
                             | (decodeCharacter(text[i + 2]) << 6)
                             | decodeCharacter(text[i + 3]);
-            result.push_back(uint8_t(word >> 16));
-            result.push_back(uint8_t(word >> 8));
-            result.push_back(uint8_t(word));
+            result.push_back(char(word >> 16));
+            result.push_back(char(word >> 8));
+            result.push_back(char(word));
         }
         if (tailSize == 3)
         {
             uint32_t word = (decodeCharacter(text[i]) << 18)
                             | (decodeCharacter(text[i + 1]) << 12)
                             | (decodeCharacter(text[i + 2]) << 6);
-            result.push_back(uint8_t(word >> 16));
-            result.push_back(uint8_t(word >> 8));
+            result.push_back(char(word >> 16));
+            result.push_back(char(word >> 8));
         }
         else if (tailSize == 2)
         {

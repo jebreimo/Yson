@@ -15,43 +15,44 @@ namespace Yson
     public:
         static const JsonInvalidValue& instance();
 
-        ValueType valueType() const override;
 
-        const std::string& typeName() const override;
+        ValueType valueType() const final;
 
-        bool value(std::string& value) const override;
+        const std::string& typeName() const final;
 
-        bool value(bool& value) const override;
+        bool value(std::string& value) const final;
 
-        bool value(int8_t& value) const override;
+        bool value(bool& value) const final;
 
-        bool value(int16_t& value) const override;
+        bool value(int8_t& value) const final;
 
-        bool value(int32_t& value) const override;
+        bool value(int16_t& value) const final;
 
-        bool value(int64_t& value) const override;
+        bool value(int32_t& value) const final;
 
-        bool value(uint8_t& value) const override;
+        bool value(int64_t& value) const final;
 
-        bool value(uint16_t& value) const override;
+        bool value(uint8_t& value) const final;
 
-        bool value(uint32_t& value) const override;
+        bool value(uint16_t& value) const final;
 
-        bool value(uint64_t& value) const override;
+        bool value(uint32_t& value) const final;
 
-        bool value(float& value) const override;
+        bool value(uint64_t& value) const final;
 
-        bool value(double& value) const override;
+        bool value(float& value) const final;
 
-        bool value(long double& value) const override;
+        bool value(double& value) const final;
 
-        bool value(std::vector<uint8_t>& value) const override;
+        bool value(long double& value) const final;
 
-        const JsonValue& operator[](size_t index) const override;
+        bool value(std::vector<char>& value) const final;
 
-        const JsonValue& operator[](const std::string& key) const override;
+        const JsonValue& operator[](size_t index) const final;
 
-        size_t updateStringRef(size_t offset) override;
+        const JsonValue& operator[](const std::string& key) const final;
+
+        size_t updateStringRef(size_t offset) final;
     private:
         JsonInvalidValue() = default;
 

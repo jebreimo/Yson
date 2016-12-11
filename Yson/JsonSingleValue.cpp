@@ -131,7 +131,7 @@ namespace Yson
         return parsedValue.second;
     }
 
-    bool JsonSingleValue::value(std::vector<uint8_t>& value) const
+    bool JsonSingleValue::value(std::vector<char>& value) const
     {
         try
         {

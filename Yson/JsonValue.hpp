@@ -50,7 +50,7 @@ namespace Yson
 
         virtual bool value(long double& value) const;
 
-        virtual bool value(std::vector<uint8_t>& value) const;
+        virtual bool value(std::vector<char>& value) const;
 
         virtual const JsonValue& operator[](size_t index) const;
 

@@ -27,7 +27,7 @@ namespace Yson
 
     #define READER_THROW(msg) \
         throw ReaderException((msg), __FILE__, __LINE__, __FUNCTION__, \
-                                  lineNumber(), columnNumber())
+                              lineNumber(), columnNumber())
 
     namespace
     {
@@ -458,7 +458,7 @@ namespace Yson
             value = Ystring::unescape(value);
     }
 
-    void Reader::readBase64(std::vector<uint8_t>& value) const
+    void Reader::readBase64(std::vector<char>& value) const
     {
         std::string rawValue;
         readValue(rawValue);

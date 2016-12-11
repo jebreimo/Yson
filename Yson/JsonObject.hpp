@@ -18,21 +18,21 @@ namespace Yson
 
         JsonObject(std::vector<NamedValue>&& values);
 
-        ValueType valueType() const override;
+        ValueType valueType() const final;
 
-        const std::string& typeName() const override;
+        const std::string& typeName() const final;
 
         bool empty() const;
 
         size_t size() const;
 
-        const JsonValue& operator[](const std::string& key) const override;
+        const JsonValue& operator[](const std::string& key) const final;
 
         Iterator begin() const;
 
         Iterator end() const;
 
-        size_t updateStringRef(size_t offset) override;
+        size_t updateStringRef(size_t offset) final;
     private:
         std::vector<std::pair<std::string, std::unique_ptr<JsonValue>>> m_Values;
     };

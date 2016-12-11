@@ -95,7 +95,7 @@ namespace Yson
         return false;
     }
 
-    bool JsonInvalidValue::value(std::vector<uint8_t>& value) const
+    bool JsonInvalidValue::value(std::vector<char>& value) const
     {
         return false;
     }

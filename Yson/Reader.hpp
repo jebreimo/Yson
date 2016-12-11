@@ -12,9 +12,9 @@
 #include <memory>
 #include <stack>
 #include <string>
+#include "JsonValue.hpp"
 #include "LineNumberCounter.hpp"
 #include "ReaderException.hpp"
-#include "JsonValue.hpp"
 #include "Tokenizer.hpp"
 #include "ValueType.hpp"
 
@@ -142,7 +142,7 @@ namespace Yson
 
         void readValue(std::string& value) const;
 
-        void readBase64(std::vector<uint8_t>& value) const;
+        void readBase64(std::vector<char>& value) const;
 
         /** @brief Moves to the next document in a multi-document file or
           *     buffer.

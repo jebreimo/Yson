@@ -50,39 +50,39 @@ namespace Yson
                         const std::shared_ptr<std::string>& buffer,
                         TokenType tokenType);
 
-        ValueType valueType() const override;
+        ValueType valueType() const final;
 
-        const std::string& typeName() const override;
+        const std::string& typeName() const final;
 
-        bool value(std::string& value) const override;
+        bool value(std::string& value) const final;
 
-        bool value(bool& value) const override;
+        bool value(bool& value) const final;
 
-        bool value(int8_t& value) const override;
+        bool value(int8_t& value) const final;
 
-        bool value(int16_t& value) const override;
+        bool value(int16_t& value) const final;
 
-        bool value(int32_t& value) const override;
+        bool value(int32_t& value) const final;
 
-        bool value(int64_t& value) const override;
+        bool value(int64_t& value) const final;
 
-        bool value(uint8_t& value) const override;
+        bool value(uint8_t& value) const final;
 
-        bool value(uint16_t& value) const override;
+        bool value(uint16_t& value) const final;
 
-        bool value(uint32_t& value) const override;
+        bool value(uint32_t& value) const final;
 
-        bool value(uint64_t& value) const override;
+        bool value(uint64_t& value) const final;
 
-        bool value(float& value) const override;
+        bool value(float& value) const final;
 
-        bool value(double& value) const override;
+        bool value(double& value) const final;
 
-        bool value(long double& value) const override;
+        bool value(long double& value) const final;
 
-        bool value(std::vector<uint8_t>& value) const override;
+        bool value(std::vector<char>& value) const final;
 
-        size_t updateStringRef(size_t offset) override;
+        size_t updateStringRef(size_t offset) final;
     private:
         template <typename T>
         bool parseSignedInteger(T& value) const;

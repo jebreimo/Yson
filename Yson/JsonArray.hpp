@@ -15,21 +15,21 @@ namespace Yson
     public:
         JsonArray(std::vector<std::unique_ptr<JsonValue>>&& values);
 
-        ValueType valueType() const override;
+        ValueType valueType() const final;
 
-        const std::string& typeName() const override;
+        const std::string& typeName() const final;
 
         bool empty() const;
 
         size_t size() const;
 
-        const JsonValue& operator[](size_t index) const override;
+        const JsonValue& operator[](size_t index) const final;
 
         std::vector<std::unique_ptr<JsonValue>>::const_iterator begin() const;
 
         std::vector<std::unique_ptr<JsonValue>>::const_iterator end() const;
 
-        size_t updateStringRef(size_t offset) override;
+        size_t updateStringRef(size_t offset) final;
     private:
         std::vector<std::unique_ptr<JsonValue>> m_Values;
     };

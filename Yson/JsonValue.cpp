@@ -78,7 +78,7 @@ namespace Yson
         YSON_THROW("Unsupported function for values of type " + typeName());
     }
 
-    bool JsonValue::value(std::vector<uint8_t>& value) const
+    bool JsonValue::value(std::vector<char>& value) const
     {
         YSON_THROW("Unsupported function for values of type " + typeName());
     }
