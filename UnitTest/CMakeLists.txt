@@ -17,7 +17,8 @@ set(SOURCE_FILES
     test_Reader.cpp
     test_Tokenizer.cpp
     test_Writer.cpp
-    test_ParseDouble.cpp test_Reader_ReadStructure.cpp)
+    test_ParseDouble.cpp
+    test_Reader_ReadStructure.cpp)
 
 add_executable(${PROJECT_NAME}
                ${SOURCE_FILES})

@@ -10,29 +10,26 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include "YsonDefinitions.hpp"
+#include "YsonException.hpp"
 
 /** @file
   * @brief Defines the JsonReaderException class.
   */
-
-#ifndef _NOEXCEPT
-    #define _NOEXCEPT
-#endif
 
 namespace Yson
 {
     /** @brief JsonReader throws instances of this class when it
       *   encounters errors.
       */
-    class YSON_API ReaderException : public std::logic_error
+    class ReaderException : public YsonException
     {
     public:
         /** @brief Constructs a JsonReaderException with an unspecific
           *   error message and no file location.
           */
         ReaderException()
-                : std::logic_error("Unspecified error."), m_LineNumber(0),
+                : YsonException("Unspecified error."),
+                  m_LineNumber(0),
                   m_ColumnNumber(0)
         {}
 
@@ -40,7 +37,9 @@ namespace Yson
           *   message, but no file location.
           */
         ReaderException(const std::string& msg)
-                : std::logic_error(msg), m_LineNumber(0), m_ColumnNumber(0)
+                : YsonException(msg),
+                  m_LineNumber(0),
+                  m_ColumnNumber(0)
         {}
 
         /** @brief Constructs a JsonReaderException with the given error
@@ -53,7 +52,9 @@ namespace Yson
                         const std::string& sourceFileName,
                         int sourceFileLineNumber,
                         const std::string& funcName)
-                : std::logic_error(msg)
+                : YsonException(msg),
+                  m_LineNumber(0),
+                  m_ColumnNumber(0)
         {
             #ifndef NDEBUG
             std::stringstream ss;
@@ -79,7 +80,8 @@ namespace Yson
                         const std::string& funcName,
                         size_t fileLineNumber,
                         size_t fileColumnNumber)
-                : std::logic_error(msg), m_LineNumber(fileLineNumber),
+                : YsonException(msg),
+                  m_LineNumber(fileLineNumber),
                   m_ColumnNumber(fileColumnNumber)
         {
             std::stringstream ss;

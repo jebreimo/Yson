@@ -24,7 +24,6 @@ add_subdirectory(Ystring)
 
 set(PUBLIC_HEADERS
     Yson/JsonArray.hpp
-    Yson/YsonException.hpp
     Yson/JsonInvalidValue.hpp
     Yson/JsonObject.hpp
     Yson/JsonSingleValue.hpp
@@ -37,6 +36,7 @@ set(PUBLIC_HEADERS
     Yson/ValueType.hpp
     Yson/Writer.hpp
     Yson/YsonDefinitions.hpp
+    Yson/YsonException.hpp
     )
 
 set(PRIVATE_HEADERS
