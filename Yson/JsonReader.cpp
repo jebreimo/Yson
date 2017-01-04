@@ -5,7 +5,7 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include "Reader.hpp"
+#include "JsonReader.hpp"
 
 #include "../Ystring/Conversion.hpp"
 #include "../Ystring/Escape/Escape.hpp"
@@ -26,7 +26,7 @@ namespace Yson
     const size_t DEFAULT_CHUNK_SIZE = 16 * 1024;
 
     #define READER_THROW(msg) \
-        throw ReaderException((msg), __FILE__, __LINE__, __FUNCTION__, \
+        throw JsonReaderException((msg), __FILE__, __LINE__, __FUNCTION__, \
                               lineNumber(), columnNumber())
 
     namespace
@@ -79,7 +79,7 @@ namespace Yson
         }
     }
 
-    Reader::Reader(std::istream& stream)
+    JsonReader::JsonReader(std::istream& stream)
         : m_TextReader(new TextStreamReader(stream)),
           m_ChunkSize(DEFAULT_CHUNK_SIZE),
           m_State(INITIAL_STATE),
@@ -87,7 +87,7 @@ namespace Yson
           m_SkipElementDepth(0)
     {}
 
-    Reader::Reader(const std::string& fileName)
+    JsonReader::JsonReader(const std::string& fileName)
         : m_TextReader(new TextFileReader(fileName)),
           m_ChunkSize(DEFAULT_CHUNK_SIZE),
           m_State(INITIAL_STATE),
@@ -95,7 +95,7 @@ namespace Yson
           m_SkipElementDepth(0)
     {}
 
-    Reader::Reader(const char* buffer, size_t bufferSize)
+    JsonReader::JsonReader(const char* buffer, size_t bufferSize)
             : m_TextReader(new TextBufferReader(buffer, bufferSize)),
               m_ChunkSize(DEFAULT_CHUNK_SIZE),
               m_State(INITIAL_STATE),
@@ -103,10 +103,10 @@ namespace Yson
               m_SkipElementDepth(0)
     {}
 
-    Reader::~Reader()
+    JsonReader::~JsonReader()
     {}
 
-    bool Reader::nextKey()
+    bool JsonReader::nextKey()
     {
         if (m_SkipElementDepth != 0 && m_State != UNRECOVERABLE_ERROR)
             skipElement();
@@ -151,7 +151,7 @@ namespace Yson
         return false;
     }
 
-    bool Reader::nextValue()
+    bool JsonReader::nextValue()
     {
         if (m_SkipElementDepth != 0 && m_State != UNRECOVERABLE_ERROR)
             skipElement();
@@ -188,7 +188,7 @@ namespace Yson
         return false;
     }
 
-    bool Reader::nextToken()
+    bool JsonReader::nextToken()
     {
         if (m_SkipElementDepth != 0 && m_State != UNRECOVERABLE_ERROR)
             skipElement();
@@ -208,7 +208,7 @@ namespace Yson
         return nextTokenImpl();
     }
 
-    void Reader::enter()
+    void JsonReader::enter()
     {
         State pushState;
         switch (m_State)
@@ -236,7 +236,7 @@ namespace Yson
         m_StateStack.push(pushState);
     }
 
-    void Reader::leave()
+    void JsonReader::leave()
     {
         switch (m_State)
         {
@@ -260,7 +260,7 @@ namespace Yson
         }
     }
 
-    ValueType Reader::valueType() const
+    ValueType JsonReader::valueType() const
     {
         switch (m_Tokenizer.tokenType())
         {
@@ -296,7 +296,7 @@ namespace Yson
         }
     }
 
-    ValueType Reader::stringValueType() const
+    ValueType JsonReader::stringValueType() const
     {
         auto type = valueType();
         if (type != ValueType::STRING)
@@ -326,38 +326,38 @@ namespace Yson
         }
     }
 
-    TokenType Reader::tokenType() const
+    TokenType JsonReader::tokenType() const
     {
         return m_Tokenizer.tokenType();
     }
 
-    std::string Reader::token() const
+    std::string JsonReader::token() const
     {
         return m_Tokenizer.token();
     }
 
-    std::pair<const char*, const char*> Reader::rawToken() const
+    std::pair<const char*, const char*> JsonReader::rawToken() const
     {
         return m_Tokenizer.rawToken();
     }
 
-    size_t Reader::lineNumber() const
+    size_t JsonReader::lineNumber() const
     {
         return m_LineNumberCounter.line();
     }
 
-    size_t Reader::columnNumber() const
+    size_t JsonReader::columnNumber() const
     {
         return m_LineNumberCounter.column();
     }
 
-    bool Reader::isNull() const
+    bool JsonReader::isNull() const
     {
         auto token = getValueToken();
         return equalsNull(get<0>(token), get<1>(token));
     }
 
-    void Reader::readValue(bool& value) const
+    void JsonReader::readValue(bool& value) const
     {
         auto token = getValueToken();
         if (equalsTrue(get<0>(token), get<1>(token)))
@@ -368,47 +368,47 @@ namespace Yson
             READER_THROW("Invalid boolean value");
     }
 
-    void Reader::readValue(int8_t& value) const
+    void JsonReader::readValue(int8_t& value) const
     {
         readSignedInteger(value);
     }
 
-    void Reader::readValue(int16_t& value) const
+    void JsonReader::readValue(int16_t& value) const
     {
         readSignedInteger(value);
     }
 
-    void Reader::readValue(int32_t& value) const
+    void JsonReader::readValue(int32_t& value) const
     {
         readSignedInteger(value);
     }
 
-    void Reader::readValue(int64_t& value) const
+    void JsonReader::readValue(int64_t& value) const
     {
         readSignedInteger(value);
     }
 
-    void Reader::readValue(uint8_t& value) const
+    void JsonReader::readValue(uint8_t& value) const
     {
         readUnsignedInteger(value);
     }
 
-    void Reader::readValue(uint16_t& value) const
+    void JsonReader::readValue(uint16_t& value) const
     {
         readUnsignedInteger(value);
     }
 
-    void Reader::readValue(uint32_t& value) const
+    void JsonReader::readValue(uint32_t& value) const
     {
         readUnsignedInteger(value);
     }
 
-    void Reader::readValue(uint64_t& value) const
+    void JsonReader::readValue(uint64_t& value) const
     {
         readUnsignedInteger(value);
     }
 
-    void Reader::readValue(float& value) const
+    void JsonReader::readValue(float& value) const
     {
         auto token = getValueToken();
         auto parsedValue = parseFloat(get<0>(token), get<1>(token));
@@ -417,7 +417,7 @@ namespace Yson
         value = parsedValue.first;
     }
 
-    void Reader::readValue(double& value) const
+    void JsonReader::readValue(double& value) const
     {
         auto token = getValueToken();
         auto parsedValue = parseDouble(get<0>(token), get<1>(token));
@@ -426,7 +426,7 @@ namespace Yson
         value = parsedValue.first;
     }
 
-    void Reader::readValue(long double& value) const
+    void JsonReader::readValue(long double& value) const
     {
         auto token = getValueToken();
         auto parsedValue = parseLongDouble(get<0>(token), get<1>(token));
@@ -435,7 +435,7 @@ namespace Yson
         value = parsedValue.first;
     }
 
-    void Reader::readValue(std::string& value) const
+    void JsonReader::readValue(std::string& value) const
     {
         auto token = m_Tokenizer.rawToken();
         if (m_Tokenizer.tokenType() == TokenType::STRING)
@@ -458,7 +458,7 @@ namespace Yson
             value = Ystring::unescape(value);
     }
 
-    void Reader::readBase64(std::vector<char>& value) const
+    void JsonReader::readBase64(std::vector<char>& value) const
     {
         std::string rawValue;
         readValue(rawValue);
@@ -473,7 +473,7 @@ namespace Yson
     }
 
 
-    std::unique_ptr<JsonValue> Reader::read()
+    std::unique_ptr<JsonValue> JsonReader::read()
     {
         switch (m_State)
         {
@@ -514,7 +514,7 @@ namespace Yson
     }
 
     std::unique_ptr<JsonValue>
-    Reader::readCompleteArray(const std::shared_ptr<std::string>& buffer)
+    JsonReader::readCompleteArray(const std::shared_ptr<std::string>& buffer)
     {
         std::vector<std::unique_ptr<JsonValue>> tokens;
         enter();
@@ -525,7 +525,7 @@ namespace Yson
     }
 
     std::unique_ptr<JsonValue>
-    Reader::readCompleteObject(const std::shared_ptr<std::string>& buffer)
+    JsonReader::readCompleteObject(const std::shared_ptr<std::string>& buffer)
     {
         std::vector<std::pair<std::string, std::unique_ptr<JsonValue>>> tokens;
         enter();
@@ -540,7 +540,7 @@ namespace Yson
     }
 
     std::unique_ptr<JsonValue>
-    Reader::readCompleteValue(const std::shared_ptr<std::string>& buffer)
+    JsonReader::readCompleteValue(const std::shared_ptr<std::string>& buffer)
     {
         std::unique_ptr<JsonValue> token;
         auto tokType = tokenType();
@@ -569,7 +569,7 @@ namespace Yson
         return token;
     }
 
-    bool Reader::nextDocument()
+    bool JsonReader::nextDocument()
     {
         while (m_State != AT_END_OF_DOCUMENT
                && m_State != AT_START_OF_DOCUMENT)
@@ -597,115 +597,115 @@ namespace Yson
         return m_Tokenizer.peek().first != TokenType::END_OF_BUFFER;
     }
 
-    bool Reader::isStringsAsValuesEnabled() const
+    bool JsonReader::isStringsAsValuesEnabled() const
     {
         return languageExtension(STRINGS_AS_VALUES);
     }
 
-    Reader& Reader::setStringsAsValuesEnabled(bool value)
+    JsonReader& JsonReader::setStringsAsValuesEnabled(bool value)
     {
         return setLanguageExtension(STRINGS_AS_VALUES, value);
     }
 
-    bool Reader::isValuesAsStringsEnabled() const
+    bool JsonReader::isValuesAsStringsEnabled() const
     {
         return languageExtension(VALUES_AS_STRINGS);
     }
 
-    Reader& Reader::setValuesAsStringsEnabled(bool value)
+    JsonReader& JsonReader::setValuesAsStringsEnabled(bool value)
     {
         return setLanguageExtension(VALUES_AS_STRINGS, value);
     }
 
-    bool Reader::isEndElementAfterCommaEnabled() const
+    bool JsonReader::isEndElementAfterCommaEnabled() const
     {
         return languageExtension(END_ELEMENT_AFTER_COMMA);
     }
 
-    Reader& Reader::setEndElementAfterCommaEnabled(bool value)
+    JsonReader& JsonReader::setEndElementAfterCommaEnabled(bool value)
     {
         return setLanguageExtension(END_ELEMENT_AFTER_COMMA, value);
     }
 
-    bool Reader::isCommentsEnabled() const
+    bool JsonReader::isCommentsEnabled() const
     {
         return languageExtension(COMMENTS);
     }
 
-    Reader& Reader::setCommentsEnabled(bool value)
+    JsonReader& JsonReader::setCommentsEnabled(bool value)
     {
         return setLanguageExtension(COMMENTS, value);
     }
 
-    bool Reader::isEnterNullEnabled() const
+    bool JsonReader::isEnterNullEnabled() const
     {
         return languageExtension(ENTER_NULL);
     }
 
-    Reader& Reader::setEnterNullEnabled(bool value)
+    JsonReader& JsonReader::setEnterNullEnabled(bool value)
     {
         return setLanguageExtension(ENTER_NULL, value);
     }
 
-    bool Reader::isValuesAsKeysEnabled() const
+    bool JsonReader::isValuesAsKeysEnabled() const
     {
         return languageExtension(VALUES_AS_KEYS);
     }
 
-    Reader& Reader::setValuesAsKeysEnabled(bool value)
+    JsonReader& JsonReader::setValuesAsKeysEnabled(bool value)
     {
         return setLanguageExtension(VALUES_AS_KEYS, value);
     }
 
-    bool Reader::isExtendedIntegersEnabled() const
+    bool JsonReader::isExtendedIntegersEnabled() const
     {
         return languageExtension(EXTENDED_INTEGERS);
     }
 
-    Reader& Reader::setExtendedIntegersEnabled(bool value)
+    JsonReader& JsonReader::setExtendedIntegersEnabled(bool value)
     {
         return setLanguageExtension(EXTENDED_INTEGERS, value);
     }
 
-    bool Reader::isBlockStringsEnabled() const
+    bool JsonReader::isBlockStringsEnabled() const
     {
         return languageExtension(BLOCK_STRINGS);
     }
 
-    Reader& Reader::setBlockStringsEnabled(bool value)
+    JsonReader& JsonReader::setBlockStringsEnabled(bool value)
     {
         return setLanguageExtension(BLOCK_STRINGS, value);
     }
 
-    bool Reader::isExtendedFloatsEnabled() const
+    bool JsonReader::isExtendedFloatsEnabled() const
     {
         return languageExtension(EXTENDED_FLOATS);
     }
 
-    Reader& Reader::setExtendedFloatsEnabled(bool value)
+    JsonReader& JsonReader::setExtendedFloatsEnabled(bool value)
     {
         return setLanguageExtension(EXTENDED_FLOATS, value);
     }
 
-    int Reader::languageExtensions() const
+    int JsonReader::languageExtensions() const
     {
         return m_LanguageExtensions;
     }
 
-    Reader& Reader::setLanguageExtensions(int value)
+    JsonReader& JsonReader::setLanguageExtensions(int value)
     {
         m_LanguageExtensions = value;
         return *this;
     }
 
-    bool Reader::languageExtension(
-            Reader::LanguageExtensions ext) const
+    bool JsonReader::languageExtension(
+            JsonReader::LanguageExtensions ext) const
     {
         return (m_LanguageExtensions & ext) != 0;
     }
 
-    Reader& Reader::setLanguageExtension(
-            Reader::LanguageExtensions ext, bool value)
+    JsonReader& JsonReader::setLanguageExtension(
+            JsonReader::LanguageExtensions ext, bool value)
     {
         if (value)
             m_LanguageExtensions |= ext;
@@ -714,7 +714,7 @@ namespace Yson
         return *this;
     }
 
-    bool Reader::fillBuffer()
+    bool JsonReader::fillBuffer()
     {
         auto initialSize = m_Buffer.size();
         m_Buffer.clear();
@@ -724,7 +724,7 @@ namespace Yson
         return true;
     }
 
-    bool Reader::nextTokenImpl()
+    bool JsonReader::nextTokenImpl()
     {
         switch (m_State)
         {
@@ -836,7 +836,7 @@ namespace Yson
         return true;
     }
 
-    void Reader::processBlockString()
+    void JsonReader::processBlockString()
     {
         if (!isBlockStringsEnabled())
             READER_THROW("Invalid token.");
@@ -858,7 +858,7 @@ namespace Yson
         }
     }
 
-    void Reader::processColon()
+    void JsonReader::processColon()
     {
         switch (m_State)
         {
@@ -878,7 +878,7 @@ namespace Yson
         }
     }
 
-    void Reader::processComma()
+    void JsonReader::processComma()
     {
         switch (m_State)
         {
@@ -906,7 +906,7 @@ namespace Yson
         }
     }
 
-    void Reader::processEndArray()
+    void JsonReader::processEndArray()
     {
         switch (m_State)
         {
@@ -926,7 +926,7 @@ namespace Yson
         }
     }
 
-    void Reader::processEndObject()
+    void JsonReader::processEndObject()
     {
         switch (m_State)
         {
@@ -946,7 +946,7 @@ namespace Yson
         }
     }
 
-    void Reader::processEndOfStream()
+    void JsonReader::processEndOfStream()
     {
         switch (m_State)
         {
@@ -962,7 +962,7 @@ namespace Yson
         }
     }
 
-    void Reader::processStartArray()
+    void JsonReader::processStartArray()
     {
         switch (m_State)
         {
@@ -982,7 +982,7 @@ namespace Yson
         }
     }
 
-    void Reader::processStartObject()
+    void JsonReader::processStartObject()
     {
         switch (m_State)
         {
@@ -1002,7 +1002,7 @@ namespace Yson
         }
     }
 
-    void Reader::processString()
+    void JsonReader::processString()
     {
         switch (m_State)
         {
@@ -1025,7 +1025,7 @@ namespace Yson
         }
     }
 
-    void Reader::processValue()
+    void JsonReader::processValue()
     {
         switch (m_State)
         {
@@ -1053,7 +1053,7 @@ namespace Yson
         }
     }
 
-    void Reader::processWhitespace()
+    void JsonReader::processWhitespace()
     {
         switch (m_State)
         {
@@ -1071,7 +1071,7 @@ namespace Yson
         }
     }
 
-    void Reader::skipElement()
+    void JsonReader::skipElement()
     {
         if (m_SkipElementDepth == 0)
         {
@@ -1104,7 +1104,7 @@ namespace Yson
         }
     }
 
-    void Reader::skipWhitespace()
+    void JsonReader::skipWhitespace()
     {
         while (m_State != AT_END_OF_STREAM)
         {
@@ -1125,7 +1125,7 @@ namespace Yson
         }
     }
 
-    std::tuple<const char*, const char*, bool> Reader::getValueToken() const
+    std::tuple<const char*, const char*, bool> JsonReader::getValueToken() const
     {
         auto token = m_Tokenizer.rawToken();
         auto isString = false;
@@ -1150,7 +1150,7 @@ namespace Yson
     }
 
     template<typename T>
-    void Reader::readSignedInteger(T& value) const
+    void JsonReader::readSignedInteger(T& value) const
     {
         auto token = getValueToken();
         auto parsedValue = parseInteger(
@@ -1164,7 +1164,7 @@ namespace Yson
     }
 
     template<typename T>
-    void Reader::readUnsignedInteger(T& value) const
+    void JsonReader::readUnsignedInteger(T& value) const
     {
         auto token = getValueToken();
         if (get<0>(token) != get<1>(token) && *get<0>(token) == '-')

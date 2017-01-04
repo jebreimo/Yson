@@ -5,7 +5,7 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include "../Yson/Reader.hpp"
+#include "../Yson/JsonReader.hpp"
 
 #include <sstream>
 #include "../Externals/Ytest/Ytest.hpp"
@@ -18,7 +18,7 @@ namespace
     {
         auto doc = R"({"int": 1234, "array": [1, 2, {"float": 1.234}]})";
         std::istringstream iss(doc);
-        Reader reader(iss);
+        JsonReader reader(iss);
         auto object = reader.read();
         Y_EQUAL(getValue<int>((*object)["int"]), 1234);
         Y_EQUAL(getValue<unsigned>((*object)["array"][0]), 1);
@@ -29,7 +29,7 @@ namespace
     void test_fromBuffer()
     {
         auto doc = R"({"int": 1234, "array": [1, 2, {"float": 1.234}]})";
-        Reader reader(doc, strlen(doc));
+        JsonReader reader(doc, strlen(doc));
         auto object = reader.read();
         Y_EQUAL(getValue<int>((*object)["int"]), 1234);
         Y_EQUAL(getValue<unsigned>((*object)["array"][0]), 1);

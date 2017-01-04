@@ -14,7 +14,7 @@
 #include <string>
 #include "JsonValue.hpp"
 #include "LineNumberCounter.hpp"
-#include "ReaderException.hpp"
+#include "JsonReaderException.hpp"
 #include "Tokenizer.hpp"
 #include "ValueType.hpp"
 
@@ -29,16 +29,16 @@ namespace Yson
     /** @brief A class for iterating over and reading the contents of a JSON
       *   file.
       */
-    class YSON_API Reader
+    class YSON_API JsonReader
     {
     public:
-        Reader(std::istream& stream);
+        JsonReader(std::istream& stream);
 
-        Reader(const std::string& fileName);
+        JsonReader(const std::string& fileName);
 
-        Reader(const char* buffer, size_t bufferSize);
+        JsonReader(const char* buffer, size_t bufferSize);
 
-        ~Reader();
+        ~JsonReader();
 
         /** @brief Reads and returns the complete value at the current
           *     position in the JSON document.
@@ -142,6 +142,19 @@ namespace Yson
 
         void readValue(std::string& value) const;
 
+        template <typename T>
+        void readArray(std::vector<T>& values)
+        {
+            enter();
+            while (nextValue())
+            {
+                T value;
+                readValue(value);
+                values.push_back(std::move(value));
+            }
+            leave();
+        }
+
         void readBase64(std::vector<char>& value) const;
 
         /** @brief Moves to the next document in a multi-document file or
@@ -153,43 +166,43 @@ namespace Yson
 
         bool isStringsAsValuesEnabled() const;
 
-        Reader& setStringsAsValuesEnabled(bool value);
+        JsonReader& setStringsAsValuesEnabled(bool value);
 
         bool isValuesAsStringsEnabled() const;
 
-        Reader& setValuesAsStringsEnabled(bool value);
+        JsonReader& setValuesAsStringsEnabled(bool value);
 
         bool isEndElementAfterCommaEnabled() const;
 
-        Reader& setEndElementAfterCommaEnabled(bool value);
+        JsonReader& setEndElementAfterCommaEnabled(bool value);
 
         bool isCommentsEnabled() const;
 
-        Reader& setCommentsEnabled(bool value);
+        JsonReader& setCommentsEnabled(bool value);
 
         bool isEnterNullEnabled() const;
 
-        Reader& setEnterNullEnabled(bool value);
+        JsonReader& setEnterNullEnabled(bool value);
 
         bool isValuesAsKeysEnabled() const;
 
-        Reader& setValuesAsKeysEnabled(bool value);
+        JsonReader& setValuesAsKeysEnabled(bool value);
 
         bool isExtendedIntegersEnabled() const;
 
-        Reader& setExtendedIntegersEnabled(bool value);
+        JsonReader& setExtendedIntegersEnabled(bool value);
 
         bool isBlockStringsEnabled() const;
 
-        Reader& setBlockStringsEnabled(bool value);
+        JsonReader& setBlockStringsEnabled(bool value);
 
         bool isExtendedFloatsEnabled() const;
 
-        Reader& setExtendedFloatsEnabled(bool value);
+        JsonReader& setExtendedFloatsEnabled(bool value);
 
         int languageExtensions() const;
 
-        Reader& setLanguageExtensions(int value);
+        JsonReader& setLanguageExtensions(int value);
     private:
         enum LanguageExtensions
         {
@@ -206,7 +219,7 @@ namespace Yson
 
         bool languageExtension(LanguageExtensions ext) const;
 
-        Reader& setLanguageExtension(LanguageExtensions ext, bool value);
+        JsonReader& setLanguageExtension(LanguageExtensions ext, bool value);
 
         bool fillBuffer();
 
@@ -295,7 +308,7 @@ namespace Yson
     };
 
     template <typename T>
-    T read(Reader& reader)
+    T read(JsonReader& reader)
     {
         T value;
         reader.readValue(value);

@@ -21,13 +21,13 @@ namespace Yson
     /** @brief JsonReader throws instances of this class when it
       *   encounters errors.
       */
-    class ReaderException : public YsonException
+    class JsonReaderException : public YsonException
     {
     public:
         /** @brief Constructs a JsonReaderException with an unspecific
           *   error message and no file location.
           */
-        ReaderException()
+        JsonReaderException()
                 : YsonException("Unspecified error."),
                   m_LineNumber(0),
                   m_ColumnNumber(0)
@@ -36,7 +36,7 @@ namespace Yson
         /** @brief Constructs a JsonReaderException with the given error
           *   message, but no file location.
           */
-        ReaderException(const std::string& msg)
+        JsonReaderException(const std::string& msg)
                 : YsonException(msg),
                   m_LineNumber(0),
                   m_ColumnNumber(0)
@@ -48,7 +48,7 @@ namespace Yson
           * The error message will include a reference to the file, function
           * and line in the source code from where the exception was thrown.
           */
-        ReaderException(const std::string& msg,
+        JsonReaderException(const std::string& msg,
                         const std::string& sourceFileName,
                         int sourceFileLineNumber,
                         const std::string& funcName)
@@ -74,7 +74,7 @@ namespace Yson
           * as well as the line and column in the JSON text where the error
           * was encountered.
           */
-        ReaderException(const std::string& msg,
+        JsonReaderException(const std::string& msg,
                         const std::string& sourceFileName,
                         int sourceFileLineNumber,
                         const std::string& funcName,
@@ -143,6 +143,6 @@ namespace Yson
     };
 
     #define YSON_READER_THROW(msg) \
-        throw ReaderException((msg), __FILE__, __LINE__, __FUNCTION__)
+        throw JsonReaderException((msg), __FILE__, __LINE__, __FUNCTION__)
 
 }

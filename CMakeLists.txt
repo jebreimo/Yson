@@ -26,15 +26,15 @@ set(PUBLIC_HEADERS
     Yson/JsonArray.hpp
     Yson/JsonInvalidValue.hpp
     Yson/JsonObject.hpp
+    Yson/JsonReader.hpp
     Yson/JsonSingleValue.hpp
     Yson/JsonValue.hpp
+    Yson/JsonWriter.hpp
     Yson/LineNumberCounter.hpp
-    Yson/Reader.hpp
-    Yson/ReaderException.hpp
+    Yson/JsonReaderException.hpp
     Yson/TokenType.hpp
     Yson/Tokenizer.hpp
     Yson/ValueType.hpp
-    Yson/Writer.hpp
     Yson/YsonDefinitions.hpp
     Yson/YsonException.hpp
     )
@@ -56,12 +56,12 @@ set(SOURCE_FILES
     Yson/JsonArray.cpp
     Yson/JsonInvalidValue.cpp
     Yson/JsonObject.cpp
+    Yson/JsonReader.cpp
     Yson/JsonSingleValue.cpp
+    Yson/JsonWriter.cpp
     Yson/JsonValue.cpp
     Yson/LineNumberCounter.cpp
-    Yson/Reader.cpp
     Yson/Tokenizer.cpp
-    Yson/Writer.cpp
     Yson/Detail/Base64.cpp
     Yson/Detail/GetValueType.cpp
     Yson/Detail/IsJavaScriptIdentifier.cpp

@@ -5,15 +5,15 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include "../Yson/Reader.hpp"
+#include "../Yson/JsonReader.hpp"
 #include <fstream>
 #include <iostream>
 
 using namespace Yson;
 
-void readArray(Reader& reader);
+void readArray(JsonReader& reader);
 
-void readObject(Reader& reader)
+void readObject(JsonReader& reader)
 {
     reader.enter();
     while (reader.nextKey())
@@ -51,7 +51,7 @@ void readObject(Reader& reader)
     reader.leave();
 }
 
-void readArray(Reader& reader)
+void readArray(JsonReader& reader)
 {
     reader.enter();
     while (reader.nextValue())
@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
         return 1;
     }
     std::ifstream file(argv[1]);
-    Reader reader(file);
+    JsonReader reader(file);
     reader.setCommentsEnabled(true);
     if (!reader.nextValue())
         return 0;

@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 #include "ValueType.hpp"
-#include "ReaderException.hpp"
+#include "JsonReaderException.hpp"
 
 namespace Yson
 {
@@ -62,7 +62,7 @@ namespace Yson
     protected:
         JsonValue();
     private:
-        friend class Reader;
+        friend class JsonReader;
     };
 
     template <typename T>
