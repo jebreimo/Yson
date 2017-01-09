@@ -46,6 +46,7 @@ set(PRIVATE_HEADERS
     Yson/Detail/ParseDouble.hpp
     Yson/Detail/ParseInteger.hpp
     Yson/Detail/Span.hpp
+    Yson/Detail/SpanFunctions.hpp
     Yson/Detail/TextBufferReader.hpp
     Yson/Detail/TextFileReader.hpp
     Yson/Detail/TextReader.hpp
@@ -67,6 +68,7 @@ set(SOURCE_FILES
     Yson/Detail/IsJavaScriptIdentifier.cpp
     Yson/Detail/ParseDouble.cpp
     Yson/Detail/ParseInteger.cpp
+    Yson/Detail/SpanFunctions.cpp
     Yson/Detail/TextBufferReader.cpp
     Yson/Detail/TextFileReader.cpp
     Yson/Detail/TextReader.cpp
