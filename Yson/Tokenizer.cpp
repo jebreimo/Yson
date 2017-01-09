@@ -7,8 +7,6 @@
 //****************************************************************************
 #include "Tokenizer.hpp"
 
-#include <algorithm>
-#include <cassert>
 #include <functional>
 #include "Detail/Span.hpp"
 #include "Detail/SpanFunctions.hpp"
