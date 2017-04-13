@@ -6,7 +6,6 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
-#include <cstdint>
 
 /** @file
   * @brief Defines constants and macros shared by all the other files

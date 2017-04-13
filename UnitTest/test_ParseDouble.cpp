@@ -5,7 +5,7 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include "../Yson/Detail/ParseDouble.hpp"
+#include "../Yson/Common/ParseFloatingPoint.hpp"
 
 #include "../Externals/Ytest/Ytest.hpp"
 
@@ -15,30 +15,30 @@ namespace
 
     void success(const std::string& s, double expectedValue, double e = 1e-10)
     {
-        auto result = parseDouble(s.data(), s.data() + s.size());
-        Y_EQUAL(result.second, true);
-        Y_EQUIVALENT(result.first, expectedValue, e);
+        double result;
+        Y_ASSERT(parse(makeStringView(s), result));
+        Y_EQUIVALENT(result, expectedValue, e);
     }
 
     void failure(const std::string& s)
     {
-        auto result = parseDouble(s.data(), s.data() + s.size());
-        Y_EQUAL(result.second, false);
+        double result;
+        Y_EQUAL(parse(makeStringView(s), result), false);
     }
 
     void isNotANumber(const std::string& s)
     {
-        auto result = parseDouble(s.data(), s.data() + s.size());
-        Y_EQUAL(result.second, true);
-        Y_ASSERT(isnan(result.first));
+        double result;
+        Y_ASSERT(parse(makeStringView(s), result));
+        Y_ASSERT(isnan(result));
     }
 
     void isInfinite(const std::string& s, bool negative)
     {
-        auto result = parseDouble(s.data(), s.data() + s.size());
-        Y_EQUAL(result.second, true);
-        Y_ASSERT(isinf(result.first));
-        Y_EQUAL(result.first < 0, negative);
+        double result;
+        Y_ASSERT(parse(makeStringView(s), result));
+        Y_ASSERT(isinf(result));
+        Y_EQUAL(result < 0, negative);
     }
 
     void test_parseDouble()
@@ -77,10 +77,10 @@ namespace
         Y_CALL(success("-1234.5678e+222", -1234.5678e222, 1e215));
         Y_CALL(success("1e308", 1e308, 1e298));
         Y_CALL(failure("1e309"));
-        Y_CALL(success("1e-308", 1e-308));
-        Y_CALL(failure("1e-309"));
+        Y_CALL(success("1e-307", 1e-307));
+        Y_CALL(failure("1e-308"));
         Y_CALL(isNotANumber("NaN"));
-        Y_CALL(isNotANumber("null"));
+        Y_CALL(isInfinite("null", false));
         Y_CALL(isInfinite("infinity", false));
         Y_CALL(isInfinite("+infinity", false));
         Y_CALL(isInfinite("-infinity", true));

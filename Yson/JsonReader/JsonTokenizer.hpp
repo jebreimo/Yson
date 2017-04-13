@@ -1,0 +1,67 @@
+//****************************************************************************
+// Copyright © 2017 Jan Erik Breimo. All rights reserved.
+// Created by Jan Erik Breimo on 28.01.2017.
+//
+// This file is distributed under the BSD License.
+// License text is included with the source distribution.
+//****************************************************************************
+#pragma once
+
+#include <string>
+#include "../YsonDefinitions.hpp"
+#include "JsonTokenType.hpp"
+#include "../Common/StringView.hpp"
+#include "TextReader.hpp"
+
+namespace Yson
+{
+    class YSON_API JsonTokenizer
+    {
+    public:
+        JsonTokenizer(std::istream& stream);
+
+        JsonTokenizer(const std::string& fileName);
+
+        JsonTokenizer(const char* buffer, size_t bufferSize);
+
+        ~JsonTokenizer();
+
+        JsonTokenizer(JsonTokenizer&&);
+
+        bool next();
+
+        JsonTokenType tokenType() const;
+
+        std::string_view token() const;
+
+        std::string tokenString() const;
+
+        const std::string& fileName() const;
+
+        size_t lineNumber() const;
+
+        size_t columnNumber() const;
+
+        size_t chunkSize() const;
+
+        void setChunkSize(size_t value);
+    private:
+        static constexpr size_t DEFAULT_CHUNK_SIZE = 64 * 1024;
+
+        bool internalNext();
+
+        bool fillBuffer();
+
+        std::unique_ptr<TextReader> m_TextReader;
+        std::string m_FileName;
+        std::string m_Buffer;
+        const char* m_BufferStart = nullptr;
+        const char* m_BufferEnd = nullptr;
+        const char* m_TokenStart = nullptr;
+        const char* m_TokenEnd = nullptr;
+        size_t m_LineNumber = 1;
+        size_t m_ColumnNumber = 1;
+        JsonTokenType m_TokenType = JsonTokenType::INVALID_TOKEN;
+        size_t m_ChunkSize = DEFAULT_CHUNK_SIZE;
+    };
+}

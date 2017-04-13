@@ -19,7 +19,7 @@ void readObject(JsonReader& reader)
     while (reader.nextKey())
     {
         std::string key;
-        reader.readValue(key);
+        reader.read(key);
         std::cout << key;
         if (reader.nextValue())
         {
@@ -28,14 +28,14 @@ void readObject(JsonReader& reader)
             case ValueType::STRING:
             {
                 std::string value;
-                reader.readValue(value);
+                reader.read(value);
                 std::cout << ": " << value;
                 break;
             }
             case ValueType::INTEGER:
             {
                 int64_t value;
-                reader.readValue(value);
+                reader.read(value);
                 std::cout << ": " << value;
                 break;
             }
@@ -61,14 +61,14 @@ void readArray(JsonReader& reader)
         case ValueType::STRING:
         {
             std::string value;
-            reader.readValue(value);
+            reader.read(value);
             std::cout << " " << value;
             break;
         }
         case ValueType::INTEGER:
         {
             int64_t value;
-            reader.readValue(value);
+            reader.read(value);
             std::cout << " " << value;
             break;
         }
@@ -92,7 +92,6 @@ int main(int argc, char* argv[])
     }
     std::ifstream file(argv[1]);
     JsonReader reader(file);
-    reader.setCommentsEnabled(true);
     if (!reader.nextValue())
         return 0;
     switch (reader.valueType())

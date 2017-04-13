@@ -7,116 +7,95 @@
 //****************************************************************************
 #pragma once
 
-#include <cstdint>
 #include <iosfwd>
 #include <memory>
 #include <string>
 #include <stack>
+#include "Writer.hpp"
 #include "YsonDefinitions.hpp"
 
 namespace Yson
 {
-    class YSON_API JsonWriter
+    class YSON_API JsonWriter : public Writer
     {
     public:
-        enum Formatting {DEFAULT, NONE, FLAT, FORMAT};
+        JsonWriter(JsonFormatting formatting = JsonFormatting::NONE);
 
-        enum IntegerMode {DECIMAL, BINARY, OCTAL, HEXADECIMAL};
+        JsonWriter(const std::string& fileName,
+                   JsonFormatting formatting = JsonFormatting::NONE);
 
-        JsonWriter();
+        JsonWriter(std::ostream& stream,
+                   JsonFormatting formatting = JsonFormatting::NONE);
 
-        JsonWriter(const std::string& fileName);
-
-        JsonWriter(std::ostream& stream);
-
-        JsonWriter(std::unique_ptr<std::ostream>&& stream);
+        JsonWriter(const JsonWriter&) = delete;
 
         JsonWriter(JsonWriter&& rhs);
 
         ~JsonWriter();
 
+        JsonWriter& operator=(const JsonWriter&) = delete;
+
         JsonWriter& operator=(JsonWriter&& rhs);
-
-        bool isFormattingEnabled() const;
-
-        JsonWriter& setFormattingEnabled(bool value);
-
-        std::pair<char, unsigned> indentation() const;
-
-        JsonWriter& setIndentation(char character, unsigned width);
 
         std::ostream* stream();
 
-        const std::string& valueName() const;
+        const std::string& key() const override;
 
-        JsonWriter& setValueName(const std::string& name);
+        JsonWriter& key(const std::string& key) override;
 
-        JsonWriter& writeBeginArray(Formatting formatting = DEFAULT);
+        JsonWriter& beginArray() override;
 
-        JsonWriter& writeBeginArray(const std::string& name,
-                                Formatting formatting = DEFAULT);
+        JsonWriter& beginArray(
+                const StructureParameters& parameters) override;
 
-        JsonWriter& writeEndArray();
+        JsonWriter& endArray() override;
 
-        JsonWriter& writeBeginObject(Formatting formatting = DEFAULT);
+        JsonWriter& beginObject() override;
 
-        JsonWriter& writeBeginObject(const std::string& name,
-                                 Formatting formatting = DEFAULT);
+        JsonWriter& beginObject(
+                const StructureParameters& parameters) override;
 
-        JsonWriter& writeEndObject();
+        JsonWriter& endObject() override;
 
-        JsonWriter& writeNull();
+        JsonWriter& null() override;
 
-        JsonWriter& writeNull(const std::string& name);
+        JsonWriter& boolean(bool value) override;
 
-        JsonWriter& writeBool(bool value);
+        JsonWriter& value(char value) override;
 
-        JsonWriter& writeBool(const std::string& name, bool value);
+        JsonWriter& value(int8_t value) override;
 
-        JsonWriter& writeValue(int8_t value);
+        JsonWriter& value(int16_t value) override;
 
-        JsonWriter& writeValue(int16_t value);
+        JsonWriter& value(int32_t value) override;
 
-        JsonWriter& writeValue(int32_t value);
+        JsonWriter& value(int64_t value) override;
 
-        JsonWriter& writeValue(int64_t value);
+        JsonWriter& value(uint8_t value) override;
 
-        JsonWriter& writeValue(uint8_t value);
+        JsonWriter& value(uint16_t value) override;
 
-        JsonWriter& writeValue(uint16_t value);
+        JsonWriter& value(uint32_t value) override;
 
-        JsonWriter& writeValue(uint32_t value);
+        JsonWriter& value(uint64_t value) override;
 
-        JsonWriter& writeValue(uint64_t value);
+        JsonWriter& value(float value) override;
 
-        JsonWriter& writeValue(float value);
+        JsonWriter& value(double value) override;
 
-        JsonWriter& writeValue(double value);
+        JsonWriter& value(long double value);
 
-        JsonWriter& writeValue(long double value);
+        JsonWriter& value(const std::string& text) override;
 
-        JsonWriter& writeValue(const std::string& value);
+        JsonWriter& value(const std::wstring& text) override;
 
-        JsonWriter& writeValue(const std::wstring& value);
+        JsonWriter& binary(const void* data, size_t size) override;
 
-        template <typename T>
-        JsonWriter& writeValue(const std::string& name, const T& value)
-        {
-            setValueName(name);
-            return this->writeValue(value);
-        }
+        JsonWriter& base64(const void* data, size_t size) override;
 
-        JsonWriter& writeRawValue(const std::string& value);
+        JsonWriter& rawValue(const std::string& value);
 
-        JsonWriter& writeRawValue(const std::string& name,
-                              const std::string& value);
-
-        JsonWriter& writeRawText(const std::string& text);
-
-        JsonWriter& writeBase64(const void* data, size_t size);
-
-        JsonWriter& writeBase64(const std::string& name,
-                            const void* data, size_t size);
+        JsonWriter& rawText(const std::string& value);
 
         JsonWriter& indent();
 
@@ -130,6 +109,14 @@ namespace Yson
 
         JsonWriter& writeSeparator(size_t count = 1);
 
+        std::pair<char, unsigned> indentation() const;
+
+        JsonWriter& setIndentation(char character, unsigned width);
+
+        bool isFormattingEnabled() const;
+
+        JsonWriter& setFormattingEnabled(bool value);
+
         int languageExtensions() const;
 
         JsonWriter& setLanguageExtensions(int value);
@@ -139,7 +126,7 @@ namespace Yson
           *
           * When this flag is enabled, the special values not-a-number and
           * positive and negative infinity are written as "NaN", "infinity"
-          * and "-infinity" respectively. If it is disabled, the writeValue
+          * and "-infinity" respectively. If it is disabled, the write
           * functions will throw an exception if it encounters any of these
           * values.
           */
@@ -151,35 +138,33 @@ namespace Yson
 
         JsonWriter& setUnquotedValueNamesEnabled(bool value);
 
-        IntegerMode integerMode() const;
-
-        JsonWriter& setIntegerMode(IntegerMode mode);
     private:
+        JsonWriter(std::unique_ptr<std::ostream>&& streamPtr,
+                   std::ostream* stream,
+                   JsonFormatting formatting = JsonFormatting::NONE);
+
         void beginValue();
 
-        Formatting formatting() const;
+        JsonFormatting formatting() const;
 
         bool isInsideObject() const;
 
-        JsonWriter& writeBeginStructure(char startChar, char endChar,
-                                    Formatting formatting);
+        JsonWriter& beginStructure(char startChar, char endChar,
+                                   JsonParameters parameters = {});
 
-        void writeEndStructure(char endChar);
+        JsonWriter& endStructure(char endChar);
 
         void writeIndentationImpl();
 
         template <typename T>
-        JsonWriter& writeIntValueImpl(T value);
+        JsonWriter& writeIntValueImpl(T number);
 
         template <typename T>
-        JsonWriter& writeFloatValueImpl(T value);
+        JsonWriter& writeFloatValueImpl(T number);
 
         enum LanguageExtensions
         {
             NON_FINITE_FLOATS_AS_STRINGS = 1,
-            INTEGERS_AS_BIN = 2,
-            INTEGERS_AS_OCT = 4,
-            INTEGERS_AS_HEX = 6,
             UNQUOTED_VALUE_NAMES = 8
         };
 
@@ -190,17 +175,19 @@ namespace Yson
         struct Context
         {
             Context()
-                : endChar(0),
-                  formatting(NONE)
             {}
 
-            Context(char endChar, Formatting formatting)
-                : endChar(endChar),
-                  formatting(formatting)
+            Context(char endChar,
+                    JsonParameters parameters,
+                    size_t valueIndex = 0)
+                : parameters(parameters),
+                  valueIndex(valueIndex),
+                  endChar(endChar)
             {}
 
-            char endChar;
-            Formatting formatting;
+            JsonParameters parameters;
+            size_t valueIndex = 0;
+            char endChar = 0;
         };
 
         enum State
@@ -217,8 +204,8 @@ namespace Yson
 
         std::unique_ptr<std::ostream> m_StreamPtr;
         std::ostream* m_Stream;
-        std::stack<Context> m_Context;
-        std::string m_ValueName;
+        std::stack<Context> m_Contexts;
+        std::string m_Key;
         State m_State;
         unsigned m_Indentation;
         unsigned m_IndentationWidth;

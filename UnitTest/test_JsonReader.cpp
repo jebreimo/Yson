@@ -14,112 +14,70 @@ namespace
 {
     using namespace Yson;
 
-    template <typename T>
-    void testReadFails(const std::string& doc)
+    void test_Basics()
     {
-        std::istringstream ss(doc);
-        JsonReader reader(ss);
+        char text[] = R"({"key": 123, "key2": "value"})";
+        JsonReader reader(text, sizeof(text));
+
         Y_ASSERT(reader.nextValue());
-        T n;
-        Y_THROWS(reader.readValue(n), JsonReaderException);
-    }
-
-    template <typename T>
-    void read(const std::string& doc, T& value)
-    {
-        std::istringstream ss(doc);
-        JsonReader reader(ss);
-        Y_ASSERT(reader.nextValue());
-        Y_NO_THROW(reader.readValue(value), JsonReaderException);
-    }
-
-    template <typename T>
-    void testRead(const std::string& doc, T expectedValue)
-    {
-        T n;
-        Y_CALL(read(doc, n));
-        Y_EQUAL(n, expectedValue);
-    }
-
-    template <typename T, typename Predicate>
-    void testReadWithPredicate(const std::string& doc, Predicate predicate)
-    {
-        T n;
-        Y_CALL(read(doc, n));
-        Y_ASSERT(predicate(n));
-    }
-
-    void
-    testRead(const std::string& doc, double expectedValue, double e = 1e-10)
-    {
-        double n;
-        Y_CALL(read(doc, n));
-        Y_EQUIVALENT(n, expectedValue, e);
-    }
-
-    void testRead(const std::string& doc, float expectedValue, float e = 1e-3)
-    {
-        double n;
-        Y_CALL(read(doc, n));
-        Y_EQUIVALENT(n, expectedValue, e);
-    }
-
-    void test_BlockString()
-    {
-        std::string doc = "{\"multi-line text\": \"\"\"This is a\n"
-                "multi-line text!\"\"\"}";
-        std::istringstream ss(doc);
-        JsonReader reader(ss);
-        reader.setBlockStringsEnabled(true);
-        Y_ASSERT(reader.nextValue());
-        Y_NO_THROW(reader.enter(), JsonReaderException);
+        reader.enter();
         Y_ASSERT(reader.nextKey());
-        Y_EQUAL(read<std::string>(reader), "multi-line text");
+        Y_EQUAL(read<std::string>(reader), "key");
+        Y_EQUAL(reader.valueType(true), ValueType::STRING);
+        Y_EQUAL(reader.detailedValueType(true), DetailedValueType::STRING);
         Y_ASSERT(reader.nextValue());
-        Y_EQUAL(read<std::string>(reader), "This is a\nmulti-line text!");
+        Y_EQUAL(read<std::string>(reader), "123");
+        Y_ASSERT(reader.nextKey());
+        Y_EQUAL(read<std::string>(reader), "key2");
+        Y_ASSERT(reader.nextValue());
+        Y_EQUAL(read<std::string>(reader), "value");
         Y_ASSERT(!reader.nextKey());
-        Y_NO_THROW(reader.leave(), JsonReaderException);
+        Y_ASSERT(!reader.nextKey());
+        reader.leave();
         Y_ASSERT(!reader.nextValue());
+        Y_ASSERT(!reader.nextDocument());
     }
 
-    void test_Double()
+    void doReadBase64(const std::string& str,
+                      std::initializer_list<char> expected)
     {
-        Y_CALL(testRead("21474.83647", 21474.83647));
-        Y_CALL(testReadWithPredicate<double>("infinity", std::isinf<double>));
-        Y_CALL(testReadWithPredicate<double>("+infinity", [](double v)
-        {
-            return std::isinf(v) && v > 0;
-        }));
-        Y_CALL(testReadWithPredicate<double>("-infinity", [](double v)
-        {
-            return std::isinf(v) && v < 0;
-        }));
-        Y_CALL(testReadWithPredicate<double>("NaN", std::isnan<double>));
-        Y_CALL(testReadWithPredicate<double>("\"infinity\"",
-                                             std::isinf<double>));
-        Y_CALL(testReadWithPredicate<double>("\"+infinity\"", [](double v)
-        {
-            return std::isinf(v) && v > 0;
-        }));
-        Y_CALL(testReadWithPredicate<double>("\"-infinity\"", [](double v)
-        {
-            return std::isinf(v) && v < 0;
-        }));
-        Y_CALL(testReadWithPredicate<double>("\"NaN\"", std::isnan<double>));
+        JsonReader reader(str.data(), str.size());
+        Y_ASSERT(reader.nextValue());
+        Y_EQUAL(reader.valueType(), ValueType::STRING);
+        std::vector<char> value;
+        Y_ASSERT(reader.readBase64(value));
+        Y_EQUAL_RANGES(value, std::vector<char>(expected));
     }
 
-    void test_EnterNull()
+    void test_read_base64()
     {
-        std::string doc = "null";
-        std::istringstream ss(doc);
-        JsonReader reader(ss);
-        reader.setEnterNullEnabled(true);
+        Y_CALL(doReadBase64(R"("")", {}));
+        Y_CALL(doReadBase64(R"("====")", {}));
+        Y_CALL(doReadBase64(R"("A===")", {}));
+        Y_CALL(doReadBase64(R"("AA==")", {0}));
+        Y_CALL(doReadBase64(R"("AAA=")", {0, 0}));
+        Y_CALL(doReadBase64(R"("AAAA")", {0, 0, 0}));
+        Y_CALL(doReadBase64(R"("AAAAAA==")", {0, 0, 0, 0}));
+        Y_CALL(doReadBase64(R"("AQ==")", {1}));
+        Y_CALL(doReadBase64(R"("Bw==")", {7}));
+    }
+
+    void test_readNull()
+    {
+        char text[] = R"(null)";
+        JsonReader reader(text, sizeof(text));
         Y_ASSERT(reader.nextValue());
-        Y_NO_THROW(reader.enter(), JsonReaderException);
-        Y_ASSERT(!reader.nextKey());
-        Y_ASSERT(!reader.nextValue());
-        Y_NO_THROW(reader.leave(), JsonReaderException);
-        Y_ASSERT(!reader.nextValue());
+        Y_ASSERT(reader.readNull());
+    }
+
+    template <typename T>
+    void assertRead(const std::string& text, T expectedValue)
+    {
+        JsonReader reader(text.data(), text.size());
+        Y_ASSERT(reader.nextValue());
+        T value;
+        Y_ASSERT(reader.read(value));
+        Y_EQUAL(value, expectedValue);
     }
 
     void test_EscapedString()
@@ -132,53 +90,93 @@ namespace
         Y_ASSERT(!reader.nextValue());
     }
 
-    void test_Float()
+    template <typename T>
+    void assertRead(const std::string& text, T expectedValue, T epsilon)
     {
-        Y_CALL(testRead("21474.836", 21474.836f));
+        JsonReader reader(text.data(), text.size());
+        Y_ASSERT(reader.nextValue());
+        T value;
+        Y_ASSERT(reader.read(value));
+        Y_EQUIVALENT(value, expectedValue, epsilon);
     }
 
-    void test_Integer()
+    template <typename T>
+    void assertReadFails(const std::string& text)
     {
-        Y_CALL(testRead<int8_t>("-128", -128));
-        Y_CALL(testRead<int8_t>("127", 127));
-        Y_CALL(testRead<uint8_t>("255", 255));
-        Y_CALL(testRead<int16_t>("-32768", -32768));
-        Y_CALL(testRead<int16_t>("32767", 32767));
-        Y_CALL(testRead<uint16_t>("65535", 65535));
-        Y_CALL(testRead<int32_t>("2147483647", 2147483647));
-        Y_CALL(testRead<int32_t>("-2147483648", -2147483648));
-        Y_CALL(testRead<uint32_t>("4294967295", 4294967295u));
-        Y_CALL(testRead<int64_t>("9223372036854775807",
-                                 9223372036854775807LL));
-        Y_CALL(testRead<uint64_t>("18446744073709551615",
-                                  18446744073709551615ULL));
-        Y_CALL(testRead<uint64_t>(R"("18_446_744_073_709_551_615")",
-                                  18446744073709551615ULL));
-        Y_CALL(testRead<uint16_t>("\"0b1001\"", 9));
-        Y_CALL(testRead<uint16_t>("\"0xC0A\"", 0xC0A));
-        Y_CALL(testRead<uint16_t>("\"0o7543\"", 07543));
-        Y_CALL(testRead<uint16_t>("\"0\"", 0));
-        Y_CALL(testRead<uint16_t>("false", 0));
-        Y_CALL(testRead<int8_t>("true", 1));
-        Y_CALL(testRead<int64_t>("null", 0));
+        JsonReader reader(text.data(), text.size());
+        Y_ASSERT(reader.nextValue());
+        bool value;
+        Y_ASSERT(!reader.read(value));
     }
 
-    void test_IntegerError()
+    void test_read_integer()
     {
-        Y_CALL(testReadFails<int8_t>("-129"));
-        Y_CALL(testReadFails<int8_t>("128"));
-        Y_CALL(testReadFails<uint8_t>("-1"));
-        Y_CALL(testReadFails<uint8_t>("256"));
-        Y_CALL(testReadFails<int16_t>("-32769"));
-        Y_CALL(testReadFails<int16_t>("32768"));
-        Y_CALL(testReadFails<uint16_t>("-1"));
-        Y_CALL(testReadFails<uint16_t>("65536"));
-        Y_CALL(testReadFails<int32_t>("2147483648"));
-        Y_CALL(testReadFails<int32_t>("-2147483649"));
-        Y_CALL(testReadFails<uint32_t>("4294967296"));
-        Y_CALL(testReadFails<uint32_t>("-1"));
-        Y_CALL(testReadFails<uint64_t>("-1"));
-        Y_CALL(testReadFails<int64_t>("-2false"));
+        Y_CALL(assertRead("true", true));
+        Y_CALL(assertRead("false", false));
+        Y_CALL(assertReadFails<bool>("falsd"));
+
+        Y_CALL(assertRead<char>("-128", -128));
+        Y_CALL(assertRead<char>("\"\\n\"", '\n'));
+
+        Y_CALL(assertReadFails<int8_t>("-129"));
+        Y_CALL(assertRead<int8_t>("-128", -128));
+        Y_CALL(assertRead<int8_t>("1_00", 100));
+        Y_CALL(assertRead<int8_t>("127", 127));
+        Y_CALL(assertReadFails<int8_t>("128"));
+
+        Y_CALL(assertReadFails<uint8_t>("-1"));
+        Y_CALL(assertRead<uint8_t>("-0", 0));
+        Y_CALL(assertRead<uint8_t>("1_00", 100));
+        Y_CALL(assertRead<uint8_t>("255", 255));
+        Y_CALL(assertReadFails<uint8_t>("256"));
+
+        Y_CALL(assertReadFails<uint8_t>("-0b1"));
+        Y_CALL(assertRead<uint8_t>("-0b0000", 0));
+        Y_CALL(assertRead<uint8_t>("0b1", 1));
+        Y_CALL(assertRead<uint8_t>("0b0000_0001", 1));
+        Y_CALL(assertRead<uint8_t>("0b1111_1111", 255));
+        Y_CALL(assertReadFails<uint8_t>("0b1_0000_0000"));
+
+        Y_CALL(assertReadFails<int16_t>("-32769"));
+        Y_CALL(assertRead<int16_t>("-32768", -32768));
+        Y_CALL(assertRead<int16_t>("1_00", 100));
+        Y_CALL(assertRead<int16_t>("32767", 32767));
+        Y_CALL(assertReadFails<int16_t>("32768"));
+
+        Y_CALL(assertReadFails<int64_t>("-0x8000_0000_0000_0001"));
+        Y_CALL(assertRead<int64_t>("-0x8000_0000_0000_0000",
+                                   -0x8000000000000000));
+        Y_CALL(assertRead<int64_t>("1_00", 100));
+        Y_CALL(assertRead<int64_t>("0x7FFF_FFFF_FFFF_FFFF",
+                                   0x7FFFFFFFFFFFFFFF));
+        Y_CALL(assertReadFails<int64_t>("0x8000_0000_0000_0000"));
+    }
+
+    void test_read_floating_point()
+    {
+        Y_CALL(assertRead<float>("100", 100.f));
+        Y_CALL(assertRead<double>("100.123", 100.123));
+        Y_CALL(assertRead<double>("-100.123", -100.123));
+        Y_CALL(assertRead<double>("-100.123e15", -100.123e15));
+        Y_CALL(assertRead<double>("-100.123e-15", -100.123e-15, 1e-25));
+        Y_CALL(assertRead<double>("-100_100_100.100_100e+1_2",
+                                  -100100100.100100e12));
+        Y_CALL(assertRead<float>("1e38", 1e38f));
+        Y_CALL(assertReadFails<float>("1e39"));
+        Y_CALL(assertReadFails<double>("1e"));
+        Y_CALL(assertReadFails<double>("1e+"));
+        Y_CALL(assertReadFails<double>("1e-"));
+        Y_CALL(assertReadFails<double>("1q"));
+        Y_CALL(assertReadFails<double>("1_"));
+        Y_CALL(assertReadFails<double>("1_.1"));
+        Y_CALL(assertReadFails<double>("1._1"));
+        Y_CALL(assertReadFails<double>("1.1_"));
+        Y_CALL(assertReadFails<double>("1.1_e-1"));
+        Y_CALL(assertReadFails<double>("1.1e_-1"));
+        Y_CALL(assertReadFails<double>("1.1e-_1"));
+        Y_CALL(assertReadFails<double>("1.1e-1_"));
+        Y_CALL(assertRead<double>("1.1e-1", 1.1e-1));
+        // TODO: test NaN, infinity and null
     }
 
     void test_LineAndColumnNumbers()
@@ -186,107 +184,161 @@ namespace
         std::string doc = "{\n  \"foo\": 34, \"bar\": /* as df\ngh*/    64\n}";
         std::istringstream ss(doc);
         JsonReader reader(ss);
-        reader.setCommentsEnabled(true);
         Y_EQUAL(reader.lineNumber(), 1);
         Y_EQUAL(reader.columnNumber(), 1);
         Y_ASSERT(reader.nextValue());
         Y_EQUAL(reader.lineNumber(), 1);
-        Y_EQUAL(reader.columnNumber(), 1);
-        Y_NO_THROW(reader.enter(), JsonReaderException);
+        Y_EQUAL(reader.columnNumber(), 2);
+        Y_NO_THROW(reader.enter(), YsonException);
         Y_ASSERT(reader.nextKey());
         Y_EQUAL(reader.lineNumber(), 2);
-        Y_EQUAL(reader.columnNumber(), 3);
+        Y_EQUAL(reader.columnNumber(), 8);
         Y_ASSERT(reader.nextValue());
         Y_EQUAL(reader.lineNumber(), 2);
-        Y_EQUAL(reader.columnNumber(), 10);
+        Y_EQUAL(reader.columnNumber(), 12);
         Y_ASSERT(reader.nextKey());
         Y_EQUAL(reader.lineNumber(), 2);
-        Y_EQUAL(reader.columnNumber(), 14);
+        Y_EQUAL(reader.columnNumber(), 19);
         Y_ASSERT(reader.nextValue());
         Y_EQUAL(reader.lineNumber(), 3);
-        Y_EQUAL(reader.columnNumber(), 9);
-        Y_NO_THROW(reader.leave(), JsonReaderException);
+        Y_EQUAL(reader.columnNumber(), 11);
+        Y_NO_THROW(reader.leave(), YsonException);
         Y_EQUAL(reader.lineNumber(), 4);
-        Y_EQUAL(reader.columnNumber(), 1);
+        Y_EQUAL(reader.columnNumber(), 2);
     }
 
-    void test_NextDocument()
+    void test_read_string()
     {
-        std::string doc = "1 {\"2\": []} 3";
-        std::istringstream ss(doc);
-        JsonReader reader(ss);
-        Y_ASSERT(reader.nextDocument());
-        Y_ASSERT(reader.nextValue());
-        Y_EQUAL(read<int32_t>(reader), 1);
-        Y_ASSERT(!reader.nextValue());
-
-        Y_ASSERT(reader.nextDocument());
-        Y_ASSERT(reader.nextValue());
-        Y_NO_THROW(reader.enter(), JsonReaderException);
-        Y_ASSERT(reader.nextKey());
-        Y_EQUAL(read<std::string>(reader), "2");
-        Y_ASSERT(reader.nextValue());
-        Y_NO_THROW(reader.enter(), JsonReaderException);
-
-        Y_ASSERT(reader.nextDocument());
-        Y_ASSERT(reader.nextValue());
-        Y_EQUAL(read<double>(reader), 3);
-        Y_ASSERT(!reader.nextValue());
-
-        Y_ASSERT(!reader.nextDocument());
+        Y_CALL(assertRead<std::string>(R"("100")", "100"));
+        Y_CALL(assertRead<std::string>("\"100\\n\"", "100\n"));
+        Y_CALL(assertRead<std::string>("\"100\\t200\\r\"", "100\t200\r"));
     }
 
-    void test_NextDocument_comments()
+    void runScript(JsonReader& reader, const std::string& script)
     {
-        std::string doc = "/* foo */ 7 /* bar */ 8 /* baz */";
-        std::istringstream ss(doc);
-        JsonReader reader(ss);
-        reader.setCommentsEnabled(true);
-        Y_ASSERT(reader.nextDocument());
-        Y_ASSERT(reader.nextValue());
-        Y_EQUAL(read<int32_t>(reader), 7);
-        Y_ASSERT(!reader.nextValue());
-
-        Y_ASSERT(reader.nextDocument());
-        Y_ASSERT(reader.nextValue());
-        Y_EQUAL(read<int32_t>(reader), 8);
-        Y_ASSERT(!reader.nextValue());
-
-        Y_ASSERT(!reader.nextDocument());
-    }
-
-    void test_RecoverFromError()
-    {
-        std::string doc = "[{\"1\": [{23: 4, : 4}],,}, {\"2\": 3}]";
-        std::istringstream ss(doc);
-        JsonReader reader(ss);
-        Y_ASSERT(reader.nextValue());
-        Y_NO_THROW(reader.enter(), JsonReaderException);
-        Y_NO_THROW(reader.nextValue(), JsonReaderException);
-        Y_THROWS(reader.nextValue(), JsonReaderException);
-        Y_THROWS(reader.nextValue(), JsonReaderException);
-        Y_THROWS(reader.nextValue(), JsonReaderException);
-        Y_THROWS(reader.nextValue(), JsonReaderException);
-        Y_NO_THROW(reader.nextValue(), JsonReaderException);
-        Y_NO_THROW(reader.enter(), JsonReaderException);
-        Y_NO_THROW(reader.nextKey(), JsonReaderException);
-        Y_EQUAL(read<std::string>(reader), "2");
-        Y_NO_THROW(reader.leave(), JsonReaderException);
-        Y_ASSERT(!reader.nextValue());
-    };
-
-    void test_StringValueType()
-    {
-        auto getType = [](const std::string& s) -> ValueType
+        for (auto c : script)
         {
-            std::istringstream ss(s);
-            JsonReader reader(ss);
-            Y_ASSERT(reader.nextValue());
-            return reader.stringValueType();
-        };
+            switch (c)
+            {
+            case 'v':
+                Y_ASSERT(reader.nextValue());
+                break;
+            case 'k':
+                Y_ASSERT(reader.nextKey());
+                break;
+            case '!':
+                Y_ASSERT(!reader.nextValue());
+                break;
+            case 'e':
+                Y_NO_THROW(reader.enter(), std::exception);
+                break;
+            case 'l':
+                Y_NO_THROW(reader.leave(), std::exception);
+                break;
+            case 'd':
+                Y_ASSERT(reader.nextDocument());
+                break;
+            case '^':
+                Y_ASSERT(!reader.nextDocument());
+                break;
+            case 'A':
+                Y_EQUAL(reader.valueType(), ValueType::ARRAY);
+                break;
+            case 'B':
+                Y_EQUAL(reader.valueType(), ValueType::BOOLEAN);
+                break;
+            case 'I':
+                Y_EQUAL(reader.valueType(), ValueType::INTEGER);
+                break;
+            case 'O':
+                Y_EQUAL(reader.valueType(), ValueType::OBJECT);
+                break;
+            case 'S':
+                Y_EQUAL(reader.valueType(), ValueType::STRING);
+                break;
+            case ' ':
+                break;
+            default:
+                Y_FATAL_FAILURE("Test script contains unknown instruction!");
+            }
+        }
+    }
 
-        Y_EQUAL(getType(R"("ABCD")"), ValueType::STRING);
-        Y_EQUAL(getType(R"("0xABCD")"), ValueType::INTEGER);
+    void runScript(const std::string& text, const std::string& script)
+    {
+        JsonReader reader(text.data(), text.size());
+        runScript(reader, script);
+    }
+
+    void failingScript(const std::string& text, const std::string& script)
+    {
+        JsonReader reader(text.data(), text.size());
+        runScript(reader, script.substr(0, script.size() - 1));
+        switch (script.back())
+        {
+        case 'v':
+            Y_ASSERT(!reader.nextValue());
+            break;
+        case 'k':
+            Y_ASSERT(!reader.nextKey());
+            break;
+        case '!':
+            Y_ASSERT(reader.nextValue());
+            break;
+        case 'e':
+            Y_THROWS(reader.enter(), std::exception);
+            break;
+        case 'l':
+            Y_THROWS(reader.leave(), std::exception);
+            break;
+        case 'd':
+            Y_ASSERT(!reader.nextDocument());
+            break;
+        case '^':
+            Y_ASSERT(reader.nextDocument());
+            break;
+        case 'A':
+            Y_NOT_EQUAL(reader.valueType(), ValueType::ARRAY);
+            break;
+        case 'B':
+            Y_NOT_EQUAL(reader.valueType(), ValueType::BOOLEAN);
+            break;
+        case 'I':
+            Y_NOT_EQUAL(reader.valueType(), ValueType::INTEGER);
+            break;
+        case 'O':
+            Y_NOT_EQUAL(reader.valueType(), ValueType::OBJECT);
+            break;
+        case 'S':
+            Y_NOT_EQUAL(reader.valueType(), ValueType::STRING);
+            break;
+        case ' ':
+            break;
+        default:
+            Y_FATAL_FAILURE("Test script contains unknown instruction!");
+        }
+    }
+
+    void test_array()
+    {
+        Y_CALL(runScript(R"(["a",2])", "ve vSvI! l!"));
+    }
+
+    void test_document()
+    {
+        Y_CALL(runScript(R"({"a":2})", "d^"));
+        Y_CALL(runScript(R"([{}] 1 "f")", "dvA dvI dvS ^"));
+    }
+
+    void test_object()
+    {
+        Y_CALL(runScript(R"({"a":2})", "vekSvI!l!^"));
+        Y_CALL(runScript(R"({"a":2})", "vevI!l!^"));
+        Y_CALL(runScript(R"({"a":2})", "vel!^"));
+        Y_CALL(runScript(R"({"a":2})", "v!^"));
+        Y_CALL(runScript(R"({"a":{"b":1,"c":2}})",
+                         "ve kSve kSvIkSvI! l! l!^"));
+        Y_CALL(failingScript(R"({"a":2})", "vekve"));
     }
 
     void test_ValuesAsStrings()
@@ -294,9 +346,9 @@ namespace
         std::string doc = "[null, 12.34, fooz, \"baz\"]";
         std::istringstream ss(doc);
         JsonReader reader(ss);
-        reader.setValuesAsStringsEnabled(true);
+        //reader.setValuesAsStringsEnabled(true);
         Y_ASSERT(reader.nextValue());
-        Y_NO_THROW(reader.enter(), JsonReaderException);
+        Y_NO_THROW(reader.enter(), YsonException);
         Y_ASSERT(reader.nextValue());
         Y_EQUAL(read<std::string>(reader), "null");
         Y_ASSERT(reader.nextValue());
@@ -306,20 +358,35 @@ namespace
         Y_ASSERT(reader.nextValue());
         Y_EQUAL(read<std::string>(reader), "baz");
         Y_ASSERT(!reader.nextValue());
-        Y_NO_THROW(reader.leave(), JsonReaderException);
+        Y_NO_THROW(reader.leave(), YsonException);
         Y_ASSERT(!reader.nextValue());
-
-        std::istringstream ss2(doc);
-        JsonReader reader2(ss2);
-        Y_ASSERT(reader2.nextValue());
-        Y_NO_THROW(reader2.enter(), JsonReaderException);
-        Y_ASSERT(reader2.nextValue());
-        Y_THROWS(read<std::string>(reader2), JsonReaderException);
     }
 
-    Y_TEST(test_BlockString, test_Double, test_EnterNull, test_EscapedString,
-           test_Float, test_Integer, test_IntegerError,
-           test_LineAndColumnNumbers, test_NextDocument,
-           test_NextDocument_comments, test_RecoverFromError,
-           test_StringValueType, test_ValuesAsStrings);
+    void test_end_of_document()
+    {
+        std::string text = "12 13";
+        JsonReader reader(text.data(), text.size());
+        Y_ASSERT(reader.nextValue());
+        Y_ASSERT(!reader.nextValue());
+        Y_ASSERT(!reader.nextValue());
+        Y_ASSERT(reader.nextDocument());
+        Y_ASSERT(reader.nextValue());
+        Y_ASSERT(!reader.nextValue());
+        Y_ASSERT(!reader.nextValue());
+        Y_ASSERT(!reader.nextDocument());
+    }
+
+    Y_TEST(test_Basics,
+           test_readNull,
+           test_read_base64,
+           test_read_floating_point,
+           test_read_integer,
+           test_read_string,
+           test_array,
+           test_document,
+           test_object,
+           test_end_of_document,
+           test_EscapedString,
+           test_LineAndColumnNumbers,
+           test_ValuesAsStrings);
 }
