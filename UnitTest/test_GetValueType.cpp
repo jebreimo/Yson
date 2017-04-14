@@ -89,7 +89,7 @@ namespace
 
     void testEx(const std::string& s, ValueType expectedType)
     {
-        auto result = getExtendedValueType(s);
+        auto result = getExtendedValueType(makeStringView(s));
         Y_EQUAL(result, expectedType);
     }
 

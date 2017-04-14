@@ -34,7 +34,7 @@ namespace Yson
                 return Result(JsonTokenType::INCOMPLETE_TOKEN, string.end(), true);
         }
 
-        switch (string.front())
+        switch (string[0])
         {
         case ' ':
         case '\t':
@@ -66,7 +66,7 @@ namespace Yson
     Result nextStringToken(std::string_view string, bool isEndOfFile)
     {
         assert(!string.empty());
-        assert(string.front() == '\"');
+        assert(string[0] == '\"');
         bool valid = true;
         bool escape = false;
         for (auto it = string.begin() + 1; it != string.end(); ++it)
@@ -126,7 +126,7 @@ namespace Yson
     Result nextCommentToken(std::string_view string, bool isEndOfFile)
     {
         assert(!string.empty());
-        assert(string.front() == '/');
+        assert(string[0] == '/');
 
         auto tokenType = determineCommentType(string);
         if (tokenType == JsonTokenType::VALUE)
@@ -152,8 +152,7 @@ namespace Yson
 
     Result findEndOfNewline(std::string_view string, bool isEndOfFile)
     {
-        assert(!string.empty() && (string.front() == '\n'
-                                   || string.front() == '\r'));
+        assert(!string.empty() && (string[0] == '\n' || string[0] == '\r'));
 
         bool precededByCr = false;
         for (auto it = string.begin(); it != string.end(); ++it)
@@ -204,7 +203,7 @@ namespace Yson
 
     JsonTokenType determineCommentType(std::string_view string)
     {
-        assert(!string.empty() && string.front() == '/');
+        assert(!string.empty() && string[0] == '/');
         if (string.size() > 1)
         {
             if (string[1] == '*')
@@ -220,7 +219,7 @@ namespace Yson
     std::pair<size_t, size_t> countLinesAndColumns(std::string_view string)
     {
         size_t lines = 0, cols = 0;
-        for (auto it = begin(string); it != end(string); ++it)
+        for (auto it = string.begin(); it != string.end(); ++it)
         {
             if (*it == '\n')
             {

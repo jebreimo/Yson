@@ -93,7 +93,7 @@ namespace Yson
     bool fromBase64(std::string_view text, char* buffer, size_t& size)
     {
         auto last = text.find_last_not_of('=');
-        if (last == std::string::npos)
+        if (last == std::string_view::npos)
         {
             size = 0;
             return true;
@@ -142,7 +142,7 @@ namespace Yson
     bool fromBase64(std::string_view text, std::vector<char>& buffer)
     {
         auto last = text.find_last_not_of('=');
-        if (last == std::string::npos)
+        if (last == std::string_view::npos)
             return true;
         auto size = last + 1;
         buffer.reserve(buffer.size() + getDecodedSize(size));
