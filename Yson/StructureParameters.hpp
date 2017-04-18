@@ -6,8 +6,6 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
-
-#include <stddef.h>
 #include "UBJsonValueType.hpp"
 
 namespace Yson

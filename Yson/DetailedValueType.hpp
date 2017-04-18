@@ -61,4 +61,4 @@ namespace Yson
     bool isCompatible(DetailedValueType valueType);
 }
 
-#include "Common/DetailedValueType-impl.hpp"
+#include "DetailedValueType-impl.hpp"
