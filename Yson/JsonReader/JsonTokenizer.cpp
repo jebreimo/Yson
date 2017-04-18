@@ -7,10 +7,11 @@
 //****************************************************************************
 #include "JsonTokenizer.hpp"
 
+#include <tuple>
+#include "../YsonException.hpp"
 #include "JsonTokenizerUtilities.hpp"
 #include "TextBufferReader.hpp"
 #include "TextFileReader.hpp"
-#include "../YsonException.hpp"
 
 namespace Yson
 {
@@ -29,7 +30,7 @@ namespace Yson
 
     JsonTokenizer::~JsonTokenizer() = default;
 
-    JsonTokenizer::JsonTokenizer(JsonTokenizer&&) = default;
+    JsonTokenizer::JsonTokenizer(JsonTokenizer&&) noexcept = default;
 
     bool JsonTokenizer::next()
     {
@@ -57,7 +58,7 @@ namespace Yson
                 break;
             case JsonTokenType::BLOCK_COMMENT:
             case JsonTokenType::WHITESPACE:
-                addLinesAndColumns(std::tie(m_LineNumber, m_ColumnNumber),
+                addLinesAndColumns(m_LineNumber, m_ColumnNumber,
                                    countLinesAndColumns(token()));
                 break;
             case JsonTokenType::NEWLINE:

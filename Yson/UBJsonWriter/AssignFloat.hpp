@@ -30,7 +30,7 @@ namespace Yson
              && source <= std::numeric_limits<T>::max())
             || !isfinite(source))
         {
-            destination = source;
+            destination = static_cast<T>(source);
             return true;
         }
         return false;

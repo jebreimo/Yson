@@ -69,7 +69,7 @@ namespace Yson
     size_t BinaryStreamReader::position() const
     {
         auto pos = m_Stream->tellg();
-        if (pos != -1)
+        if (pos != std::istream::pos_type(-1))
             return size_t(pos) - remainingBytes();
         return 0;
     }

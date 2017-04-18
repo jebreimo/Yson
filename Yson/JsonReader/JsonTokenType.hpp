@@ -7,6 +7,8 @@
 //****************************************************************************
 #pragma once
 #include <iosfwd>
+#include <string>
+#include "../YsonDefinitions.hpp"
 
 namespace Yson
 {
@@ -36,5 +38,5 @@ namespace Yson
 
     std::string toString(JsonTokenType type);
 
-    std::ostream& operator<<(std::ostream& stream, JsonTokenType type);
+    YSON_API std::ostream& operator<<(std::ostream& stream, JsonTokenType type);
 }

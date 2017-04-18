@@ -6,9 +6,9 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
+#include <memory>
 #include "../../Ystring/Encoding.hpp"
 #include "TextReader.hpp"
-#include "../YsonDefinitions.hpp"
 
 namespace Ystring { namespace Conversion
 {
@@ -17,7 +17,7 @@ namespace Ystring { namespace Conversion
 
 namespace Yson
 {
-    class YSON_API TextBufferReader : public TextReader
+    class TextBufferReader : public TextReader
     {
     public:
         TextBufferReader(const char* buffer, size_t size,

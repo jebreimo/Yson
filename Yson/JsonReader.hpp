@@ -9,6 +9,7 @@
 
 #include "Reader.hpp"
 #include <iosfwd>
+#include <memory>
 
 namespace Yson
 {

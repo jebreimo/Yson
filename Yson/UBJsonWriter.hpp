@@ -15,7 +15,7 @@
 
 namespace Yson
 {
-    class UBJsonWriter : public Writer
+    class YSON_API UBJsonWriter : public Writer
     {
     public:
         UBJsonWriter();

@@ -7,6 +7,7 @@
 //****************************************************************************
 #include "TextBufferReader.hpp"
 
+#include <algorithm>
 #include "../../Ystring/Conversion.hpp"
 #include "../../Ystring/EncodingInfo.hpp"
 

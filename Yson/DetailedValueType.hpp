@@ -7,7 +7,7 @@
 //****************************************************************************
 #pragma once
 #include <iosfwd>
-#include <cstdint>
+#include <string>
 #include "YsonDefinitions.hpp"
 
 namespace Yson

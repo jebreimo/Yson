@@ -7,10 +7,10 @@
 //****************************************************************************
 #pragma once
 
-#include <string>
+#include <memory>
 #include "../YsonDefinitions.hpp"
-#include "JsonTokenType.hpp"
 #include "../Common/StringView.hpp"
+#include "JsonTokenType.hpp"
 #include "TextReader.hpp"
 
 namespace Yson
@@ -26,7 +26,7 @@ namespace Yson
 
         ~JsonTokenizer();
 
-        JsonTokenizer(JsonTokenizer&&);
+        JsonTokenizer(JsonTokenizer&&) noexcept;
 
         bool next();
 

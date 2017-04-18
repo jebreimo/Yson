@@ -9,6 +9,7 @@
 #include <limits>
 #include <type_traits>
 #include <utility>
+#include "SelectTypeIf.hpp"
 
 namespace Yson
 {
@@ -105,8 +106,13 @@ namespace Yson
             return std::make_pair(value, true);
         }
 
+        struct IsSigned {};
+
+        struct IsUnsigned {};
+
         template <typename IntT, IntT Base>
-        std::pair<IntT, bool> parseNegativeIntegerImpl(std::string_view str)
+        std::pair<IntT, bool> parseNegativeIntegerImpl(std::string_view str,
+                                                       IsSigned)
         {
             if (str.empty())
                 return std::make_pair(0, false);
@@ -133,10 +139,29 @@ namespace Yson
             return std::make_pair(-value, true);
         }
 
+        template <typename IntT, IntT Base>
+        std::pair<IntT, bool> parseNegativeIntegerImpl(std::string_view str,
+                                                       IsUnsigned)
+        {
+            if (str.empty())
+                return std::make_pair(0, false);
+            for (size_t i = 0; i < str.size(); ++i)
+            {
+                auto digit = fromDigit<IntT>(str[i]);
+                if (digit > 0)
+                    return std::make_pair(0, false);
+            }
+            return std::make_pair(0, true);
+        }
+
         template <typename IntT>
         std::pair<IntT, bool>
         parseInteger(std::string_view str, bool detectBase)
         {
+            using Signedness = typename SelectTypeIf<
+                    std::is_signed<IntT>::value,
+                    IsSigned,
+                    IsUnsigned>::type;
             using Result = std::pair<IntT, bool>;
             if (str.empty())
                 return Result(0, false);
@@ -167,14 +192,16 @@ namespace Yson
                 {
                 case 'b':
                     return positive ? parsePositiveIntegerImpl<IntT, 2>(str2)
-                                    : parseNegativeIntegerImpl<IntT, 2>(str2);
+                                    : parseNegativeIntegerImpl<IntT, 2>(
+                                              str2, Signedness());
                 case 'o':
                     return positive ? parsePositiveIntegerImpl<IntT, 8>(str2)
-                                    : parseNegativeIntegerImpl<IntT, 8>(str2);
+                                    : parseNegativeIntegerImpl<IntT, 8>(
+                                              str2, Signedness());
                 case 'x':
                     return positive ? parsePositiveIntegerImpl<IntT, 16>(str2)
                                     : parseNegativeIntegerImpl<IntT, 16>(
-                                    str2);
+                                              str2, Signedness());
                 case '_':
                     if (str2.empty())
                         return Result(0, false);
@@ -182,14 +209,15 @@ namespace Yson
                 default:
                     return positive ? parsePositiveIntegerImpl<IntT, 10>(str2)
                                     : parseNegativeIntegerImpl<IntT, 10>(
-                                    str2);
+                                              str2, Signedness());
                 }
             }
             if ('0' <= str[i] && str[i] <= '9')
             {
                 auto str2 = str.substr(i);
                 return positive ? parsePositiveIntegerImpl<IntT, 10>(str2)
-                                : parseNegativeIntegerImpl<IntT, 10>(str2);
+                                : parseNegativeIntegerImpl<IntT, 10>(
+                                          str2, Signedness());
             }
             if (str == "false")
                 return Result(0, true);
