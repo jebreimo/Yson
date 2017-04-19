@@ -35,7 +35,7 @@ namespace
         Y_EQUAL(ss.str(), expected);
     }
 
-    void test_Newline()
+    void test_ManualFormatting()
     {
         std::stringstream ss;
         JsonWriter(ss)
@@ -80,6 +80,36 @@ namespace
         Y_EQUAL(ss.str(), expected);
     }
 
+    void test_MultiValueLines()
+    {
+        std::stringstream ss;
+        JsonWriter(ss)
+            .beginArray(JsonParameters(4))
+            .writeNewline().writeIndentation()
+            .rawText("// A 4x4 sudoku").writeNewline()
+            .value(1).value(2).writeComma().writeSeparator(2)
+            .value(3).value(4)
+            .value(3).value(4).writeComma().writeSeparator(2)
+            .value(1).value(2)
+            .writeComma().writeNewline().writeNewline()
+            .value(2).value(1).writeComma().writeSeparator(2)
+            .value(4).value(3)
+            .value(4).value(3).writeComma().writeSeparator(2)
+            .value(2).value(1)
+            .endArray();
+
+        std::string expected =
+                "[\n"
+                "  // A 4x4 sudoku\n"
+                "  1, 2,  3, 4,\n"
+                "  3, 4,  1, 2,\n"
+                "\n"
+                "  2, 1,  4, 3,\n"
+                "  4, 3,  2, 1\n"
+                "]";
+        Y_EQUAL(ss.str(), expected);
+    }
+
     void test_SimpleObject()
     {
         std::stringstream ss;
@@ -96,24 +126,21 @@ namespace
         Y_EQUAL(ss.str(), expected);
     }
 
-    //template <typename T>
-    //void doTestInteger(T value,
-    //                   JsonWriter::IntegerMode mode,
-    //                   const std::string& expected)
-    //{
-    //    std::stringstream ss;
-    //    JsonWriter writer(ss);
-    //    writer.setIntegerMode(mode);
-    //    writer.writeValue(value);
-    //    Y_EQUAL(ss.str(), expected);
-    //}
-    //
-    //void test_Integers()
-    //{
-    //    doTestInteger(32, JsonWriter::HEXADECIMAL, R"("0x20")");
-    //    doTestInteger(20, JsonWriter::BINARY, R"("0b10100")");
-    //    doTestInteger(20, JsonWriter::OCTAL, R"("0o24")");
-    //}
+    template <typename T>
+    void doTestInteger(T value,
+                      const std::string& expected)
+    {
+       std::stringstream ss;
+       JsonWriter writer(ss);
+       writer.value(value);
+       Y_EQUAL(ss.str(), expected);
+    }
+
+    void test_Integers()
+    {
+       doTestInteger(32, "32");
+       doTestInteger(char(20), "20");
+    }
 
     void test_FloatingPointValues()
     {
@@ -130,7 +157,7 @@ namespace
     {
         std::stringstream ss;
         JsonWriter writer(ss);
-        writer.setUnquotedValueNamesEnabled(true).setFormattingEnabled(false);
+        writer.setUnquotedValueNamesEnabled(true);
         writer.beginObject()
               .key("Key1").value(0)
               .key("$Key2_").value(1)
@@ -142,10 +169,28 @@ namespace
                 "{Key1:0,$Key2_:1,_Key$3:2,\"4Key4\":3,\"Key 5\":4}");
     }
 
+    void test_FormatAndFlat()
+    {
+        std::stringstream ss;
+        JsonWriter writer(ss, JsonFormatting::FORMAT);
+        writer.beginObject();
+        writer.key("1").value(2);
+        writer.key("array").beginArray(JsonParameters(JsonFormatting::FLAT)).value(1).value(2).endArray();
+        writer.endObject();
+        Y_EQUAL(ss.str(),
+                "{\n"
+                "  \"1\": 2,\n"
+                "  \"array\": [1, 2]\n"
+                "}");
+    }
+
     Y_TEST(test_Basics,
            test_EscapedString,
-           test_Newline,
+           test_ManualFormatting,
+           test_MultiValueLines,
            test_SimpleObject,
+           test_Integers,
            test_FloatingPointValues,
-           test_UnquotedValueNames);
+           test_UnquotedValueNames,
+           test_FormatAndFlat);
 }

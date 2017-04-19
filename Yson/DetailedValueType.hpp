@@ -7,7 +7,7 @@
 //****************************************************************************
 #pragma once
 #include <iosfwd>
-#include <cstdint>
+#include <string>
 #include "YsonDefinitions.hpp"
 
 namespace Yson
@@ -61,4 +61,4 @@ namespace Yson
     bool isCompatible(DetailedValueType valueType);
 }
 
-#include "Common/DetailedValueType-impl.hpp"
+#include "DetailedValueType-impl.hpp"

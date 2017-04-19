@@ -19,7 +19,7 @@ namespace Ystring { namespace Conversion
 
 namespace Yson
 {
-    class YSON_API TextStreamReader : public TextReader
+    class TextStreamReader : public TextReader
     {
     public:
         TextStreamReader(std::istream& stream,

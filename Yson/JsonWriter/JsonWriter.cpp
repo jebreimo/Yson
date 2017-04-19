@@ -136,12 +136,12 @@ namespace Yson
 
     JsonWriter& JsonWriter::value(char value)
     {
-        return writeIntValueImpl(value);
+        return writeIntValueImpl(int16_t(value));
     }
 
     JsonWriter& JsonWriter::value(int8_t value)
     {
-        return writeIntValueImpl(value);
+        return writeIntValueImpl(int16_t(value));
     }
 
     JsonWriter& JsonWriter::value(int16_t value)
@@ -473,7 +473,7 @@ namespace Yson
         default:
             break;
         }
-
+        ++m_Contexts.top().valueIndex;
         if (isInsideObject())
         {
             if (!isUnquotedValueNamesEnabled()
@@ -512,7 +512,7 @@ namespace Yson
                 parameters.formatting = JsonFormatting::FLAT;
         }
         m_Contexts.push(Context(endChar, parameters));
-        if (parameters.formatting == JsonFormatting::FORMAT)
+        if (formatting() == JsonFormatting::FORMAT)
             indent();
         m_State = AT_START_OF_STRUCTURE;
         return *this;
@@ -551,6 +551,10 @@ namespace Yson
                     writeIndentationImpl();
                 }
             }
+            else
+            {
+                m_Contexts.pop();
+            }
             break;
         case AT_START_OF_LINE_NO_COMMA:
         case AT_START_OF_LINE_BEFORE_COMMA:
@@ -576,6 +580,7 @@ namespace Yson
         auto n = m_Indentation * m_IndentationWidth;
         for (size_t i = 0; i < n; ++i)
             *m_Stream << m_IndentationCharacter;
+        m_Contexts.top().valueIndex = 0;
     }
 
     template <typename T>

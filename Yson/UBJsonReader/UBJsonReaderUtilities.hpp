@@ -31,15 +31,15 @@ namespace Yson
             return true;
         case UBJsonTokenType::CHAR_TOKEN:
         case UBJsonTokenType::INT8_TOKEN:
-            return assignInteger<T, int8_t>(value, tokenizer.tokenAs<int8_t>());
+            return assignInteger(value, tokenizer.tokenAs<int8_t>());
         case UBJsonTokenType::UINT8_TOKEN:
-            return assignInteger<T, uint8_t>(value, tokenizer.tokenAs<uint8_t>());
+            return assignInteger(value, tokenizer.tokenAs<uint8_t>());
         case UBJsonTokenType::INT16_TOKEN:
-            return assignInteger<T, int16_t>(value, tokenizer.tokenAs<int16_t>());
+            return assignInteger(value, tokenizer.tokenAs<int16_t>());
         case UBJsonTokenType::INT32_TOKEN:
-            return assignInteger<T, int32_t>(value, tokenizer.tokenAs<int32_t>());
+            return assignInteger(value, tokenizer.tokenAs<int32_t>());
         case UBJsonTokenType::INT64_TOKEN:
-            return assignInteger<T, int64_t>(value, tokenizer.tokenAs<int64_t>());
+            return assignInteger(value, tokenizer.tokenAs<int64_t>());
         case UBJsonTokenType::STRING_TOKEN:
             return parse(tokenizer.token(), value, true);
         default:

@@ -7,6 +7,7 @@
 //****************************************************************************
 #include "GetDetailedValueType.hpp"
 
+#include <tuple>
 #include <vector>
 #include "ValueTypeUtilities.hpp"
 
@@ -239,7 +240,7 @@ namespace Yson
 
         using Pow2Threshold = std::tuple<size_t, char, DetailedValueType>;
 
-        const std::vector<Pow2Threshold> PositiveBinaryThresholds = {
+        const std::vector<Pow2Threshold> PositiveBinaryThresholds{
                 {7,  '1', DetailedValueType::UINT_7},
                 {8,  '1', DetailedValueType::UINT_8},
                 {15, '1', DetailedValueType::UINT_15},
@@ -249,13 +250,13 @@ namespace Yson
                 {63, '1', DetailedValueType::UINT_63},
                 {64, '1', DetailedValueType::UINT_64}};
 
-        const std::vector<Pow2Threshold> NegativeBinaryThresholds = {
+        const std::vector<Pow2Threshold> NegativeBinaryThresholds{
                 {8,  '1', DetailedValueType::SINT_8},
                 {16, '1', DetailedValueType::SINT_16},
                 {32, '1', DetailedValueType::SINT_32},
                 {64, '1', DetailedValueType::SINT_64}};
 
-        const std::vector<Pow2Threshold> PositiveOctalThresholds = {
+        const std::vector<Pow2Threshold> PositiveOctalThresholds{
                 {3,  '1', DetailedValueType::UINT_7},
                 {3,  '3', DetailedValueType::UINT_8},
                 {5,  '7', DetailedValueType::UINT_15},
@@ -265,13 +266,13 @@ namespace Yson
                 {21, '7', DetailedValueType::UINT_63},
                 {22, '1', DetailedValueType::UINT_64}};
 
-        const std::vector<Pow2Threshold> NegativeOctalThresholds = {
+        const std::vector<Pow2Threshold> NegativeOctalThresholds{
                 {3,  '2', DetailedValueType::SINT_8},
                 {6,  '1', DetailedValueType::SINT_16},
                 {11, '2', DetailedValueType::SINT_32},
                 {22, '1', DetailedValueType::SINT_64}};
 
-        const std::vector<Pow2Threshold> PositiveHexadecimalThresholds = {
+        const std::vector<Pow2Threshold> PositiveHexadecimalThresholds{
                 {2,  '7', DetailedValueType::UINT_7},
                 {2,  'F', DetailedValueType::UINT_8},
                 {4,  '7', DetailedValueType::UINT_15},
@@ -281,7 +282,7 @@ namespace Yson
                 {16, '7', DetailedValueType::UINT_63},
                 {16, 'F', DetailedValueType::UINT_64}};
 
-        const std::vector<Pow2Threshold> NegativeHexadecimalThresholds = {
+        const std::vector<Pow2Threshold> NegativeHexadecimalThresholds{
                 {2,  '8', DetailedValueType::SINT_8},
                 {4,  '8', DetailedValueType::SINT_16},
                 {8,  '8', DetailedValueType::SINT_32},

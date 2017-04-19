@@ -37,6 +37,6 @@ namespace Yson
 
     std::pair<size_t, size_t> countLinesAndColumns(std::string_view string);
 
-    void addLinesAndColumns(std::pair<size_t&, size_t&> linesAndColumns,
+    void addLinesAndColumns(size_t& lineNumber, size_t& columnNumber,
                             std::pair<size_t, size_t> addend);
 }

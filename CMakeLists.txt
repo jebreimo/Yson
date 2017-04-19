@@ -24,6 +24,7 @@ add_subdirectory(Ystring)
 
 set(PUBLIC_HEADER_FILES
     Yson/DetailedValueType.hpp
+    Yson/DetailedValueType-impl.hpp
     Yson/JsonReader.hpp
     Yson/JsonWriter.hpp
     Yson/Reader.hpp
@@ -39,6 +40,7 @@ set(PUBLIC_HEADER_FILES
 
 set(SOURCE_FILES
     Yson/DetailedValueType.hpp
+    Yson/DetailedValueType-impl.hpp
     Yson/JsonReader.hpp
     Yson/JsonWriter.hpp
     Yson/Reader.hpp
@@ -54,7 +56,6 @@ set(SOURCE_FILES
     Yson/Common/Base64.cpp
     Yson/Common/Base64.hpp
     Yson/Common/DetailedValueType.cpp
-    Yson/Common/DetailedValueType-impl.hpp
     Yson/Common/GetDetailedValueType.cpp
     Yson/Common/GetDetailedValueType.hpp
     Yson/Common/GetValueType.cpp

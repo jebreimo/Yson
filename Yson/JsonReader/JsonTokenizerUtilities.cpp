@@ -238,17 +238,17 @@ namespace Yson
         return std::make_pair(lines, cols);
     }
 
-    void addLinesAndColumns(std::pair<size_t&, size_t&> linesAndColumns,
+    void addLinesAndColumns(size_t& lineNumber, size_t& columnNumber,
                             std::pair<size_t, size_t> addend)
     {
         if (addend.first == 0)
         {
-            linesAndColumns.second += addend.second;
+            columnNumber += addend.second;
         }
         else
         {
-            linesAndColumns.first += addend.first;
-            linesAndColumns.second = addend.second;
+            lineNumber += addend.first;
+            columnNumber = addend.second;
         }
     }
 }
