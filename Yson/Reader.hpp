@@ -16,15 +16,35 @@
 
 namespace Yson
 {
+    /** @brief Reader is the common interface for JsonReader and UBJsonReader.
+      */
     class Reader
     {
     public:
         virtual ~Reader() = default;
 
+        /** @brief Moves to the next key inside the current object.
+          *
+          * If the returned value is true, then the key can be read with one
+          * of the read-functions.
+          * @return @arg true another key was found inside the current.
+          *         @arg false the Reader has reached the end of the object
+          *             without finding any more keys.
+          * @throw YsonException if the current location's immediate parent
+          *     isn't an object or if the source cannot be parsed.
+          */
         virtual bool nextKey() = 0;
 
+        /** @brief Moves to the next value.
+          */
         virtual bool nextValue() = 0;
 
+        /** @brief Moves to the next document if the source consists of
+          *     mulitiple documents.
+          *
+          * This function makes it possible to read a file or buffer that
+          * consists of multiple JSON or Universal Binary JSON documents.
+          */
         virtual bool nextDocument() = 0;
 
         virtual void enter() = 0;

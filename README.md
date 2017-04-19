@@ -20,7 +20,7 @@ The high-level interface of JsonReader consists of the following members:
 * *nextValue()* for advancing to the next value in a JSON-array or JSON-object.
 * *enter()* for entering the JSON-array or JSON-object starting at the current position in the file. nextKey() and nextValue() will only advance through the most recently entered structure, structures that haven been entered will be skipped entirely by next time either of the two functions is called.
 * *leave()* for leaving the most recently *entered* JSON-array or JSON-object.
-* *readValue(...)* for reading the current key or value.
+* *read(...)* for reading the current key or value.
 * *valueType()* returns the value type of the current key or value.
 
 Example

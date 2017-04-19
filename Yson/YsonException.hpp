@@ -15,6 +15,8 @@ namespace Yson
         #define _NOEXCEPT
     #endif
 
+    /** @brief The exception class used by all functions in the Yson library.
+      */
     class YsonException : public std::logic_error
     {
     public:
