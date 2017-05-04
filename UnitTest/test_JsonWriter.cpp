@@ -80,7 +80,7 @@ namespace
         Y_EQUAL(ss.str(), expected);
     }
 
-    void test_MultiValueLines()
+    void test_SemiManualFormatting()
     {
         std::stringstream ss;
         JsonWriter(ss)
@@ -184,13 +184,24 @@ namespace
                 "}");
     }
 
+    void test_SpecialValues()
+    {
+        std::stringstream ss;
+        JsonWriter writer(ss);
+        writer.beginArray();
+        writer.boolean(true).boolean(false).null();
+        writer.endArray();
+        Y_EQUAL(ss.str(), "[true,false,null]");
+    }
+
     Y_TEST(test_Basics,
            test_EscapedString,
            test_ManualFormatting,
-           test_MultiValueLines,
+           test_SemiManualFormatting,
            test_SimpleObject,
            test_Integers,
            test_FloatingPointValues,
            test_UnquotedValueNames,
-           test_FormatAndFlat);
+           test_FormatAndFlat,
+           test_SpecialValues);
 }
