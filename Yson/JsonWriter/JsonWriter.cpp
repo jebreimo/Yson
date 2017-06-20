@@ -16,6 +16,30 @@
 #include "../YsonException.hpp"
 #include "IsJavaScriptIdentifier.hpp"
 
+#if defined(WIN32) || defined(WIN64)
+    std::unique_ptr<std::ostream> openFile(const std::string& fileName)
+    {
+        try
+        {
+            auto fileName16 = Ystring::Conversion::convert<std::wstring>(
+                    fileName,
+                    Ystring::Encoding::UTF_8,
+                    Ystring::Encoding::UTF_16,
+                    Ystring::Conversion::ErrorHandlingPolicy::THROW);
+            return std::make_unique<std::ofstream>(fileName16);
+        }
+        catch (Ystring::YstringException&)
+        {
+            return std::make_unique<std::ofstream>(fileName);
+        }
+    }
+#else
+    std::unique_ptr<std::ostream> openFile(const std::string& fileName)
+    {
+        return std::make_unique<std::ofstream>(fileName);
+    }
+#endif
+
 namespace Yson
 {
     JsonWriter::JsonWriter(JsonFormatting formatting)
@@ -24,8 +48,7 @@ namespace Yson
 
     JsonWriter::JsonWriter(const std::string& fileName,
                            JsonFormatting formatting)
-        : JsonWriter(std::make_unique<std::ofstream>(fileName), nullptr,
-                     formatting)
+        : JsonWriter(openFile(fileName), nullptr, formatting)
     {}
 
     JsonWriter::JsonWriter(std::ostream& stream, JsonFormatting formatting)
