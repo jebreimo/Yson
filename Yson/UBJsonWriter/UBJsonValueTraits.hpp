@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include "../UBJsonValueType.hpp"
 
 namespace Yson
 {

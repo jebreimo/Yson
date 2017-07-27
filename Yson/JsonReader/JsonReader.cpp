@@ -354,6 +354,11 @@ namespace Yson
         }
     }
 
+    std::string JsonReader::fileName() const
+    {
+        return m_Members->tokenizer.fileName();
+    }
+
     size_t JsonReader::lineNumber() const
     {
         return m_Members->tokenizer.lineNumber();

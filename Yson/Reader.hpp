@@ -89,6 +89,8 @@ namespace Yson
         virtual bool readBinary(std::vector<char>& value) = 0;
 
         virtual bool readBase64(std::vector<char>& value) const = 0;
+
+        virtual std::string fileName() const = 0;
     };
 
     template <typename T>

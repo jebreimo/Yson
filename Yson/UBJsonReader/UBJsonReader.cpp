@@ -473,6 +473,16 @@ namespace Yson
             return false;
     }
 
+    std::string UBJsonReader::fileName() const
+    {
+        return m_Members->tokenizer.fileName();
+    }
+
+    size_t UBJsonReader::position() const
+    {
+        return m_Members->tokenizer.position();
+    }
+
     void UBJsonReader::assertStateIsKeyOrValue() const
     {
         auto state = currentScope().state.state;

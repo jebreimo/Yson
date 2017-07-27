@@ -85,6 +85,8 @@ namespace Yson
 
         bool readBinary(void* buffer, size_t& size) override;
 
+        std::string fileName() const override;
+
         size_t lineNumber() const;
 
         size_t columnNumber() const;

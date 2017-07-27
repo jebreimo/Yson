@@ -77,8 +77,6 @@ namespace Yson
 
         bool read(std::string& value) const override;
 
-        bool readBase64(std::vector<char>& value) const override;
-
         bool read(char& value) const override;
 
         bool read(float& value) const override;
@@ -103,10 +101,15 @@ namespace Yson
 
         bool readOptimizedArray(char* buffer, size_t& size);
 
+        bool readBase64(std::vector<char>& value) const override;
+
         bool readBinary(std::vector<char>& value) override;
 
         bool readBinary(void* buffer, size_t& size) override;
 
+        std::string fileName() const override;
+
+        size_t position() const;
     private:
         struct Members;
         struct Scope;
