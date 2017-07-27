@@ -32,8 +32,8 @@ namespace
     void doTestFromBase64(const std::string& str,
                           std::initializer_list<char> expected)
     {
-        //Y_EQUAL_RANGES(fromBase64(makeStringView(str)),
-        //               std::vector<char>(expected));
+        Y_EQUAL_RANGES(fromBase64(makeStringView(str)),
+                       std::vector<char>(expected));
     }
 
     void test_fromBase64()
@@ -47,8 +47,20 @@ namespace
         Y_CALL(doTestFromBase64("AAAAAA==", {0, 0, 0, 0}));
         Y_CALL(doTestFromBase64("AQ==", {1}));
         Y_CALL(doTestFromBase64("Bw==", {7}));
-        //Y_THROWS(fromBase64("=A="), std::exception);
     }
 
-    Y_TEST(test_toBase64, test_fromBase64);
+    void test_fromBase64_raw()
+    {
+        std::string str = "AAAAAA==";
+        auto value = makeStringView(str);
+        size_t size;
+        Y_ASSERT(fromBase64(value, nullptr, size));
+        Y_EQUAL(size, 4);
+        std::vector<char> buffer(size);
+        fromBase64(value, buffer.data(), size);
+        Y_EQUAL(size, 4);
+        Y_EQUAL_RANGES(buffer, std::vector<char>({0, 0, 0, 0}));
+    }
+
+    Y_TEST(test_toBase64, test_fromBase64, test_fromBase64_raw);
 }

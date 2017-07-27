@@ -127,6 +127,7 @@ namespace
         Y_CALL(testNextToken("/* /* // */45", JsonTokenType::VALUE,
                              "45"));
         Y_CALL(testNoNextToken("/* ", JsonTokenType::INVALID_TOKEN, "/* "));
+        Y_CALL(testNextToken("23/* ", JsonTokenType::VALUE, "23"));
     }
 
     void test_ValueTokens()

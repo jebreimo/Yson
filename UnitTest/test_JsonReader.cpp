@@ -214,6 +214,21 @@ namespace
         Y_CALL(assertRead<std::string>("\"100\\t200\\r\"", "100\t200\r"));
     }
 
+    void test_read_binary()
+    {
+        std::string doc = "\"SGVsbG8=\"";
+        std::istringstream ss(doc);
+        JsonReader reader(ss);
+        Y_ASSERT(reader.nextValue());
+        size_t size;
+        Y_ASSERT(reader.readBinary(nullptr, size));
+        Y_EQUAL(size, 5);
+        std::string buffer(size, ' ');
+        Y_ASSERT(reader.readBinary(&buffer[0], size));
+        Y_EQUAL(size, 5);
+        Y_EQUAL(buffer, "Hello");
+    }
+
     void runScript(JsonReader& reader, const std::string& script)
     {
         for (auto c : script)
@@ -322,6 +337,8 @@ namespace
     void test_array()
     {
         Y_CALL(runScript(R"(["a",2])", "ve vSvI! l!"));
+        Y_CALL(runScript(R"([1, 2/*, 3*/])", "ve vIvI! l!"));
+        Y_CALL(runScript(R"([1, 2/*, 3*/, 4])", "ve vIvIvI! l!"));
     }
 
     void test_document()
@@ -382,6 +399,7 @@ namespace
            test_read_floating_point,
            test_read_integer,
            test_read_string,
+           test_read_binary,
            test_array,
            test_document,
            test_object,

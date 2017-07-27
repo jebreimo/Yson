@@ -184,6 +184,10 @@ namespace Yson
             case '{':
             case '}':
                 return Result(JsonTokenType::VALUE, it);
+            case '/':
+            case '*':
+                if (it != string.begin() && *(it - 1) == '/')
+                    return Result(JsonTokenType::VALUE, it - 1);
             default:
                 break;
             }

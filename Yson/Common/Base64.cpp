@@ -105,11 +105,11 @@ namespace Yson
             size = decodedSize;
             return true;
         }
-        if (size < getDecodedSize(encodedSize))
+        if (size < decodedSize)
             return false;
         size = decodedSize;
-        auto tailSize = size % 4;
-        auto mainSize = size - tailSize;
+        auto tailSize = encodedSize % 4;
+        auto mainSize = encodedSize - tailSize;
         size_t i = 0;
         size_t j = 0;
         for (; i < mainSize; i += 4)
