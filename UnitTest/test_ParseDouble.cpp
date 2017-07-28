@@ -75,10 +75,14 @@ namespace
         Y_CALL(success("-1234.5678e222", -1234.5678e222, 1e215));
         Y_CALL(success("-1234.5678e-222", -1234.5678e-222));
         Y_CALL(success("-1234.5678e+222", -1234.5678e222, 1e215));
+        Y_CALL(success("-1234.5678e+222", -1234.5678e222, 1e215));
+        Y_CALL(success("2.2250738585072014e-308", 2.2250738585072014e-308));
+        Y_CALL(success("2.2250739e-308", 2.2250739e-308));
+        Y_CALL(success("1.7976931348623157e+308", 1.7976931348623157e+308));
         Y_CALL(success("1e308", 1e308, 1e298));
         Y_CALL(failure("1e309"));
         Y_CALL(success("1e-307", 1e-307));
-        Y_CALL(failure("1e-308"));
+        Y_CALL(success("1e-308", 1e-308));
         Y_CALL(isNotANumber("NaN"));
         Y_CALL(isInfinite("null", false));
         Y_CALL(isInfinite("infinity", false));

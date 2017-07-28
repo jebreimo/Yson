@@ -161,12 +161,17 @@ namespace Yson
             }
 
             exponent -= decimals;
-            if (exponent < std::numeric_limits<T>::min_exponent10)
-                return BadResult;
-
-            // Add the exponent
-            if (exponent)
-                value *= pow(T(10), exponent);
+            if (exponent >= std::numeric_limits<T>::min_exponent10)
+            {
+              // Add the exponent
+              if (exponent)
+                  value *= pow(T(10), exponent);
+            }
+            else
+            {
+                value /= pow(T(10), decimals);
+                value *= pow(T(10), exponent + decimals);
+            }
 
             // Add the sign
             if (negative)
