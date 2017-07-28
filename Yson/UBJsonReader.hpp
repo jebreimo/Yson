@@ -109,6 +109,8 @@ namespace Yson
 
         std::string fileName() const override;
 
+        std::string errorContext() const override;
+
         size_t position() const;
     private:
         struct Members;

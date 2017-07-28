@@ -18,13 +18,14 @@ namespace Yson
                                            int lineNo,
                                            const std::string& function)
     {
-        std::stringstream ss;
+        std::string str;
         if (!tokenizer.fileName().empty())
-            ss << tokenizer.fileName() << ",";
+            str = "In " + tokenizer.fileName() + " at ";
         else
-            ss << "At";
-        ss << " position " << tokenizer.position() << ": " << msg;
-        return YsonException(ss.str(), fileName, lineNo, function);
+            str = "At ";
+        str += "position " + std::to_string(tokenizer.position())
+               + ": " +msg;
+        return {str, fileName, lineNo, function};
     }
 
     #define UBJSON_READER_THROW(msg, tokenizer) \

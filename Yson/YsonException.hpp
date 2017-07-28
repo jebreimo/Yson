@@ -6,7 +6,6 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
-#include <sstream>
 #include <stdexcept>
 
 namespace Yson
@@ -24,21 +23,20 @@ namespace Yson
             : std::logic_error("Unspecified error.")
         {}
 
-        YsonException(const std::string& msg)
+        explicit YsonException(const std::string& msg)
             : std::logic_error(msg)
         {}
 
         YsonException(const std::string& msg,
                       const std::string& filename,
-                      int lineno,
+                      int lineNo,
                       const std::string& funcname)
             : std::logic_error(msg)
         {
-            std::stringstream ss;
+            m_Message = msg + " [";
             if (!funcname.empty())
-                ss << funcname << "() in ";
-            ss << filename << ":" << lineno << ": " << msg;
-            m_Message = ss.str();
+                m_Message += funcname + "() in ";
+            m_Message += filename + ":" + std::to_string(lineNo) + "]";
         }
 
         const char* what() const _NOEXCEPT

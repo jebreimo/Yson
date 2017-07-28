@@ -404,4 +404,16 @@ namespace Yson
             return parse(m_Members->tokenizer.token(), value);
         return false;
     }
+
+    std::string JsonReader::errorContext() const
+    {
+        std::string str;
+        if (!fileName().empty())
+            str = "In " + fileName() + " at ";
+        else
+            str = "At ";
+        str += "line " + std::to_string(lineNumber())
+               + " and column " + std::to_string(columnNumber());
+        return str;
+    }
 }

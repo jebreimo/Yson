@@ -87,6 +87,8 @@ namespace Yson
 
         std::string fileName() const override;
 
+        std::string errorContext() const override;
+
         size_t lineNumber() const;
 
         size_t columnNumber() const;

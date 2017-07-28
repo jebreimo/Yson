@@ -533,4 +533,15 @@ namespace Yson
         }
         return false;
     }
+
+    std::string UBJsonReader::errorContext() const
+    {
+        std::string str;
+        if (!fileName().empty())
+            str = "In " + fileName() + " at ";
+        else
+            str = "At ";
+        str += "position " + std::to_string(position());
+        return str;
+    }
 }

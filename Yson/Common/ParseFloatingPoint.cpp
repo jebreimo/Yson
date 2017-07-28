@@ -169,6 +169,8 @@ namespace Yson
             }
             else
             {
+                // The value is awfully close to 0. Try to restore it in
+                // two steps.
                 value /= pow(T(10), decimals);
                 value *= pow(T(10), exponent + decimals);
             }

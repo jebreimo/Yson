@@ -91,6 +91,8 @@ namespace Yson
         virtual bool readBase64(std::vector<char>& value) const = 0;
 
         virtual std::string fileName() const = 0;
+
+        virtual std::string errorContext() const = 0;
     };
 
     template <typename T>
@@ -99,6 +101,8 @@ namespace Yson
         T value;
         if (reader.read(value))
             return value;
-        YSON_THROW("Current value is " + toString(reader.valueType()));
+        YSON_THROW(reader.errorContext()
+                   + ": can't read the current value. Its type is "
+                   + toString(reader.valueType()) + ".");
     }
 }

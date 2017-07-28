@@ -7,7 +7,6 @@
 //****************************************************************************
 #pragma once
 
-#include <sstream>
 #include <stdexcept>
 #include <string>
 #include "../YsonException.hpp"
@@ -25,14 +24,15 @@ namespace Yson
                                            int lineNo,
                                            const std::string& function)
     {
-        std::stringstream ss;
+        std::string str;
         if (!tokenizer.fileName().empty())
-            ss << tokenizer.fileName() << ",";
+            str = "In " + tokenizer.fileName() + " at ";
         else
-            ss << "On";
-        ss << " line " << tokenizer.lineNumber() << ", column "
-           << tokenizer.columnNumber() << ": " << msg;
-        return YsonException(ss.str(), fileName, lineNo, function);
+            str = "At ";
+        str += "line " + std::to_string(tokenizer.lineNumber())
+               + " and column " + std::to_string(tokenizer.columnNumber())
+               + ": " + msg;
+        return {str, fileName, lineNo, function};
     }
 
     #define JSON_READER_THROW(msg, tokenizer) \
