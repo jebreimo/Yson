@@ -358,6 +358,11 @@ namespace
         Y_CALL(failingScript(R"({"a":2})", "vekve"));
     }
 
+    void test_non_ASCII_characters()
+    {
+        Y_CALL(runScript(R"("º")", "vS!^"));
+    }
+
     void test_ValuesAsStrings()
     {
         std::string doc = "[null, 12.34, fooz, \"baz\"]";
@@ -403,6 +408,7 @@ namespace
            test_array,
            test_document,
            test_object,
+           test_non_ASCII_characters,
            test_end_of_document,
            test_EscapedString,
            test_LineAndColumnNumbers,

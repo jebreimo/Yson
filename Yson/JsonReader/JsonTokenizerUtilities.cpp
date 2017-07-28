@@ -71,7 +71,7 @@ namespace Yson
         bool escape = false;
         for (auto it = string.begin() + 1; it != string.end(); ++it)
         {
-            if (*it < 0x20)
+            if (*it < 0x20 && 0 < *it)
             {
                 if (*it == '\n')
                     return Result(JsonTokenType::INVALID_TOKEN, it);
