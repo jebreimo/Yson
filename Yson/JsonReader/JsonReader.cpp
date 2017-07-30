@@ -213,6 +213,12 @@ namespace Yson
                 value = false;
                 return true;
             }
+            uint8_t uValue;
+            if (readInteger(uValue) && uValue <= 1)
+            {
+                value = uValue == 1;
+                return true;
+            }
         }
         return false;
     }

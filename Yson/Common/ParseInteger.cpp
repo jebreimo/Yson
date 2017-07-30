@@ -207,9 +207,9 @@ namespace Yson
                         return Result(0, false);
                     //[[fallthrough]]
                 default:
-                    return positive ? parsePositiveIntegerImpl<IntT, 10>(str2)
+                    return positive ? parsePositiveIntegerImpl<IntT, 10>(str)
                                     : parseNegativeIntegerImpl<IntT, 10>(
-                                              str2, Signedness());
+                                              str, Signedness());
                 }
             }
             if ('0' <= str[i] && str[i] <= '9')
@@ -225,7 +225,7 @@ namespace Yson
                 return Result(0, true);
             if (str == "true")
                 return Result(1, true);
-            return Result(0, true);
+            return Result(0, false);
         }
 
         template <typename T>

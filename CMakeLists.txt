@@ -64,6 +64,7 @@ set(SOURCE_FILES
     Yson/Common/ParseFloatingPoint.hpp
     Yson/Common/ParseInteger.cpp
     Yson/Common/ParseInteger.hpp
+    Yson/Common/SelectTypeIf.hpp
     Yson/Common/StringView.hpp
     Yson/Common/UBJsonValueType.cpp
     Yson/Common/ValueType.cpp

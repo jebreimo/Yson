@@ -113,12 +113,20 @@ namespace
     {
         Y_CALL(assertRead("true", true));
         Y_CALL(assertRead("false", false));
+        Y_CALL(assertRead("0", false));
+        Y_CALL(assertRead("1", true));
         Y_CALL(assertReadFails<bool>("falsd"));
+        Y_CALL(assertReadFails<bool>("0.1"));
+        Y_CALL(assertReadFails<bool>("2"));
+        Y_CALL(assertReadFails<bool>("-1"));
 
         Y_CALL(assertRead<char>("-128", -128));
         Y_CALL(assertRead<char>("\"\\n\"", '\n'));
 
         Y_CALL(assertReadFails<int8_t>("-129"));
+        Y_CALL(assertRead<int8_t>("01", 1));
+        Y_CALL(assertRead<int8_t>("067", 67));
+        Y_CALL(assertRead<int8_t>("000067", 67));
         Y_CALL(assertRead<int8_t>("-128", -128));
         Y_CALL(assertRead<int8_t>("1_00", 100));
         Y_CALL(assertRead<int8_t>("127", 127));
