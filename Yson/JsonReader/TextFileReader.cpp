@@ -6,14 +6,18 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "TextFileReader.hpp"
+#include "../YsonException.hpp"
+#include "../Common/GetUnicodeFileName.hpp"
 
 namespace Yson
 {
     TextFileReader::TextFileReader(
             const std::string& fileName,
             Ystring::Encoding_t sourceEncoding)
-        : m_FileStream(fileName, std::ios_base::binary)
+        : m_FileStream(getUnicodeFileName(fileName), std::ios_base::binary)
     {
+        if (!m_FileStream)
+            YSON_THROW("Unable to open file: " + fileName);
         init(m_FileStream, sourceEncoding);
     }
 }

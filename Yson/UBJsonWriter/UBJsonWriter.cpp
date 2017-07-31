@@ -12,6 +12,7 @@
 #include "../../Ystring/Conversion.hpp"
 #include "../YsonException.hpp"
 #include "../Common/Base64.hpp"
+#include "../Common/GetUnicodeFileName.hpp"
 #include "UBJsonWriterUtilities.hpp"
 
 namespace Yson
@@ -22,7 +23,8 @@ namespace Yson
     {}
 
     UBJsonWriter::UBJsonWriter(std::string& fileName)
-        : m_StreamPtr(new std::ofstream(fileName, std::ios_base::binary)),
+        : m_StreamPtr(new std::ofstream(getUnicodeFileName(fileName),
+                                        std::ios_base::binary)),
           m_Stream(m_StreamPtr.get()),
           m_StrictIntegerSizes(false)
     {}

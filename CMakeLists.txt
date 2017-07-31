@@ -58,6 +58,8 @@ set(SOURCE_FILES
     Yson/Common/DetailedValueType.cpp
     Yson/Common/GetDetailedValueType.cpp
     Yson/Common/GetDetailedValueType.hpp
+    Yson/Common/GetUnicodeFileName.cpp
+    Yson/Common/GetUnicodeFileName.hpp
     Yson/Common/GetValueType.cpp
     Yson/Common/GetValueType.hpp
     Yson/Common/ParseFloatingPoint.cpp
