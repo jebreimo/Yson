@@ -49,11 +49,12 @@ namespace Yson
         m_Contexts.push(Context('\0', formatting));
     }
 
-    JsonWriter::JsonWriter(JsonWriter&& rhs)
-        : m_StreamPtr(std::move(rhs.m_StreamPtr)),
-          m_Contexts(std::move(rhs.m_Contexts)),
-          m_Key(std::move(rhs.m_Key)),
+    JsonWriter::JsonWriter(JsonWriter&& rhs) noexcept
+        : m_StreamPtr(move(rhs.m_StreamPtr)),
+          m_Contexts(move(rhs.m_Contexts)),
           m_Indentation(move(rhs.m_Indentation)),
+          m_Key(move(rhs.m_Key)),
+          m_State(rhs.m_State),
           m_IndentationWidth(rhs.m_IndentationWidth),
           m_LanguagExtensions(rhs.m_LanguagExtensions),
           m_FormattingEnabled(rhs.m_FormattingEnabled),
@@ -65,14 +66,15 @@ namespace Yson
 
     JsonWriter::~JsonWriter() = default;
 
-    JsonWriter& JsonWriter::operator=(JsonWriter&& rhs)
+    JsonWriter& JsonWriter::operator=(JsonWriter&& rhs) noexcept
     {
         m_StreamPtr = move(rhs.m_StreamPtr);
         m_Stream = rhs.m_Stream;
         rhs.m_Stream = nullptr;
         m_Contexts = move(rhs.m_Contexts);
-        m_Key = move(rhs.m_Key);
         m_Indentation = move(rhs.m_Indentation);
+        m_Key = move(rhs.m_Key);
+        m_State = rhs.m_State;
         m_IndentationCharacter = rhs.m_IndentationCharacter;
         m_FormattingEnabled = rhs.m_FormattingEnabled;
         m_IndentationWidth = rhs.m_IndentationWidth;

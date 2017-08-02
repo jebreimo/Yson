@@ -29,13 +29,13 @@ namespace Yson
 
         JsonWriter(const JsonWriter&) = delete;
 
-        JsonWriter(JsonWriter&& rhs);
+        JsonWriter(JsonWriter&& rhs) noexcept;
 
         ~JsonWriter();
 
         JsonWriter& operator=(const JsonWriter&) = delete;
 
-        JsonWriter& operator=(JsonWriter&& rhs);
+        JsonWriter& operator=(JsonWriter&& rhs) noexcept;
 
         std::ostream* stream();
 
@@ -205,10 +205,9 @@ namespace Yson
         std::unique_ptr<std::ostream> m_StreamPtr;
         std::ostream* m_Stream;
         std::stack<Context> m_Contexts;
+        std::string m_Indentation;
         std::string m_Key;
         State m_State;
-        std::string m_Indentation;
-        //unsigned m_Indentation;
         unsigned m_IndentationWidth;
         int m_LanguagExtensions;
         bool m_FormattingEnabled;
