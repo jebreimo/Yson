@@ -39,7 +39,6 @@ namespace Yson
         : m_StreamPtr(move(streamPtr)),
           m_Stream(m_StreamPtr ? m_StreamPtr.get() : stream),
           m_State(AT_START_OF_VALUE_NO_COMMA),
-          m_Indentation(0),
           m_IndentationWidth(2),
           m_LanguagExtensions(0),
           m_FormattingEnabled(true),
@@ -54,7 +53,7 @@ namespace Yson
         : m_StreamPtr(std::move(rhs.m_StreamPtr)),
           m_Contexts(std::move(rhs.m_Contexts)),
           m_Key(std::move(rhs.m_Key)),
-          m_Indentation(rhs.m_Indentation),
+          m_Indentation(move(rhs.m_Indentation)),
           m_IndentationWidth(rhs.m_IndentationWidth),
           m_LanguagExtensions(rhs.m_LanguagExtensions),
           m_FormattingEnabled(rhs.m_FormattingEnabled),
@@ -68,12 +67,12 @@ namespace Yson
 
     JsonWriter& JsonWriter::operator=(JsonWriter&& rhs)
     {
-        m_StreamPtr = std::move(rhs.m_StreamPtr);
+        m_StreamPtr = move(rhs.m_StreamPtr);
         m_Stream = rhs.m_Stream;
         rhs.m_Stream = nullptr;
-        m_Contexts = std::move(rhs.m_Contexts);
-        m_Key = std::move(rhs.m_Key);
-        m_Indentation = rhs.m_Indentation;
+        m_Contexts = move(rhs.m_Contexts);
+        m_Key = move(rhs.m_Key);
+        m_Indentation = move(rhs.m_Indentation);
         m_IndentationCharacter = rhs.m_IndentationCharacter;
         m_FormattingEnabled = rhs.m_FormattingEnabled;
         m_IndentationWidth = rhs.m_IndentationWidth;
@@ -243,15 +242,15 @@ namespace Yson
 
     JsonWriter& JsonWriter::indent()
     {
-        ++m_Indentation;
+        m_Indentation.append(m_IndentationWidth, m_IndentationCharacter);
         return *this;
     }
 
     JsonWriter& JsonWriter::outdent()
     {
-        if (m_Indentation == 0)
+        if (m_Indentation.size() < m_IndentationWidth)
             YSON_THROW("Can't outdent, indentation level is 0.");
-        --m_Indentation;
+        m_Indentation.resize(m_Indentation.size() - m_IndentationWidth);
         return *this;
     }
 
@@ -338,7 +337,7 @@ namespace Yson
             break;
         }
         for (size_t i = 0; i < count; ++i)
-            *m_Stream << m_IndentationCharacter;
+            *m_Stream << ' ';
         return *this;
     }
 
@@ -579,9 +578,7 @@ namespace Yson
 
     void JsonWriter::writeIndentationImpl()
     {
-        auto n = m_Indentation * m_IndentationWidth;
-        for (size_t i = 0; i < n; ++i)
-            *m_Stream << m_IndentationCharacter;
+        *m_Stream << m_Indentation;
         m_Contexts.top().valueIndex = 0;
     }
 

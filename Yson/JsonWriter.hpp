@@ -207,7 +207,8 @@ namespace Yson
         std::stack<Context> m_Contexts;
         std::string m_Key;
         State m_State;
-        unsigned m_Indentation;
+        std::string m_Indentation;
+        //unsigned m_Indentation;
         unsigned m_IndentationWidth;
         int m_LanguagExtensions;
         bool m_FormattingEnabled;
