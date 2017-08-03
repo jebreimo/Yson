@@ -130,19 +130,37 @@ namespace
     void doTestInteger(T value,
                       const std::string& expected)
     {
-       std::stringstream ss;
-       JsonWriter writer(ss);
-       writer.value(value);
-       Y_EQUAL(ss.str(), expected);
+        std::stringstream ss;
+        JsonWriter writer(ss);
+        writer.value(value);
+        Y_EQUAL(ss.str(), expected);
     }
 
     void test_Integers()
     {
-       doTestInteger(32, "32");
-       doTestInteger(char(20), "20");
+        Y_CALL(doTestInteger(32, "32"));
+        Y_CALL(doTestInteger(char(20), "20"));
+    }
+
+    template <typename T>
+    void doTestFloatingPoint(T value,
+                             int precision,
+                             const std::string& expected)
+    {
+       std::stringstream ss;
+       JsonWriter writer(ss);
+        writer.setFloatingPointPrecision(precision);
+        writer.value(value);
+        Y_EQUAL(ss.str(), expected);
     }
 
     void test_FloatingPointValues()
+    {
+        Y_CALL(doTestFloatingPoint(1.0f / 3.0f, 9, "0.333333"));
+        Y_CALL(doTestFloatingPoint(1.0 / 3.0, 9, "0.333333333"));
+    }
+
+    void test_FloatingPointInfinity()
     {
         std::stringstream ss;
         JsonWriter writer(ss);
@@ -201,6 +219,7 @@ namespace
            test_SimpleObject,
            test_Integers,
            test_FloatingPointValues,
+           test_FloatingPointInfinity,
            test_UnquotedValueNames,
            test_FormatAndFlat,
            test_SpecialValues);

@@ -16,6 +16,7 @@ add_definitions(-DYstring=Yson_Ystring)
 
 if(WIN32)
     add_definitions(-D_SCL_SECURE_NO_WARNINGS
+                    -D_CRT_SECURE_NO_WARNINGS
                     -DYSON_EXPORTS
                     -DYSTRING_NO_AUTO_IMPORT)
 endif(WIN32)

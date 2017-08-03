@@ -10,7 +10,6 @@
 #include <iosfwd>
 #include <memory>
 #include <string>
-#include <stack>
 #include "Writer.hpp"
 #include "YsonDefinitions.hpp"
 
@@ -138,10 +137,15 @@ namespace Yson
 
         JsonWriter& setUnquotedValueNamesEnabled(bool value);
 
+        int floatingPointPrecision() const;
+
+        JsonWriter& setFloatingPointPrecision(int value);
     private:
         JsonWriter(std::unique_ptr<std::ostream>&& streamPtr,
                    std::ostream* stream,
                    JsonFormatting formatting = JsonFormatting::NONE);
+
+        void assertValid() const;
 
         void beginValue();
 
@@ -157,10 +161,10 @@ namespace Yson
         void writeIndentationImpl();
 
         template <typename T>
-        JsonWriter& writeIntValueImpl(T number);
+        JsonWriter& writeIntValueImpl(T number, const char* format);
 
         template <typename T>
-        JsonWriter& writeFloatValueImpl(T number);
+        JsonWriter& writeFloatValueImpl(T number, const char* format);
 
         enum LanguageExtensions
         {
@@ -172,45 +176,7 @@ namespace Yson
 
         JsonWriter& setLanguageExtension(LanguageExtensions ext, bool value);
 
-        struct Context
-        {
-            Context()
-            {}
-
-            Context(char endChar,
-                    JsonParameters parameters,
-                    size_t valueIndex = 0)
-                : parameters(parameters),
-                  valueIndex(valueIndex),
-                  endChar(endChar)
-            {}
-
-            JsonParameters parameters;
-            size_t valueIndex = 0;
-            char endChar = 0;
-        };
-
-        enum State
-        {
-            AT_START_OF_VALUE_NO_COMMA,
-            AT_START_OF_VALUE_AFTER_COMMA,
-            AT_START_OF_STRUCTURE,
-            AT_END_OF_VALUE,
-            AT_START_OF_LINE_NO_COMMA,
-            AT_START_OF_LINE_AFTER_COMMA,
-            AT_START_OF_LINE_BEFORE_COMMA,
-            AFTER_COMMA
-        };
-
-        std::unique_ptr<std::ostream> m_StreamPtr;
-        std::ostream* m_Stream;
-        std::stack<Context> m_Contexts;
-        std::string m_Indentation;
-        std::string m_Key;
-        State m_State;
-        unsigned m_IndentationWidth;
-        int m_LanguagExtensions;
-        bool m_FormattingEnabled;
-        char m_IndentationCharacter;
+        struct Members;
+        std::unique_ptr<Members> m_Members;
     };
 }
