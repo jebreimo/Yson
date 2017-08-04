@@ -110,7 +110,7 @@ namespace Yson
     JsonWriter::~JsonWriter()
     {
         if (m_Members)
-            flush();
+            JsonWriter::flush();
     }
 
     JsonWriter& JsonWriter::operator=(JsonWriter&& rhs) noexcept
@@ -241,7 +241,6 @@ namespace Yson
         beginValue();
         auto& m = members();
         m.buffer.push_back('"');
-        //*m.stream << "\"";
         if (!Ystring::hasUnescapedCharacters(text))
             write(text);
         else
@@ -752,15 +751,13 @@ namespace Yson
         return *this;
     }
 
-    bool JsonWriter::languageExtension(
-            JsonWriter::LanguageExtensions ext) const
+    bool JsonWriter::languageExtension(LanguageExtensions ext) const
     {
         return (members().languagExtensions & ext) != 0;
     }
 
-    JsonWriter& JsonWriter::setLanguageExtension(
-            JsonWriter::LanguageExtensions ext,
-            bool value)
+    JsonWriter& JsonWriter::setLanguageExtension(LanguageExtensions ext,
+                                                 bool value)
     {
         if (value)
             members().languagExtensions |= ext;

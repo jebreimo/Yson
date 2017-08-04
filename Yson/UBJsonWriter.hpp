@@ -30,7 +30,7 @@ namespace Yson
 
         UBJsonWriter& operator=(UBJsonWriter&&) = default;
 
-        std::ostream& stream() const;
+        std::ostream& stream();
 
         const std::string& key() const override;
 
@@ -89,6 +89,7 @@ namespace Yson
 
         UBJsonWriter& setStrictIntegerSizesEnabled(bool value);
 
+        UBJsonWriter& flush() override;
     private:
         UBJsonWriter& beginStructure(UBJsonValueType structureType,
                                      const UBJsonParameters& parameters);
@@ -96,8 +97,6 @@ namespace Yson
         UBJsonWriter& endStructure(UBJsonValueType structureType);
 
         void beginValue();
-
-        void flush() const;
 
         template <typename T>
         UBJsonWriter& writeInteger(T value);

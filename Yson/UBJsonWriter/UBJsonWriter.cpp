@@ -17,17 +17,26 @@
 
 namespace Yson
 {
+    namespace
+    {
+        size_t MAX_BUFFER_SIZE = 1024 * 1024;
+    }
+
     UBJsonWriter::UBJsonWriter()
         : m_Stream(&std::cout),
           m_StrictIntegerSizes(false)
-    {}
+    {
+      m_Buffer.reserve(MAX_BUFFER_SIZE);
+    }
 
     UBJsonWriter::UBJsonWriter(std::string& fileName)
         : m_StreamPtr(new std::ofstream(getUnicodeFileName(fileName),
                                         std::ios_base::binary)),
           m_Stream(m_StreamPtr.get()),
           m_StrictIntegerSizes(false)
-    {}
+    {
+      m_Buffer.reserve(MAX_BUFFER_SIZE);
+    }
 
     UBJsonWriter::UBJsonWriter(std::ostream& stream)
             : m_Stream(&stream),
@@ -38,10 +47,10 @@ namespace Yson
 
     UBJsonWriter::~UBJsonWriter()
     {
-        flush();
+        UBJsonWriter::flush();
     }
 
-    std::ostream& UBJsonWriter::stream() const
+    std::ostream& UBJsonWriter::stream()
     {
         flush();
         return *m_Stream;
@@ -282,12 +291,13 @@ namespace Yson
                        + " as if it was a " + toString(structureType));
         }
         m_Contexts.pop();
-        flush();
         return *this;
     }
 
     void UBJsonWriter::beginValue()
     {
+        if (m_Buffer.size() >= MAX_BUFFER_SIZE)
+            flush();
         auto& context = m_Contexts.top();
         if (context.structureType == UBJsonValueType::OBJECT)
         {
@@ -300,13 +310,14 @@ namespace Yson
         ++context.index;
     }
 
-    void UBJsonWriter::flush() const
+    UBJsonWriter& UBJsonWriter::flush()
     {
         if (m_Stream && !m_Buffer.empty())
         {
             m_Stream->write(m_Buffer.data(), m_Buffer.size());
             m_Buffer.clear();
         }
+        return *this;
     }
 
     template <typename T>

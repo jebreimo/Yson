@@ -25,7 +25,7 @@ namespace
         writer.key("Key");
         Y_EQUAL(writer.key(), "Key");
         writer.beginArray().value(int32_t(0xFFBB7733))
-                .endArray();
+                .endArray().flush();
         Y_EQUAL(stream.str(), S("[l\xFF\xBB\x77\x33]"));
     }
 
@@ -34,7 +34,7 @@ namespace
         std::ostringstream stream(std::ios_base::out | std::ios_base::binary);
         UBJsonWriter writer(stream);
         writer.beginObject().key("Key").value(int32_t(0xFFBB7733))
-                .endObject();
+                .endObject().flush();
         Y_EQUAL(stream.str(), S("{U\x03Keyl\xFF\xBB\x77\x33}"));
     }
 
@@ -44,7 +44,7 @@ namespace
         UBJsonWriter writer(stream);
         writer.beginArray(UBJsonParameters(3, UBJsonValueType::INT_16)).value(
                 int16_t(2)).value(int16_t(200)).value(int16_t(20000))
-                .endArray();
+                .endArray().flush();
         Y_EQUAL(stream.str(), S("[$I#i\x03" "\x00\x02\x00\xC8\x4E\x20"));
     }
 
@@ -53,7 +53,7 @@ namespace
         std::ostringstream stream(std::ios_base::out | std::ios_base::binary);
         UBJsonWriter writer(stream);
         int8_t data[] = {1, 2, 3, 5, 8, 14};
-        writer.binary(data, sizeof(data));
+        writer.binary(data, sizeof(data)).flush();
         Y_EQUAL(stream.str(), S("[$U#i\x06" "\x01\x02\x03\x05\x08\x0E"));
     }
 

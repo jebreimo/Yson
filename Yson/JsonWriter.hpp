@@ -141,7 +141,7 @@ namespace Yson
 
         JsonWriter& setFloatingPointPrecision(int value);
 
-        JsonWriter& flush();
+        JsonWriter& flush() override;
     private:
         struct Members;
 

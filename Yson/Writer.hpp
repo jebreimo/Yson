@@ -68,5 +68,7 @@ namespace Yson
         virtual Writer& binary(const void* data, size_t size) = 0;
 
         virtual Writer& base64(const void* data, size_t size) = 0;
+
+        virtual Writer& flush() = 0;
     };
 }
