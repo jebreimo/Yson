@@ -25,8 +25,7 @@ namespace Yson
     {
         struct Context
         {
-            Context()
-            {}
+            Context() = default;
 
             Context(char endChar,
                     JsonParameters parameters,
@@ -52,6 +51,8 @@ namespace Yson
             AT_START_OF_LINE_BEFORE_COMMA,
             AFTER_COMMA
         };
+
+        size_t MAX_BUFFER_SIZE = 1024 * 1024;
     }
 
     struct JsonWriter::Members
@@ -62,6 +63,7 @@ namespace Yson
         std::string indentation;
         std::string key;
         std::array<char, 256> sprintfBuffer;
+        std::string buffer;
         State state = AT_START_OF_VALUE_NO_COMMA;
         unsigned indentationWidth = 2;
         int languagExtensions = 0;
@@ -98,13 +100,18 @@ namespace Yson
                      ? formatting
                      : JsonFormatting::NONE;
         m_Members->contexts.push(Context('\0', formatting));
+        m_Members->buffer.reserve(MAX_BUFFER_SIZE);
     }
 
     JsonWriter::JsonWriter(JsonWriter&& rhs) noexcept
         : m_Members(move(rhs.m_Members))
     {}
 
-    JsonWriter::~JsonWriter() = default;
+    JsonWriter::~JsonWriter()
+    {
+        if (m_Members)
+            flush();
+    }
 
     JsonWriter& JsonWriter::operator=(JsonWriter&& rhs) noexcept
     {
@@ -114,20 +121,18 @@ namespace Yson
 
     std::ostream* JsonWriter::stream()
     {
-        assertValid();
-        return m_Members->stream;
+        flush();
+        return members().stream;
     }
 
     const std::string& JsonWriter::key() const
     {
-        assertValid();
-        return m_Members->key;
+        return members().key;
     }
 
     JsonWriter& JsonWriter::key(const std::string& key)
     {
-        assertValid();
-        m_Members->key = key;
+        members().key = key;
         return *this;
     }
 
@@ -234,13 +239,15 @@ namespace Yson
     JsonWriter& JsonWriter::value(const std::string& text)
     {
         beginValue();
-        *m_Members->stream << "\"";
+        auto& m = members();
+        m.buffer.push_back('"');
+        //*m.stream << "\"";
         if (!Ystring::hasUnescapedCharacters(text))
-            *m_Members->stream << text;
+            write(text);
         else
-            *m_Members->stream << Ystring::escape(text);
-        *m_Members->stream << "\"";
-        m_Members->state = AT_END_OF_VALUE;
+            write(Ystring::escape(text));
+        m.buffer.push_back('"');
+        m.state = AT_END_OF_VALUE;
         return *this;
     }
 
@@ -255,15 +262,15 @@ namespace Yson
     JsonWriter& JsonWriter::rawValue(const std::string& value)
     {
         beginValue();
-        *m_Members->stream << value;
-        m_Members->state = AT_END_OF_VALUE;
+        auto& m = members();
+        write(value);
+        members().state = AT_END_OF_VALUE;
         return *this;
     }
 
     JsonWriter& JsonWriter::rawText(const std::string& value)
     {
-        assertValid();
-        *m_Members->stream << value;
+        write(value);
         return *this;
     }
 
@@ -279,26 +286,25 @@ namespace Yson
 
     JsonWriter& JsonWriter::indent()
     {
-        assertValid();
-        m_Members->indentation.append(m_Members->indentationWidth,
-                                      m_Members->indentationCharacter);
+        auto& m = members();
+        m.indentation.append(m.indentationWidth, m.indentationCharacter);
         return *this;
     }
 
     JsonWriter& JsonWriter::outdent()
     {
-        assertValid();
-        if (m_Members->indentation.size() < m_Members->indentationWidth)
+        auto& m = members();
+        if (m.indentation.size() < m.indentationWidth)
             YSON_THROW("Can't outdent, indentation level is 0.");
-        auto newSize = m_Members->indentation.size() - m_Members->indentationWidth;
-        m_Members->indentation.resize(newSize);
+        auto newSize = m.indentation.size() - m.indentationWidth;
+        m.indentation.resize(newSize);
         return *this;
     }
 
     JsonWriter& JsonWriter::writeComma()
     {
-        assertValid();
-        switch (m_Members->state)
+        auto& m = members();
+        switch (m.state)
         {
         case AT_END_OF_VALUE:
             break;
@@ -309,27 +315,27 @@ namespace Yson
         default:
             YSON_THROW("A comma has already been added.");
         }
-        *m_Members->stream << ',';
-        m_Members->state = AFTER_COMMA;
+        m.buffer.push_back(',');
+        m.state = AFTER_COMMA;
         return *this;
     }
 
     JsonWriter& JsonWriter::writeIndentation()
     {
-        assertValid();
-        switch (m_Members->state)
+        auto& m = members();
+        switch (m.state)
         {
         case AT_START_OF_LINE_NO_COMMA:
             writeIndentationImpl();
-            m_Members->state = AT_START_OF_VALUE_NO_COMMA;
+            m.state = AT_START_OF_VALUE_NO_COMMA;
             break;
         case AT_START_OF_LINE_BEFORE_COMMA:
             writeIndentationImpl();
-            m_Members->state = AT_END_OF_VALUE;
+            m.state = AT_END_OF_VALUE;
             break;
         case AT_START_OF_LINE_AFTER_COMMA:
             writeIndentationImpl();
-            m_Members->state = AT_START_OF_VALUE_AFTER_COMMA;
+            m.state = AT_START_OF_VALUE_AFTER_COMMA;
             break;
         default:
             break;
@@ -339,20 +345,20 @@ namespace Yson
 
     JsonWriter& JsonWriter::writeNewline()
     {
-        assertValid();
-        *m_Members->stream << "\n";
-        switch (m_Members->state)
+        auto& m = members();
+        m.buffer.push_back('\n');
+        switch (m.state)
         {
         case AT_START_OF_VALUE_NO_COMMA:
         case AT_START_OF_STRUCTURE:
-            m_Members->state = AT_START_OF_LINE_NO_COMMA;
+            m.state = AT_START_OF_LINE_NO_COMMA;
             break;
         case AT_START_OF_VALUE_AFTER_COMMA:
         case AFTER_COMMA:
-            m_Members->state = AT_START_OF_LINE_AFTER_COMMA;
+            m.state = AT_START_OF_LINE_AFTER_COMMA;
             break;
         case AT_END_OF_VALUE:
-            m_Members->state = AT_START_OF_LINE_BEFORE_COMMA;
+            m.state = AT_START_OF_LINE_BEFORE_COMMA;
             break;
         default:
             break;
@@ -365,20 +371,19 @@ namespace Yson
         if (count == 0)
             return *this;
 
-        assertValid();
-        for (size_t i = 0; i < count; ++i)
-            *m_Members->stream << ' ';
-        switch (m_Members->state)
+        auto& m = members();
+        m.buffer.append(count, ' ');
+        switch (m.state)
         {
         case AT_START_OF_LINE_NO_COMMA:
-            m_Members->state = AT_START_OF_VALUE_NO_COMMA;
+            m.state = AT_START_OF_VALUE_NO_COMMA;
             break;
         case AT_START_OF_LINE_BEFORE_COMMA:
-            m_Members->state = AT_END_OF_VALUE;
+            m.state = AT_END_OF_VALUE;
             break;
         case AT_START_OF_LINE_AFTER_COMMA:
         case AFTER_COMMA:
-            m_Members->state = AT_START_OF_VALUE_AFTER_COMMA;
+            m.state = AT_START_OF_VALUE_AFTER_COMMA;
             break;
         default:
             break;
@@ -388,42 +393,37 @@ namespace Yson
 
     std::pair<char, unsigned> JsonWriter::indentation() const
     {
-        assertValid();
-        return std::make_pair(m_Members->indentationCharacter,
-                              m_Members->indentationWidth);
+        auto& m = members();
+        return std::make_pair(m.indentationCharacter, m.indentationWidth);
     }
 
     JsonWriter& JsonWriter::setIndentation(char character, unsigned count)
     {
-        assertValid();
-        m_Members->indentationCharacter = character;
-        m_Members->indentationWidth = count;
+        auto& m = members();
+        m.indentationCharacter = character;
+        m.indentationWidth = count;
         return *this;
     }
 
     bool JsonWriter::isFormattingEnabled() const
     {
-        assertValid();
-        return m_Members->formattingEnabled;
+        return members().formattingEnabled;
     }
 
     JsonWriter& JsonWriter::setFormattingEnabled(bool value)
     {
-        assertValid();
-        m_Members->formattingEnabled = value;
+        members().formattingEnabled = value;
         return *this;
     }
 
     int JsonWriter::languageExtensions() const
     {
-        assertValid();
-        return m_Members->languagExtensions;
+        return members().languagExtensions;
     }
 
     JsonWriter& JsonWriter::setLanguageExtensions(int value)
     {
-        assertValid();
-        m_Members->languagExtensions = value;
+        members().languagExtensions = value;
         return *this;
     }
 
@@ -449,32 +449,67 @@ namespace Yson
 
     int JsonWriter::floatingPointPrecision() const
     {
-        assertValid();
-        return m_Members->floatingPointPrecision;
+        return members().floatingPointPrecision;
     }
 
     JsonWriter& JsonWriter::setFloatingPointPrecision(int value)
     {
-        assertValid();
-        m_Members->floatingPointPrecision = std::max(value, 1);
+        members().floatingPointPrecision = std::max(value, 1);
         return *this;
     }
 
-    void JsonWriter::assertValid() const
+    JsonWriter& JsonWriter::flush()
     {
-        if (!m_Members)
-            YSON_THROW("The members of this JsonWriter instance has been moved to another instance.");
+        auto& m = members();
+        *m.stream << m.buffer;
+        m.buffer.clear();
+        return *this;
+    }
+
+    void JsonWriter::write(const std::string& s)
+    {
+        auto& m = members();
+        if (m.buffer.size() + s.size() <= MAX_BUFFER_SIZE)
+        {
+            m.buffer.append(s);
+        }
+        else
+        {
+            flush();
+            *m.stream << s;
+        }
+    }
+
+    void JsonWriter::write(const char* s, size_t size)
+    {
+        auto& m = members();
+        if (m.buffer.size() + size <= MAX_BUFFER_SIZE)
+        {
+            m.buffer.append(s, size);
+        }
+        else
+        {
+            flush();
+            m.stream->write(s, size);
+        }
+    }
+
+    JsonWriter::Members& JsonWriter::members() const
+    {
+        if (m_Members)
+            return *m_Members;
+        YSON_THROW("The members of this JsonWriter instance has been moved to another instance.");
     }
 
     void JsonWriter::beginValue()
     {
-        assertValid();
-        switch (m_Members->state)
+        auto& m = members();
+        switch (m.state)
         {
         case AT_START_OF_STRUCTURE:
             if (formatting() == JsonFormatting::FORMAT)
             {
-                *m_Members->stream << '\n';
+                m.buffer.push_back('\n');
                 writeIndentationImpl();
             }
             break;
@@ -482,23 +517,26 @@ namespace Yson
             switch (formatting())
             {
             case JsonFormatting::NONE:
-                *m_Members->stream << ',';
+                m.buffer.push_back(',');
                 break;
             case JsonFormatting::FLAT:
-                *m_Members->stream << ", ";
+                m.buffer.push_back(',');
+                m.buffer.push_back(' ');
                 break;
             case JsonFormatting::FORMAT:
                 {
-                    auto& c = m_Members->contexts.top();
+                    auto& c = m.contexts.top();
                     if (c.parameters.valuesPerLine <= 1
                         || c.valueIndex >= c.parameters.valuesPerLine)
                     {
-                        *m_Members->stream << ",\n";
+                        m.buffer.push_back(',');
+                        m.buffer.push_back('\n');
                         writeIndentationImpl();
                     }
                     else
                     {
-                        *m_Members->stream << ", ";
+                        m.buffer.push_back(',');
+                        m.buffer.push_back(' ');
                     }
                 }
                 break;
@@ -515,14 +553,16 @@ namespace Yson
             switch (formatting())
             {
             case JsonFormatting::NONE:
-                *m_Members->stream << ',';
+                m.buffer.push_back(',');
                 break;
             case JsonFormatting::FLAT:
-                *m_Members->stream << ", ";
+                m.buffer.push_back(',');
+                m.buffer.push_back(' ');
                 break;
             case JsonFormatting::FORMAT:
                 writeIndentationImpl();
-                *m_Members->stream << ",\n";
+                m.buffer.push_back(',');
+                m.buffer.push_back('\n');
                 writeIndentationImpl();
                 break;
             default:
@@ -533,10 +573,10 @@ namespace Yson
             switch (formatting())
             {
             case JsonFormatting::FLAT:
-                *m_Members->stream << ' ';
+                m.buffer.push_back(' ');
                 break;
             case JsonFormatting::FORMAT:
-                *m_Members->stream << '\n';
+                m.buffer.push_back('\n');
                 writeIndentationImpl();
                 break;
             default:
@@ -546,58 +586,68 @@ namespace Yson
         default:
             break;
         }
-        ++m_Members->contexts.top().valueIndex;
+        ++m.contexts.top().valueIndex;
         if (isInsideObject())
         {
             if (!isUnquotedValueNamesEnabled()
-                || !isJavaScriptIdentifier(m_Members->key))
-                *m_Members->stream << "\"" << m_Members->key
-                        << (formatting() != JsonFormatting::NONE ? "\": " : "\":");
+                || !isJavaScriptIdentifier(m.key))
+            {
+                m.buffer.push_back('"');
+                write(m.key);
+                m.buffer.push_back('"');
+                m.buffer.push_back(':');
+                if (formatting() != JsonFormatting::NONE)
+                    m.buffer.push_back(' ');
+            }
             else
-                *m_Members->stream << m_Members->key
-                        << (formatting() != JsonFormatting::NONE ? ": " : ":");
+            {
+                write(m.key);
+                m.buffer.push_back(':');
+                if (formatting() != JsonFormatting::NONE)
+                    m.buffer.push_back(' ');
+            }
         }
     }
 
     JsonFormatting JsonWriter::formatting() const
     {
-        assertValid();
-        if (!m_Members->formattingEnabled)
+        auto& m = members();
+        if (!m.formattingEnabled)
             return JsonFormatting::NONE;
-        if (m_Members->contexts.empty())
+        if (m.contexts.empty())
             return JsonFormatting::FORMAT;
-        return m_Members->contexts.top().parameters.formatting;
+        return m.contexts.top().parameters.formatting;
     }
 
     bool JsonWriter::isInsideObject() const
     {
-        return !m_Members->contexts.empty()
-               && m_Members->contexts.top().endChar == '}';
+        auto& m = members();
+        return !m.contexts.empty() && m.contexts.top().endChar == '}';
     }
 
     JsonWriter& JsonWriter::beginStructure(char startChar, char endChar,
                                            JsonParameters parameters)
     {
         beginValue();
-        *m_Members->stream << startChar;
+        auto& m = members();
+        m.buffer.push_back(startChar);
         if (parameters.formatting == JsonFormatting::DEFAULT)
         {
-            parameters.formatting = m_Members->contexts.top().parameters.formatting;
-            if (m_Members->contexts.top().parameters.valuesPerLine > 1)
+            parameters.formatting = m.contexts.top().parameters.formatting;
+            if (m.contexts.top().parameters.valuesPerLine > 1)
                 parameters.formatting = JsonFormatting::FLAT;
         }
-        m_Members->contexts.push(Context(endChar, parameters));
+        m.contexts.push(Context(endChar, parameters));
         if (formatting() == JsonFormatting::FORMAT)
             indent();
-        m_Members->state = AT_START_OF_STRUCTURE;
+        m.state = AT_START_OF_STRUCTURE;
         return *this;
     }
 
     JsonWriter& JsonWriter::endStructure(char endChar)
     {
-        assertValid();
-        if (m_Members->contexts.empty()
-            || m_Members->contexts.top().endChar != endChar)
+        auto& m = members();
+        if (m.contexts.empty() || m.contexts.top().endChar != endChar)
         {
             // This function could be called from the destructor of some
             // RAII-class. If so, make sure that we're not already processing
@@ -609,28 +659,28 @@ namespace Yson
                 return *this;
         }
 
-        switch (m_Members->state)
+        switch (m.state)
         {
         case AT_START_OF_VALUE_NO_COMMA:
         case AT_START_OF_STRUCTURE:
             if (formatting() == JsonFormatting::FORMAT)
                 outdent();
-            m_Members->contexts.pop();
+            m.contexts.pop();
             break;
         case AT_END_OF_VALUE:
             if (formatting() == JsonFormatting::FORMAT)
             {
                 outdent();
-                m_Members->contexts.pop();
-                if (m_Members->contexts.top().parameters.valuesPerLine <= 1)
+                m.contexts.pop();
+                if (m.contexts.top().parameters.valuesPerLine <= 1)
                 {
-                    *m_Members->stream << '\n';
+                    m.buffer.push_back('\n');
                     writeIndentationImpl();
                 }
             }
             else
             {
-                m_Members->contexts.pop();
+                m.contexts.pop();
             }
             break;
         case AT_START_OF_LINE_NO_COMMA:
@@ -639,7 +689,7 @@ namespace Yson
             {
                 outdent();
                 writeIndentationImpl();
-                m_Members->contexts.pop();
+                m.contexts.pop();
             }
             break;
         default:
@@ -647,24 +697,26 @@ namespace Yson
                        + endChar + "'");
         }
 
-        *m_Members->stream << endChar;
-        m_Members->state = AT_END_OF_VALUE;
+        m.buffer.push_back(endChar);
+        m.state = AT_END_OF_VALUE;
         return *this;
     }
 
     void JsonWriter::writeIndentationImpl()
     {
-        *m_Members->stream << m_Members->indentation;
-        m_Members->contexts.top().valueIndex = 0;
+        auto& m = members();
+        write(m.indentation);
+        m.contexts.top().valueIndex = 0;
     }
 
     template <typename T>
     JsonWriter& JsonWriter::writeIntValueImpl(T number, const char* format)
     {
         beginValue();
-        auto size = sprintf(m_Members->sprintfBuffer.data(), format, number);
-        m_Members->stream->write(m_Members->sprintfBuffer.data(), size);
-        m_Members->state = AT_END_OF_VALUE;
+        auto& m = members();
+        auto size = sprintf(m.sprintfBuffer.data(), format, number);
+        write(m.sprintfBuffer.data(), size);
+        m.state = AT_END_OF_VALUE;
         return *this;
     }
 
@@ -674,13 +726,14 @@ namespace Yson
         if (std::isfinite(number))
         {
             beginValue();
-            auto size = sprintf(m_Members->sprintfBuffer.data(),
+            auto& m = members();
+            auto size = sprintf(m.sprintfBuffer.data(),
                                 format,
-                                std::min(m_Members->floatingPointPrecision,
+                                std::min(m.floatingPointPrecision,
                                          std::numeric_limits<T>::digits10),
                                 number);
-            m_Members->stream->write(m_Members->sprintfBuffer.data(), size);
-            m_Members->state = AT_END_OF_VALUE;
+            write(m.sprintfBuffer.data(), size);
+            m.state = AT_END_OF_VALUE;
         }
         else if (!languageExtension(NON_FINITE_FLOATS_AS_STRINGS))
         {
@@ -702,19 +755,17 @@ namespace Yson
     bool JsonWriter::languageExtension(
             JsonWriter::LanguageExtensions ext) const
     {
-        assertValid();
-        return (m_Members->languagExtensions & ext) != 0;
+        return (members().languagExtensions & ext) != 0;
     }
 
     JsonWriter& JsonWriter::setLanguageExtension(
             JsonWriter::LanguageExtensions ext,
             bool value)
     {
-        assertValid();
         if (value)
-            m_Members->languagExtensions |= ext;
+            members().languagExtensions |= ext;
         else
-            m_Members->languagExtensions &= ~ext;
+            members().languagExtensions &= ~ext;
         return *this;
     }
 }

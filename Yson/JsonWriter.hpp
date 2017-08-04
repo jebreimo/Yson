@@ -140,12 +140,20 @@ namespace Yson
         int floatingPointPrecision() const;
 
         JsonWriter& setFloatingPointPrecision(int value);
+
+        JsonWriter& flush();
     private:
+        struct Members;
+
+        Members& members() const;
+
+        void write(const std::string& s);
+
+        void write(const char* s, size_t size);
+
         JsonWriter(std::unique_ptr<std::ostream>&& streamPtr,
                    std::ostream* stream,
                    JsonFormatting formatting = JsonFormatting::NONE);
-
-        void assertValid() const;
 
         void beginValue();
 
@@ -176,7 +184,6 @@ namespace Yson
 
         JsonWriter& setLanguageExtension(LanguageExtensions ext, bool value);
 
-        struct Members;
         std::unique_ptr<Members> m_Members;
     };
 }

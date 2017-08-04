@@ -22,7 +22,7 @@ namespace
         writer.key("Key");
         Y_EQUAL(writer.key(), "Key");
         writer.beginArray().value(12345678)
-                .endArray();
+                .endArray().flush();
         Y_EQUAL(stream.str(), "[12345678]");
     }
 
@@ -30,7 +30,7 @@ namespace
     {
         std::stringstream ss;
         JsonWriter(ss)
-            .value("\"foo\nbar\t\\x89baz\"");
+            .value("\"foo\nbar\t\\x89baz\"").flush();
         std::string expected = "\"\\\"foo\\nbar\\t\\\\x89baz\\\"\"";
         Y_EQUAL(ss.str(), expected);
     }
@@ -66,7 +66,7 @@ namespace
             .value(2).value(1).writeNewline()
 
             .outdent()
-            .endArray();
+            .endArray().flush();
 
         std::string expected =
                 "[\n"
@@ -96,7 +96,7 @@ namespace
             .value(4).value(3)
             .value(4).value(3).writeComma().writeSeparator(2)
             .value(2).value(1)
-            .endArray();
+            .endArray().flush();
 
         std::string expected =
                 "[\n"
@@ -118,7 +118,7 @@ namespace
             .key("name")
             .beginObject()
             .endObject()
-            .endObject();
+            .endObject().flush();
         std::string expected =
                 "{\n"
                 "  \"name\": {}\n"
@@ -132,7 +132,7 @@ namespace
     {
         std::stringstream ss;
         JsonWriter writer(ss);
-        writer.value(value);
+        writer.value(value).flush();
         Y_EQUAL(ss.str(), expected);
     }
 
@@ -147,10 +147,10 @@ namespace
                              int precision,
                              const std::string& expected)
     {
-       std::stringstream ss;
-       JsonWriter writer(ss);
+        std::stringstream ss;
+        JsonWriter writer(ss);
         writer.setFloatingPointPrecision(precision);
-        writer.value(value);
+        writer.value(value).flush();
         Y_EQUAL(ss.str(), expected);
     }
 
@@ -167,7 +167,7 @@ namespace
         Y_THROWS(writer.value(std::numeric_limits<double>::infinity()),
                  std::logic_error);
         writer.setNonFiniteFloatsAsStringsEnabled(true);
-        writer.value(std::numeric_limits<double>::infinity());
+        writer.value(std::numeric_limits<double>::infinity()).flush();
         Y_EQUAL(ss.str(), "\"infinity\"");
     }
 
@@ -182,7 +182,7 @@ namespace
               .key("_Key$3").value(2)
               .key("4Key4").value(3)
               .key("Key 5").value(4)
-              .endObject();
+              .endObject().flush();
         Y_EQUAL(ss.str(),
                 "{Key1:0,$Key2_:1,_Key$3:2,\"4Key4\":3,\"Key 5\":4}");
     }
@@ -194,7 +194,7 @@ namespace
         writer.beginObject();
         writer.key("1").value(2);
         writer.key("array").beginArray(JsonParameters(JsonFormatting::FLAT)).value(1).value(2).endArray();
-        writer.endObject();
+        writer.endObject().flush();
         Y_EQUAL(ss.str(),
                 "{\n"
                 "  \"1\": 2,\n"
@@ -208,7 +208,7 @@ namespace
         JsonWriter writer(ss);
         writer.beginArray();
         writer.boolean(true).boolean(false).null();
-        writer.endArray();
+        writer.endArray().flush();
         Y_EQUAL(ss.str(), "[true,false,null]");
     }
 
