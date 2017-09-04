@@ -29,25 +29,31 @@ namespace Yson
         {}
 
         YsonException(const std::string& msg,
-                      const std::string& filename,
-                      int lineNo,
-                      const std::string& funcname)
+                      const std::string& debugFileName,
+                      int debugLineNumber,
+                      const std::string& debugFunctionName)
             : std::logic_error(msg)
         {
-            m_Message = msg + " [";
-            if (!funcname.empty())
-                m_Message += funcname + "() in ";
-            m_Message += filename + ":" + std::to_string(lineNo) + "]";
+            if (!debugFunctionName.empty())
+                m_DebugLocation += debugFunctionName + "() in ";
+            m_DebugLocation += debugFileName + ":"
+                               + std::to_string(debugLineNumber);
         }
 
-        const char* what() const _NOEXCEPT
+        const std::string& debugLocation() const _NOEXCEPT
         {
-            if (!m_Message.empty())
-                return m_Message.c_str();
-            return std::exception::what();
+            return m_DebugLocation;
+        }
+
+        const std::string& debugMessage() const
+        {
+            if (!m_DebugLocation.empty())
+                return what() + std::string(" [") + m_DebugLocation + "]";
+            else
+                return what();
         }
     private:
-        std::string m_Message;
+        std::string m_DebugLocation;
     };
 
     #define YSON_THROW(msg) \

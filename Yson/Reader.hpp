@@ -12,7 +12,7 @@
 #include "DetailedValueType.hpp"
 #include "ValueType.hpp"
 #include "YsonDefinitions.hpp"
-#include "YsonException.hpp"
+#include "YsonReaderException.hpp"
 
 namespace Yson
 {

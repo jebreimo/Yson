@@ -37,6 +37,7 @@ set(PUBLIC_HEADER_FILES
     Yson/Writer.hpp
     Yson/YsonDefinitions.hpp
     Yson/YsonException.hpp
+    Yson/YsonReaderException.hpp
     )
 
 set(SOURCE_FILES

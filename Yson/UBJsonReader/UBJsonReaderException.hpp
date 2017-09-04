@@ -12,32 +12,25 @@
 
 namespace Yson
 {
-    inline YsonException makeYsonException(const std::string& msg,
-                                           const UBJsonTokenizer& tokenizer,
-                                           const std::string& fileName,
-                                           int lineNo,
-                                           const std::string& function)
-    {
-        std::string str;
-        if (!tokenizer.fileName().empty())
-            str = "In " + tokenizer.fileName() + " at ";
-        else
-            str = "At ";
-        str += "position " + std::to_string(tokenizer.position())
-               + ": " +msg;
-        return {str, fileName, lineNo, function};
-    }
-
     #define UBJSON_READER_THROW(msg, tokenizer) \
-        throw makeYsonException((msg), tokenizer, \
-                                __FILE__, __LINE__, __FUNCTION__)
+        throw YsonReaderException((msg), \
+                                  __FILE__, __LINE__, __FUNCTION__, \
+                                  (tokenizer).fileName(), \
+                                  0, \
+                                  (tokenizer).position())
 
     #define UBJSON_READER_UNEXPECTED_TOKEN(tokenizer) \
-        throw makeYsonException( \
-                "Unexpected token: " + toString((tokenizer).tokenType()), \
-                tokenizer, __FILE__, __LINE__, __FUNCTION__)
+        throw YsonReaderException( \
+                "Unexpected token: " + toString((tokenizer).tokenType()) + ".", \
+                __FILE__, __LINE__, __FUNCTION__, \
+                (tokenizer).fileName(), \
+                0, \
+                (tokenizer).position())
 
     #define UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer) \
-        throw makeYsonException("Unexpected end of document.", tokenizer, \
-                                __FILE__, __LINE__, __FUNCTION__)
+        throw YsonReaderException("Unexpected end of document.",\
+                                  __FILE__, __LINE__, __FUNCTION__, \
+                                  (tokenizer).fileName(), \
+                                  0, \
+                                  (tokenizer).position())
 }
