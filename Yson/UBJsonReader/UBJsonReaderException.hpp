@@ -7,7 +7,7 @@
 //****************************************************************************
 #pragma once
 
-#include "../YsonException.hpp"
+#include "../YsonReaderException.hpp"
 #include "UBJsonTokenizer.hpp"
 
 namespace Yson

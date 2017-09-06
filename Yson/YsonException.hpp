@@ -45,7 +45,7 @@ namespace Yson
             return m_DebugLocation;
         }
 
-        const std::string& debugMessage() const
+        std::string debugMessage() const
         {
             if (!m_DebugLocation.empty())
                 return what() + std::string(" [") + m_DebugLocation + "]";

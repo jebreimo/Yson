@@ -9,7 +9,7 @@
 
 #include <stdexcept>
 #include <string>
-#include "../YsonException.hpp"
+#include "../YsonReaderException.hpp"
 
 /** @file
   * @brief Defines macros and functions used when JsonReader
