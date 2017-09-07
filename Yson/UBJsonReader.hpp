@@ -109,9 +109,9 @@ namespace Yson
 
         std::string fileName() const override;
 
-        std::string errorContext() const override;
+        size_t lineNumber() const override;
 
-        size_t position() const;
+        size_t columnNumber() const override;
     private:
         struct Members;
         struct Scope;

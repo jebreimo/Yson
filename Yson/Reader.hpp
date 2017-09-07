@@ -92,7 +92,9 @@ namespace Yson
 
         virtual std::string fileName() const = 0;
 
-        virtual std::string errorContext() const = 0;
+        virtual size_t lineNumber() const = 0;
+
+        virtual size_t columnNumber() const = 0;
     };
 
     template <typename T>
@@ -101,8 +103,10 @@ namespace Yson
         T value;
         if (reader.read(value))
             return value;
-        YSON_THROW(reader.errorContext()
-                   + ": can't read the current value. Its type is "
-                   + toString(reader.valueType()) + ".");
+        throw YsonReaderException("Can't read the current value. Its type is "
+                                  + toString(reader.valueType()) + ".",
+                                  __FILE__, __LINE__, __FUNCTION__,
+                                  reader.fileName(), reader.lineNumber(),
+                                  reader.columnNumber());
     }
 }

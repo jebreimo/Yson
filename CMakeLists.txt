@@ -54,6 +54,7 @@ set(SOURCE_FILES
     Yson/Writer.hpp
     Yson/YsonDefinitions.hpp
     Yson/YsonException.hpp
+    Yson/YsonReaderException.hpp
     Yson/Common/AssignInteger.hpp
     Yson/Common/Base64.cpp
     Yson/Common/Base64.hpp

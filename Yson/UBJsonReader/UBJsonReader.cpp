@@ -478,7 +478,12 @@ namespace Yson
         return m_Members->tokenizer.fileName();
     }
 
-    size_t UBJsonReader::position() const
+    size_t UBJsonReader::lineNumber() const
+    {
+        return 0;
+    }
+
+    size_t UBJsonReader::columnNumber() const
     {
         return m_Members->tokenizer.position();
     }
@@ -532,16 +537,5 @@ namespace Yson
             return true;
         }
         return false;
-    }
-
-    std::string UBJsonReader::errorContext() const
-    {
-        std::string str;
-        if (!fileName().empty())
-            str = "In " + fileName() + " at ";
-        else
-            str = "At ";
-        str += "position " + std::to_string(position());
-        return str;
     }
 }

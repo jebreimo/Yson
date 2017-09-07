@@ -87,11 +87,9 @@ namespace Yson
 
         std::string fileName() const override;
 
-        std::string errorContext() const override;
+        size_t lineNumber() const override;
 
-        size_t lineNumber() const;
-
-        size_t columnNumber() const;
+        size_t columnNumber() const override;
     private:
         void assertStateIsKeyOrValue() const;
 
