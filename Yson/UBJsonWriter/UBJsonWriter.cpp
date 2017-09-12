@@ -23,26 +23,25 @@ namespace Yson
     }
 
     UBJsonWriter::UBJsonWriter()
-        : m_Stream(&std::cout),
-          m_StrictIntegerSizes(false)
-    {
-      m_Buffer.reserve(MAX_BUFFER_SIZE);
-    }
+        : UBJsonWriter(std::cout)
+    {}
 
-    UBJsonWriter::UBJsonWriter(std::string& fileName)
+    UBJsonWriter::UBJsonWriter(const std::string& fileName)
         : m_StreamPtr(new std::ofstream(getUnicodeFileName(fileName),
                                         std::ios_base::binary)),
           m_Stream(m_StreamPtr.get()),
           m_StrictIntegerSizes(false)
     {
-      m_Buffer.reserve(MAX_BUFFER_SIZE);
+        m_Contexts.push(Context());
+        m_Buffer.reserve(MAX_BUFFER_SIZE);
     }
 
     UBJsonWriter::UBJsonWriter(std::ostream& stream)
-            : m_Stream(&stream),
-              m_StrictIntegerSizes(false)
+        : m_Stream(&stream),
+          m_StrictIntegerSizes(false)
     {
         m_Contexts.push(Context());
+        m_Buffer.reserve(MAX_BUFFER_SIZE);
     }
 
     UBJsonWriter::~UBJsonWriter()
@@ -285,7 +284,10 @@ namespace Yson
                 }
             }
         }
-        else
+        // This function could be called from the destructor of some
+        // RAII-class. If so, make sure that we're not already processing
+        // another exception before throwing our own.
+        else if (!std::uncaught_exception())
         {
             YSON_THROW("Ending structure " + toString(context.structureType)
                        + " as if it was a " + toString(structureType));

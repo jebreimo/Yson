@@ -20,7 +20,7 @@ namespace Yson
     public:
         UBJsonWriter();
 
-        UBJsonWriter(std::string& fileName);
+        UBJsonWriter(const std::string& fileName);
 
         UBJsonWriter(std::ostream& stream);
 
