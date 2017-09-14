@@ -21,6 +21,8 @@ namespace Yson
     {}
 
     TextStreamReader::TextStreamReader(std::istream& stream,
+                                       const char* buffer,
+                                       size_t bufferSize,
                                        Encoding_t sourceEncoding)
             : m_Stream(&stream)
     {
@@ -29,10 +31,11 @@ namespace Yson
             m_Converter.reset(new Conversion::Converter(
                     sourceEncoding, Ystring::Encoding::UTF_8));
         }
+        if (buffer && bufferSize)
+            m_Buffer.insert(m_Buffer.end(), buffer, buffer + bufferSize);
     }
 
-    TextStreamReader::~TextStreamReader()
-    {}
+    TextStreamReader::~TextStreamReader() = default;
 
     bool TextStreamReader::read(std::string& destination, size_t bytes)
     {

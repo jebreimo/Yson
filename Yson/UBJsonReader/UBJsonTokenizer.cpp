@@ -14,8 +14,10 @@
 
 namespace Yson
 {
-    UBJsonTokenizer::UBJsonTokenizer(std::istream& stream)
-        : m_Reader(new BinaryStreamReader(stream))
+    UBJsonTokenizer::UBJsonTokenizer(std::istream& stream,
+                                     const char* buffer,
+                                     size_t bufferSize)
+        : m_Reader(new BinaryStreamReader(stream, buffer, bufferSize))
     {}
 
     UBJsonTokenizer::UBJsonTokenizer(const std::string& fileName)

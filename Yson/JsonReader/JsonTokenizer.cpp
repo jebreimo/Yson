@@ -15,8 +15,10 @@
 
 namespace Yson
 {
-    JsonTokenizer::JsonTokenizer(std::istream& stream)
-            : m_TextReader(new TextStreamReader(stream))
+    JsonTokenizer::JsonTokenizer(std::istream& stream,
+                                 const char* buffer,
+                                 size_t bufferSize)
+            : m_TextReader(new TextStreamReader(stream, buffer, bufferSize))
     {}
 
     JsonTokenizer::JsonTokenizer(const std::string& fileName)

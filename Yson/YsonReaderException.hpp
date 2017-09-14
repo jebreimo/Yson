@@ -24,7 +24,7 @@ namespace Yson
         {}
 
         explicit YsonReaderException(const std::string& msg,
-                                     std::string fileName = "",
+                                     std::string fileName = std::string(),
                                      size_t lineNumber = 0,
                                      size_t columnNumber = 0)
             : YsonException(msg),
@@ -35,13 +35,13 @@ namespace Yson
             m_DefaultMessage = makeDefaultMessage(msg);
         }
 
-        explicit YsonReaderException(const std::string& msg,
-                                     const std::string& debugFileName,
-                                     int debugLineNumber,
-                                     const std::string& debugFunctionName,
-                                     std::string fileName = "",
-                                     size_t lineNumber = 0,
-                                     size_t columnNumber = 0)
+        YsonReaderException(const std::string& msg,
+                            const std::string& debugFileName,
+                            int debugLineNumber,
+                            const std::string& debugFunctionName,
+                            std::string fileName = "",
+                            size_t lineNumber = 0,
+                            size_t columnNumber = 0)
             : YsonException(msg, debugFileName, debugLineNumber, debugFunctionName),
               m_FileName(move(fileName)),
               m_LineNumber(lineNumber),

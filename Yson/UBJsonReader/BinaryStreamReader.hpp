@@ -15,7 +15,9 @@ namespace Yson
     class BinaryStreamReader : public BinaryReader
     {
     public:
-        BinaryStreamReader(std::istream& stream);
+        BinaryStreamReader(std::istream& stream,
+                           const char* buffer,
+                           size_t bufferSize);
 
         bool advance(size_t count) override;
 

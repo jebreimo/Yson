@@ -23,11 +23,19 @@ namespace Yson
               m_End(m_Buffer.data())
     {}
 
-    BinaryStreamReader::BinaryStreamReader(std::istream& stream)
+    BinaryStreamReader::BinaryStreamReader(std::istream& stream,
+                                           const char* buffer,
+                                           size_t bufferSize)
             : m_Stream(&stream),
               m_Start(m_Buffer.data()),
               m_End(m_Buffer.data())
-    {}
+    {
+        if (buffer && bufferSize)
+        {
+            m_Buffer.insert(m_Buffer.end(), buffer, buffer + bufferSize);
+            m_Start = m_End = m_Buffer.data();
+        }
+    }
 
     bool BinaryStreamReader::advance(size_t size)
     {

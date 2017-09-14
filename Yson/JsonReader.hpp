@@ -24,6 +24,10 @@ namespace Yson
 
         JsonReader(const char* buffer, size_t bufferSize);
 
+        JsonReader(std::istream& stream,
+                   const char* buffer,
+                   size_t bufferSize);
+
         JsonReader(const JsonReader&) = delete;
 
         JsonReader(JsonReader&&);

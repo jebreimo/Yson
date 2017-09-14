@@ -23,9 +23,11 @@ namespace Yson
     {
     public:
         TextStreamReader(std::istream& stream,
+                         const char* buffer = nullptr,
+                         size_t bufferSize = 0,
                          Ystring::Encoding_t sourceEncoding = Ystring::Encoding::UNKNOWN);
 
-        virtual ~TextStreamReader();
+        ~TextStreamReader();
 
         bool read(std::string& destination, size_t bytes) override;
 

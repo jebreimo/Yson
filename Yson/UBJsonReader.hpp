@@ -26,6 +26,10 @@ namespace Yson
 
         UBJsonReader(const char* buffer, size_t bufferSize);
 
+        UBJsonReader(std::istream& stream,
+                     const char* buffer,
+                     size_t bufferSize);
+
         UBJsonReader(const UBJsonReader&) = delete;
 
         UBJsonReader(UBJsonReader&&);

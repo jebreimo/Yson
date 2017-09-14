@@ -18,7 +18,9 @@ namespace Yson
     class YSON_API JsonTokenizer
     {
     public:
-        JsonTokenizer(std::istream& stream);
+        JsonTokenizer(std::istream& stream,
+                      const char* buffer = nullptr,
+                      size_t bufferSize = 0);
 
         JsonTokenizer(const std::string& fileName);
 

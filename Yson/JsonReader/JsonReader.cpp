@@ -37,11 +37,8 @@ namespace Yson
     {}
 
     JsonReader::JsonReader(std::istream& stream)
-            : m_Members(new Members(JsonTokenizer(stream)))
-    {
-        m_Members->scopes.push({&m_Members->documentReader,
-                                JsonReaderState::INITIAL_STATE});
-    }
+            : JsonReader(stream, nullptr, 0)
+    {}
 
     JsonReader::JsonReader(const std::string& fileName)
             : m_Members(new Members(JsonTokenizer(fileName)))
@@ -52,6 +49,15 @@ namespace Yson
 
     JsonReader::JsonReader(const char* buffer, size_t bufferSize)
             : m_Members(new Members(JsonTokenizer(buffer, bufferSize)))
+    {
+        m_Members->scopes.push({&m_Members->documentReader,
+                                JsonReaderState::INITIAL_STATE});
+    }
+
+    JsonReader::JsonReader(std::istream& stream,
+                           const char* buffer,
+                           size_t bufferSize)
+            : m_Members(new Members(JsonTokenizer(stream, buffer, 0)))
     {
         m_Members->scopes.push({&m_Members->documentReader,
                                 JsonReaderState::INITIAL_STATE});

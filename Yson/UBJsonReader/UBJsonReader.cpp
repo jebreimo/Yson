@@ -60,6 +60,12 @@ namespace Yson
         : UBJsonReader(new Members(UBJsonTokenizer(buffer, bufferSize)))
     {}
 
+    UBJsonReader::UBJsonReader(std::istream& stream, const char* buffer,
+                               size_t bufferSize)
+        : UBJsonReader(new Members(UBJsonTokenizer(stream, buffer, bufferSize)))
+    {
+    }
+
     UBJsonReader::UBJsonReader(UBJsonReader::Members* members)
         : m_Members(members)
     {
