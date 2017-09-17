@@ -56,6 +56,30 @@ namespace Yson
         std::string m_DebugLocation;
     };
 
-    #define YSON_THROW(msg) \
-        throw YsonException((msg), __FILE__, __LINE__, __FUNCTION__)
+    class FileNotFound : public YsonException
+    {
+    public:
+        explicit FileNotFound(const std::string& fileName)
+            : YsonException("File not found: " + fileName),
+              m_FileName(fileName)
+        {}
+
+        FileNotFound(const std::string& fileName,
+                     const std::string& debugFileName,
+                     int debugLineNumber,
+                     const std::string& debugFunctionName)
+                : YsonException("File not found: " + fileName,
+                                debugFileName,
+                                debugLineNumber,
+                                debugFunctionName),
+                  m_FileName(fileName)
+        {}
+
+        const std::string& fileName() const
+        {
+            return m_FileName;
+        }
+    private:
+        std::string m_FileName;
+    };
 }

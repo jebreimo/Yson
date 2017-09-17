@@ -7,7 +7,7 @@
 //****************************************************************************
 #include <vector>
 #include "JsonDocumentReader.hpp"
-#include "JsonReaderException.hpp"
+#include "ThrowJsonReaderException.hpp"
 #include "JsonScopeReaderUtilities.hpp"
 
 namespace Yson

@@ -6,7 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "UBJsonOptimizedArrayReader.hpp"
-#include "UBJsonReaderException.hpp"
+#include "ThrowUBJsonReaderException.hpp"
 #include "UBJsonScopeReaderUtilties.hpp"
 
 namespace Yson

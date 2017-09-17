@@ -14,7 +14,7 @@
 #include "JsonDocumentReader.hpp"
 #include "JsonObjectReader.hpp"
 #include "../JsonReader.hpp"
-#include "JsonReaderException.hpp"
+#include "ThrowJsonReaderException.hpp"
 #include "../Common/ParseFloatingPoint.hpp"
 #include "../Common/ParseInteger.hpp"
 

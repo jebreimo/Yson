@@ -9,7 +9,7 @@
 #include "../Common/AssignInteger.hpp"
 #include "../Common/ParseFloatingPoint.hpp"
 #include "../Common/ParseInteger.hpp"
-#include "UBJsonReaderException.hpp"
+#include "ThrowUBJsonReaderException.hpp"
 #include "UBJsonReaderState.hpp"
 #include "UBJsonTokenizer.hpp"
 

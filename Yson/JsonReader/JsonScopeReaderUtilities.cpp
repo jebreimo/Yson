@@ -8,7 +8,7 @@
 #include "JsonScopeReaderUtilities.hpp"
 
 #include <vector>
-#include "JsonReaderException.hpp"
+#include "ThrowJsonReaderException.hpp"
 
 namespace Yson
 {

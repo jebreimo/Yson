@@ -109,4 +109,10 @@ namespace Yson
                                   reader.fileName(), reader.lineNumber(),
                                   reader.columnNumber());
     }
+
+    std::unique_ptr<Reader> makeReader(std::istream& stream);
+
+    std::unique_ptr<Reader> makeReader(const std::string& fileName);
+
+    std::unique_ptr<Reader> makeReader(const char* buffer, size_t bufferSize);
 }

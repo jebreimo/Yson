@@ -9,7 +9,7 @@
 #include "BinaryBufferReader.hpp"
 #include "BinaryFileReader.hpp"
 #include "BinaryMutableBufferReader.hpp"
-#include "UBJsonReaderException.hpp"
+#include "ThrowUBJsonReaderException.hpp"
 #include "UBJsonTokenizerUtilities.hpp"
 
 namespace Yson

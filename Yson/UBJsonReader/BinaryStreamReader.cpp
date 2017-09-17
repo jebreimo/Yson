@@ -27,15 +27,10 @@ namespace Yson
                                            const char* buffer,
                                            size_t bufferSize)
             : m_Stream(&stream),
+              m_Buffer(buffer, buffer ? buffer + bufferSize : buffer),
               m_Start(m_Buffer.data()),
               m_End(m_Buffer.data())
-    {
-        if (buffer && bufferSize)
-        {
-            m_Buffer.insert(m_Buffer.end(), buffer, buffer + bufferSize);
-            m_Start = m_End = m_Buffer.data();
-        }
-    }
+    {}
 
     bool BinaryStreamReader::advance(size_t size)
     {

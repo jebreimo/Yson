@@ -6,7 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
-
+#include "../Common/ThrowYsonException.hpp"
 #include "../YsonReaderException.hpp"
 #include "UBJsonTokenizer.hpp"
 

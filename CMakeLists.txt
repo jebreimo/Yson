@@ -82,7 +82,7 @@ set(SOURCE_FILES
     Yson/JsonReader/JsonObjectReader.cpp
     Yson/JsonReader/JsonObjectReader.hpp
     Yson/JsonReader/JsonReader.cpp
-    Yson/JsonReader/JsonReaderException.hpp
+    Yson/JsonReader/ThrowJsonReaderException.hpp
     Yson/JsonReader/JsonReaderState.cpp
     Yson/JsonReader/JsonReaderState.hpp
     Yson/JsonReader/JsonScopeReader.hpp
@@ -125,7 +125,7 @@ set(SOURCE_FILES
     Yson/UBJsonReader/UBJsonOptimizedObjectReader.cpp
     Yson/UBJsonReader/UBJsonOptimizedObjectReader.hpp
     Yson/UBJsonReader/UBJsonReader.cpp
-    Yson/UBJsonReader/UBJsonReaderException.hpp
+    Yson/UBJsonReader/ThrowUBJsonReaderException.hpp
     Yson/UBJsonReader/UBJsonReaderState.cpp
     Yson/UBJsonReader/UBJsonReaderState.hpp
     Yson/UBJsonReader/UBJsonReaderUtilities.cpp
@@ -144,7 +144,7 @@ set(SOURCE_FILES
     Yson/UBJsonWriter/UBJsonWriter.cpp
     Yson/UBJsonWriter/UBJsonWriterUtilities.cpp
     Yson/UBJsonWriter/UBJsonWriterUtilities.hpp
-    )
+    Yson/Common/MakeReader.cpp Yson/Common/ThrowYsonException.hpp)
 
 add_library(
     ${PROJECT_NAME} SHARED

@@ -7,8 +7,8 @@
 //****************************************************************************
 #pragma once
 #include <cstdint>
+#include "../Common/ThrowYsonException.hpp"
 #include "UBJsonTokenType.hpp"
-#include "../YsonException.hpp"
 
 namespace Yson
 {

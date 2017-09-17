@@ -8,7 +8,7 @@
 #include "JsonTokenizer.hpp"
 
 #include <tuple>
-#include "../YsonException.hpp"
+#include "../Common/ThrowYsonException.hpp"
 #include "JsonTokenizerUtilities.hpp"
 #include "TextBufferReader.hpp"
 #include "TextFileReader.hpp"

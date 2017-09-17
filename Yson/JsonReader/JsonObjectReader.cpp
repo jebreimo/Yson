@@ -6,7 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "JsonObjectReader.hpp"
-#include "JsonReaderException.hpp"
+#include "ThrowJsonReaderException.hpp"
 #include "JsonScopeReaderUtilities.hpp"
 
 namespace Yson

@@ -14,9 +14,9 @@
 #include <stack>
 #include "../../Ystring/Conversion.hpp"
 #include "../../Ystring/Escape/Escape.hpp"
-#include "../YsonException.hpp"
 #include "../Common/Base64.hpp"
 #include "../Common/GetUnicodeFileName.hpp"
+#include "../Common/ThrowYsonException.hpp"
 #include "IsJavaScriptIdentifier.hpp"
 
 namespace Yson

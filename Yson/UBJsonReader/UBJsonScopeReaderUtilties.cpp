@@ -8,7 +8,7 @@
 #include "UBJsonScopeReaderUtilties.hpp"
 
 #include <vector>
-#include "UBJsonReaderException.hpp"
+#include "ThrowUBJsonReaderException.hpp"
 #include "UBJsonReaderState.hpp"
 
 namespace Yson
