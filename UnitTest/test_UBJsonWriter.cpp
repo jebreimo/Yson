@@ -57,8 +57,17 @@ namespace
         Y_EQUAL(stream.str(), S("[$U#i\x06" "\x01\x02\x03\x05\x08\x0E"));
     }
 
+    void test_WriteString()
+    {
+        std::ostringstream stream(std::ios_base::out | std::ios_base::binary);
+        UBJsonWriter writer(stream);
+        writer.value("Snorre").flush();
+        Y_EQUAL(stream.str(), S("SU\x06Snorre"));
+    }
+
     Y_TEST(test_Array,
            test_Object,
            test_OptimizedArray,
-           test_WriteBinary);
+           test_WriteBinary,
+           test_WriteString);
 }

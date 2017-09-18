@@ -205,6 +205,124 @@ namespace Yson
         UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
     }
 
+    bool UBJsonTokenizer::skip()
+    {
+        while (true)
+        {
+            if (!m_Reader->read(1))
+                return false;
+            if (skip(static_cast<UBJsonTokenType>(m_Reader->front())))
+                return true;
+        }
+    }
+
+    bool UBJsonTokenizer::skip(UBJsonTokenType tokenType)
+    {
+        m_TokenType = tokenType;
+        m_ContentSize =  0;
+        switch (tokenType)
+        {
+        case UBJsonTokenType::INT8_TOKEN:
+        case UBJsonTokenType::UINT8_TOKEN:
+            if (m_Reader->advance(1))
+                return true;
+            UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
+        case UBJsonTokenType::INT16_TOKEN:
+            if (m_Reader->advance(2))
+                return true;
+            UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
+        case UBJsonTokenType::INT32_TOKEN:
+            if (m_Reader->advance(4))
+                return true;
+            UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
+        case UBJsonTokenType::INT64_TOKEN:
+            if (m_Reader->advance(8))
+                return true;
+            UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
+        case UBJsonTokenType::FLOAT32_TOKEN:
+            if (m_Reader->advance(4))
+                return true;
+            UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
+        case UBJsonTokenType::FLOAT64_TOKEN:
+            if (m_Reader->advance(8))
+                return true;
+            UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
+        case UBJsonTokenType::CHAR_TOKEN:
+            if (m_Reader->advance(1))
+                return true;
+            UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
+        case UBJsonTokenType::OBJECT_KEY_TOKEN:
+            {
+                char c;
+                if (m_Reader->peek(&c) && c != '}')
+                {
+                    skipSizedToken();
+                    m_TokenType = UBJsonTokenType::STRING_TOKEN;
+                    return true;
+                }
+                if (m_Reader->advance(1))
+                {
+                    m_TokenType = UBJsonTokenType::END_OBJECT_TOKEN;
+                    return true;
+                }
+                UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
+            }
+        case UBJsonTokenType::HIGH_PRECISION_TOKEN:
+        case UBJsonTokenType::STRING_TOKEN:
+            {
+                skipSizedToken();
+                m_TokenType = tokenType;
+                return true;
+            }
+        case UBJsonTokenType::START_OBJECT_TOKEN:
+        case UBJsonTokenType::START_ARRAY_TOKEN:
+            {
+                char value;
+                if (!m_Reader->peek(&value))
+                    UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
+                if (value == '$')
+                {
+                    if (!m_Reader->read(3))
+                        UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
+                    auto data = static_cast<const char*>(m_Reader->data());
+                    if (data[2] != '#')
+                        UBJSON_READER_THROW(
+                                "Optimized object or array doesn't specify length.",
+                                *this);
+                    m_ContentType = static_cast<UBJsonTokenType>(data[1]);
+                    if (!next())
+                        UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
+                    m_ContentSize = convertInteger<size_t>(m_TokenType,
+                                                           m_Reader->data());
+                    m_TokenType =
+                            tokenType == UBJsonTokenType::START_ARRAY_TOKEN
+                            ? UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN
+                            : UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN;
+                }
+                else if (value == '#')
+                {
+                    m_Reader->read(1);
+                    if (!next())
+                        UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
+                    m_ContentType = UBJsonTokenType::UNKNOWN_TOKEN;
+                    m_ContentSize = convertInteger<size_t>(m_TokenType,
+                                                           m_Reader->data());
+                    m_TokenType =
+                            tokenType == UBJsonTokenType::START_ARRAY_TOKEN
+                            ? UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN
+                            : UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN;
+                }
+                return true;
+            }
+        case UBJsonTokenType::NO_OP_TOKEN:
+            return false;
+        default:
+            if (isValidTokenType(char(tokenType)))
+                return true;
+            UBJSON_READER_UNEXPECTED_TOKEN(*this);
+        }
+    }
+
     size_t UBJsonTokenizer::position() const
     {
         return m_Reader->position();
@@ -237,6 +355,15 @@ namespace Yson
             UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
         auto size = convertInteger<size_t>(m_TokenType, m_Reader->data());
         if (!m_Reader->read(size))
+            UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
+    }
+
+    void UBJsonTokenizer::skipSizedToken()
+    {
+        if (!next())
+            UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
+        auto size = convertInteger<size_t>(m_TokenType, m_Reader->data());
+        if (!m_Reader->advance(size))
             UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
     }
 }

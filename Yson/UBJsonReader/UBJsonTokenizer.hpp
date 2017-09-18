@@ -42,6 +42,10 @@ namespace Yson
 
         bool read(void* buffer, size_t size, UBJsonTokenType tokenType);
 
+        bool skip();
+
+        bool skip(UBJsonTokenType tokenType);
+
         size_t position() const;
 
         const void* tokenData() const;
@@ -59,6 +63,8 @@ namespace Yson
         }
     private:
         void readSizedToken();
+
+        void skipSizedToken();
 
         std::unique_ptr<BinaryReader> m_Reader;
         UBJsonTokenType m_TokenType;

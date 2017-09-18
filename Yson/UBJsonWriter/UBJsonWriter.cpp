@@ -189,8 +189,8 @@ namespace Yson
         auto& context = m_Contexts.top();
         if (context.valueType == UBJsonValueType::UNKNOWN)
             m_Buffer.push_back('S');
-        writeMinimalInteger(m_Buffer, m_Key.size());
-        m_Buffer.insert(m_Buffer.end(), m_Key.begin(), m_Key.end());
+        writeMinimalInteger(m_Buffer, text.size());
+        m_Buffer.insert(m_Buffer.end(), text.begin(), text.end());
         return *this;
     }
 

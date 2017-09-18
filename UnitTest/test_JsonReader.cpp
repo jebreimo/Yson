@@ -290,13 +290,13 @@ namespace
     void runScript(const std::string& text, const std::string& script)
     {
         JsonReader reader(text.data(), text.size());
-        runScript(reader, script);
+        Y_CALL(runScript(reader, script));
     }
 
     void failingScript(const std::string& text, const std::string& script)
     {
         JsonReader reader(text.data(), text.size());
-        runScript(reader, script.substr(0, script.size() - 1));
+        Y_CALL(runScript(reader, script.substr(0, script.size() - 1)));
         switch (script.back())
         {
         case 'v':

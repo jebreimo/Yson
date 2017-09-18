@@ -71,7 +71,7 @@ namespace
     }
 
     template <typename T, size_t N>
-    void readSuccedes(const char(&doc)[N], T expectedValue)
+    void readSucceeds(const char(&doc)[N], T expectedValue)
     {
         UBJsonReader reader(doc, sizeof(doc) - 1);
         Y_ASSERT(reader.nextValue());
@@ -79,7 +79,7 @@ namespace
     }
 
     template <typename T>
-    void readSuccedes(const std::string& doc, T expectedValue)
+    void readSucceeds(const std::string& doc, T expectedValue)
     {
         UBJsonReader reader(doc.data(), doc.size());
         Y_ASSERT(reader.nextValue());
@@ -97,24 +97,24 @@ namespace
 
     void test_Read()
     {
-        Y_CALL(readSuccedes<int8_t>("i\x80", -128));
-        Y_CALL(readSuccedes<int16_t>("i\x80", -128));
+        Y_CALL(readSucceeds<int8_t>("i\x80", -128));
+        Y_CALL(readSucceeds<int16_t>("i\x80", -128));
         Y_CALL(readFails<uint8_t>("i\x80"));
         Y_CALL(readFails<uint16_t>("i\x80"));
 
-        Y_CALL(readSuccedes<uint8_t>("U\x7F", 127));
-        Y_CALL(readSuccedes<int8_t>("U\x7F", 127));
-        Y_CALL(readSuccedes<uint8_t>("U\x80", 128));
-        Y_CALL(readSuccedes<int16_t>("U\x80", 128));
+        Y_CALL(readSucceeds<uint8_t>("U\x7F", 127));
+        Y_CALL(readSucceeds<int8_t>("U\x7F", 127));
+        Y_CALL(readSucceeds<uint8_t>("U\x80", 128));
+        Y_CALL(readSucceeds<int16_t>("U\x80", 128));
         Y_CALL(readFails<int8_t>("U\x80"));
 
-        Y_CALL(readSuccedes<int8_t>("i\xFF", -1));
+        Y_CALL(readSucceeds<int8_t>("i\xFF", -1));
         Y_CALL(readFails<uint8_t>("i\xFF"));
         Y_CALL(readFails<uint64_t>("i\xFF"));
 
-        Y_CALL(readSuccedes<float>("d\x41\x8c\x00\x00", 17.5));
+        Y_CALL(readSucceeds<float>("d\x41\x8c\x00\x00", 17.5));
 
-        Y_CALL(readSuccedes<int16_t>("Si\x05""32767", 32767));
+        Y_CALL(readSucceeds<int16_t>("Si\x05""32767", 32767));
     }
 
     void test_OptimizedArray()
@@ -134,29 +134,141 @@ namespace
         Y_ASSERT(!reader.nextDocument());
     }
 
+    void runScript(UBJsonReader& reader, const std::string& script)
+    {
+        for (auto c : script)
+        {
+            switch (c)
+            {
+            case 'v':
+                Y_ASSERT(reader.nextValue());
+                break;
+            case 'k':
+                Y_ASSERT(reader.nextKey());
+                break;
+            case '!':
+                Y_ASSERT(!reader.nextValue());
+                break;
+            case '~':
+                Y_ASSERT(!reader.nextKey());
+                break;
+            case 'e':
+                Y_NO_THROW(reader.enter(), std::exception);
+                break;
+            case 'l':
+                Y_NO_THROW(reader.leave(), std::exception);
+                break;
+            case 'd':
+                Y_ASSERT(reader.nextDocument());
+                break;
+            case '^':
+                Y_ASSERT(!reader.nextDocument());
+                break;
+            case 'A':
+                Y_EQUAL(reader.valueType(), ValueType::ARRAY);
+                break;
+            case 'B':
+                Y_EQUAL(reader.valueType(), ValueType::BOOLEAN);
+                break;
+            case 'I':
+                Y_EQUAL(reader.valueType(), ValueType::INTEGER);
+                break;
+            case 'O':
+                Y_EQUAL(reader.valueType(), ValueType::OBJECT);
+                break;
+            case 'S':
+                Y_EQUAL(reader.valueType(), ValueType::STRING);
+                break;
+            case ' ':
+                break;
+            default:
+                Y_FATAL_FAILURE("Test script contains unknown instruction!");
+            }
+        }
+    }
+
+    void runScript(std::pair<const char*, size_t> buffer,
+                   const std::string& script)
+    {
+        UBJsonReader reader(buffer.first, buffer.second);
+        Y_CALL(runScript(reader, script));
+    }
+
+    void failingScript(std::pair<const char*, size_t> buffer,
+                       const std::string& script)
+    {
+        UBJsonReader reader(buffer.first, buffer.second);
+        Y_CALL(runScript(reader, script.substr(0, script.size() - 1)));
+        switch (script.back())
+        {
+        case 'v':
+            Y_ASSERT(!reader.nextValue());
+            break;
+        case 'k':
+            Y_ASSERT(!reader.nextKey());
+            break;
+        case '!':
+            Y_ASSERT(reader.nextValue());
+            break;
+        case 'e':
+            Y_THROWS(reader.enter(), std::exception);
+            break;
+        case 'l':
+            Y_THROWS(reader.leave(), std::exception);
+            break;
+        case 'd':
+            Y_ASSERT(!reader.nextDocument());
+            break;
+        case '^':
+            Y_ASSERT(reader.nextDocument());
+            break;
+        case 'A':
+            Y_NOT_EQUAL(reader.valueType(), ValueType::ARRAY);
+            break;
+        case 'B':
+            Y_NOT_EQUAL(reader.valueType(), ValueType::BOOLEAN);
+            break;
+        case 'I':
+            Y_NOT_EQUAL(reader.valueType(), ValueType::INTEGER);
+            break;
+        case 'O':
+            Y_NOT_EQUAL(reader.valueType(), ValueType::OBJECT);
+            break;
+        case 'S':
+            Y_NOT_EQUAL(reader.valueType(), ValueType::STRING);
+            break;
+        case ' ':
+            break;
+        default:
+            Y_FATAL_FAILURE("Test script contains unknown instruction!");
+        }
+    }
+
+    template <size_t N>
+    std::pair<const char*, size_t> S(const char (&values)[N])
+    {
+        return {values, N - 1};
+    }
+
     void test_OptimizedObject()
     {
-        char doc[] = "{$d#i\x03i\x03Key" "\x41\x8c\x00\x00" "i\x03Kay\x41\x8a\x00\x00"
-                "i\x03Koy\x41\x89\x00\x00";
-        UBJsonReader reader(doc, sizeof(doc) - 1);
-        Y_ASSERT(reader.nextValue());
-        Y_NO_THROW(reader.enter(), YsonException);
-        Y_ASSERT(reader.nextKey());
-        Y_ASSERT(reader.nextValue());
-        Y_ASSERT(reader.nextKey());
-        Y_ASSERT(reader.nextValue());
-        Y_ASSERT(reader.nextKey());
-        Y_ASSERT(reader.nextValue());
-        Y_ASSERT(!reader.nextKey());
-        Y_ASSERT(!reader.nextKey());
-        Y_NO_THROW(reader.leave(), YsonException);
-        Y_ASSERT(!reader.nextValue());
-        Y_ASSERT(!reader.nextDocument());
+        const char doc[] = "{$d#i\x03i\x03Key"
+                           "\x41\x8c\x00\x00"
+                           "i\x03Kay\x41\x8a\x00\x00"
+                           "i\x03Koy\x41\x89\x00\x00";
+        Y_CALL(runScript(S(doc), "v ekvkvkv!!l !^"));
+    }
+
+    void test_EmptyString()
+    {
+        Y_CALL(runScript(S("[{U\02**U\x03}]"), "v ev!l !^"));
+        Y_CALL(runScript(S("{U\02**[U\x03[$U#U\x02\01\02]U\02##SU\x04%%%%}"), "v ekk~l !^"));
     }
 
     Y_TEST(test_Basics,
            test_NextDocumentValue,
            test_Read,
            test_OptimizedArray,
-           test_OptimizedObject);
+           test_OptimizedObject,
+           test_EmptyString);
 }

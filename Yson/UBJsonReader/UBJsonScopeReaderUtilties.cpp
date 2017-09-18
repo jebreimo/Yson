@@ -100,50 +100,36 @@ namespace Yson
 
     void skipKeys(UBJsonTokenizer& tokenizer)
     {
-        auto count = tokenizer.tokenSize();
+        auto count = tokenizer.contentSize();
         for (size_t i = 0; i < count; ++i)
         {
-            if (!tokenizer.next(UBJsonTokenType::STRING_TOKEN))
+            if (!tokenizer.skip(UBJsonTokenType::STRING_TOKEN))
                 UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer);
         }
     }
 
     void skipKeysAndTrivialValues(UBJsonTokenizer& tokenizer)
     {
-        auto count = tokenizer.tokenSize();
+        auto count = tokenizer.contentSize();
         auto contentType = tokenizer.contentType();
         for (size_t i = 0; i < count; ++i)
         {
-            if (!tokenizer.next(UBJsonTokenType::STRING_TOKEN)
-                || !tokenizer.next(contentType))
+            if (!tokenizer.skip(UBJsonTokenType::STRING_TOKEN)
+                || !tokenizer.skip(contentType))
                 UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer);
         }
     }
 
     void skipKeysAndComplexValues(UBJsonTokenizer& tokenizer)
     {
-        auto count = tokenizer.tokenSize();
+        auto count = tokenizer.contentSize();
         auto contentType = tokenizer.contentType();
         for (size_t i = 0; i < count; ++i)
         {
-            if (!tokenizer.next(UBJsonTokenType::STRING_TOKEN)
-                || !tokenizer.next(contentType))
+            if (!tokenizer.skip(UBJsonTokenType::STRING_TOKEN)
+                || !tokenizer.skip(contentType))
                 UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer);
-            switch (tokenizer.tokenType())
-            {
-            case UBJsonTokenType::START_ARRAY_TOKEN:
-            case UBJsonTokenType::START_OBJECT_TOKEN:
-                skipValue(tokenizer);
-                break;
-            case UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN:
-                skipOptimizedArray(tokenizer);
-                break;
-            case UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN:
-                skipOptimizedObject(tokenizer);
-                break;
-            default:
-                UBJSON_READER_UNEXPECTED_TOKEN(tokenizer);
-            }
+            skipValue(tokenizer);
         }
     }
 
@@ -159,38 +145,24 @@ namespace Yson
 
     void skipTrivialValues(UBJsonTokenizer& tokenizer)
     {
-        auto count = tokenizer.tokenSize();
+        auto count = tokenizer.contentSize();
         auto contentType = tokenizer.contentType();
         for (size_t i = 0; i < count; ++i)
         {
-            if (!tokenizer.next(contentType))
+            if (!tokenizer.skip(contentType))
                 UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer);
         }
     }
 
     void skipComplexValues(UBJsonTokenizer& tokenizer)
     {
-        auto count = tokenizer.tokenSize();
+        auto count = tokenizer.contentSize();
         auto contentType = tokenizer.contentType();
         for (size_t i = 0; i < count; ++i)
         {
-            if (!tokenizer.next(contentType))
+            if (!tokenizer.skip(contentType))
                 UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer);
-            switch (tokenizer.tokenType())
-            {
-            case UBJsonTokenType::START_ARRAY_TOKEN:
-            case UBJsonTokenType::START_OBJECT_TOKEN:
-                skipValue(tokenizer);
-                break;
-            case UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN:
-                skipOptimizedArray(tokenizer);
-                break;
-            case UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN:
-                skipOptimizedObject(tokenizer);
-                break;
-            default:
-                UBJSON_READER_UNEXPECTED_TOKEN(tokenizer);
-            }
+            skipValue(tokenizer);
         }
     }
 
@@ -204,16 +176,37 @@ namespace Yson
             skipComplexValues(tokenizer);
     }
 
+    void skipObject(UBJsonTokenizer& tokenizer)
+    {
+        while (tokenizer.skip(UBJsonTokenType::OBJECT_KEY_TOKEN))
+        {
+          if (tokenizer.tokenType() == UBJsonTokenType::END_OBJECT_TOKEN)
+            return;
+          tokenizer.skip();
+          skipValue(tokenizer);
+        }
+    }
+
+    void skipArray(UBJsonTokenizer& tokenizer)
+    {
+        while (tokenizer.skip())
+        {
+          if (tokenizer.tokenType() == UBJsonTokenType::END_ARRAY_TOKEN)
+            return;
+          skipValue(tokenizer);
+        }
+    }
+
     void skipValue(UBJsonTokenizer& tokenizer)
     {
         std::vector<UBJsonTokenType> tokens;
         switch (tokenizer.tokenType())
         {
         case UBJsonTokenType::START_OBJECT_TOKEN:
-            tokens.push_back(UBJsonTokenType::END_OBJECT_TOKEN);
+            skipObject(tokenizer);
             break;
         case UBJsonTokenType::START_ARRAY_TOKEN:
-            tokens.push_back(UBJsonTokenType::END_ARRAY_TOKEN);
+            skipArray(tokenizer);
             break;
         case UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN:
             skipOptimizedObject(tokenizer);
@@ -226,31 +219,7 @@ namespace Yson
         case UBJsonTokenType::END_OBJECT_TOKEN:
             UBJSON_READER_UNEXPECTED_TOKEN(tokenizer);
         default:
-            return;
+            break;
         }
-
-        while (tokenizer.next())
-        {
-            switch (tokenizer.tokenType())
-            {
-            case UBJsonTokenType::START_ARRAY_TOKEN:
-                tokens.push_back(UBJsonTokenType::END_ARRAY_TOKEN);
-                break;
-            case UBJsonTokenType::END_ARRAY_TOKEN:
-            case UBJsonTokenType::END_OBJECT_TOKEN:
-                if (tokens.back() != tokenizer.tokenType())
-                    UBJSON_READER_UNEXPECTED_TOKEN(tokenizer);
-                tokens.pop_back();
-                if (tokens.empty())
-                    return;
-                break;
-            case UBJsonTokenType::START_OBJECT_TOKEN:
-                tokens.push_back(UBJsonTokenType::END_OBJECT_TOKEN);
-                break;
-            default:
-                break;
-            }
-        }
-        UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer);
     }
 }
