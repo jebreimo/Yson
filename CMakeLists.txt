@@ -65,12 +65,14 @@ set(SOURCE_FILES
     Yson/Common/GetUnicodeFileName.hpp
     Yson/Common/GetValueType.cpp
     Yson/Common/GetValueType.hpp
+    Yson/Common/MakeReader.cpp
     Yson/Common/ParseFloatingPoint.cpp
     Yson/Common/ParseFloatingPoint.hpp
     Yson/Common/ParseInteger.cpp
     Yson/Common/ParseInteger.hpp
     Yson/Common/SelectTypeIf.hpp
     Yson/Common/StringView.hpp
+    Yson/Common/ThrowYsonException.hpp
     Yson/Common/UBJsonValueType.cpp
     Yson/Common/ValueType.cpp
     Yson/Common/ValueTypeUtilities.cpp
@@ -144,7 +146,7 @@ set(SOURCE_FILES
     Yson/UBJsonWriter/UBJsonWriter.cpp
     Yson/UBJsonWriter/UBJsonWriterUtilities.cpp
     Yson/UBJsonWriter/UBJsonWriterUtilities.hpp
-    Yson/Common/MakeReader.cpp Yson/Common/ThrowYsonException.hpp)
+    )
 
 add_library(
     ${PROJECT_NAME} SHARED

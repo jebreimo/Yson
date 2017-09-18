@@ -54,7 +54,7 @@ namespace Yson
 
         ContentType identifyFile(const char* contents, size_t size)
         {
-            if (isByteOrderMark(contents, size))
+            if (size == 0 || isByteOrderMark(contents, size))
                 return ContentType::JSON;
             bool allowComma = false;
             std::vector<char> scopes;
@@ -63,8 +63,11 @@ namespace Yson
                 switch (contents[i])
                 {
                 case '{':
+                scopes.push_back('}');
+                    allowComma = false;
+                    break;
                 case '[':
-                    scopes.push_back(contents[i]);
+                    scopes.push_back(']');
                     allowComma = false;
                     break;
                 case '}':

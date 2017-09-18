@@ -19,6 +19,7 @@ set(SOURCE_FILES
     test_JsonReader.cpp
     test_JsonTokenizer.cpp
     test_JsonWriter.cpp
+    test_MakeReader.cpp
     test_ParseDouble.cpp
     test_UBJsonReader.cpp
     test_UBJsonTokenizer.cpp
