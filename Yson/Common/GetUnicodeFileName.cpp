@@ -6,7 +6,7 @@
 
 #include "../../Ystring/Conversion.hpp"
 #include "../../Ystring/YstringException.hpp"
-#include "../YsonException.hpp"
+#include "../Common/ThrowYsonException.hpp"
 
 namespace Yson
 {

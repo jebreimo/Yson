@@ -7,11 +7,11 @@
 //****************************************************************************
 #pragma once
 #include <cstdint>
+#include <memory>
 #include <vector>
 #include <string>
 #include "DetailedValueType.hpp"
 #include "ValueType.hpp"
-#include "YsonDefinitions.hpp"
 #include "YsonReaderException.hpp"
 
 namespace Yson
@@ -110,9 +110,10 @@ namespace Yson
                                   reader.columnNumber());
     }
 
-    std::unique_ptr<Reader> makeReader(std::istream& stream);
+    YSON_API std::unique_ptr<Reader> makeReader(std::istream& stream);
 
-    std::unique_ptr<Reader> makeReader(const std::string& fileName);
+    YSON_API std::unique_ptr<Reader> makeReader(const std::string& fileName);
 
-    std::unique_ptr<Reader> makeReader(const char* buffer, size_t bufferSize);
+    YSON_API std::unique_ptr<Reader> makeReader(const char* buffer,
+                                                size_t bufferSize);
 }
