@@ -35,16 +35,17 @@ namespace Yson
     bool BinaryStreamReader::advance(size_t size)
     {
         m_Start = m_End;
-        auto remainderSize = remainingBytes();
-        if (size < remainderSize)
+        auto remainderSize = remainingBytesAfterValue();
+        if (size <= remainderSize)
         {
             m_End = m_Start += size;
             return true;
         }
         m_End = m_Start += remainderSize;
+        auto originalPos = m_Stream->tellg();
         m_Stream->seekg(std::streamsize(size - remainderSize),
                         std::ios_base::cur);
-        return m_Stream->gcount() == size - remainderSize;
+        return m_Stream->tellg() - originalPos == size - remainderSize;
     }
 
     const void* BinaryStreamReader::data() const
@@ -61,7 +62,7 @@ namespace Yson
     bool BinaryStreamReader::peek(char* value)
     {
         assert(value);
-        if (remainingBytes() != 0 || fillBuffer(1))
+        if (remainingBytesAfterValue() != 0 || fillBuffer(1 + size()))
         {
             *value = *m_End;
             return true;
@@ -73,14 +74,14 @@ namespace Yson
     {
         auto pos = m_Stream->tellg();
         if (pos != std::istream::pos_type(-1))
-            return size_t(pos) - remainingBytes();
+            return size_t(pos) - remainingBytesIncludingValue();
         return 0;
     }
 
     bool BinaryStreamReader::read(size_t size, size_t unitSize)
     {
         m_Start = m_End;
-        auto remainderSize = remainingBytes();
+        auto remainderSize = remainingBytesAfterValue();
         if (size > remainderSize)
         {
             if (!fillBuffer(size))
@@ -95,7 +96,7 @@ namespace Yson
     bool BinaryStreamReader::read(void* buffer, size_t size, size_t unitSize)
     {
         m_Start = m_End;
-        auto remainderSize = remainingBytes();
+        auto remainderSize = remainingBytesAfterValue();
         if (size <= remainderSize)
         {
             m_End = m_Start + size;
@@ -130,7 +131,7 @@ namespace Yson
 
     bool BinaryStreamReader::fillBuffer(size_t size)
     {
-        auto remainderSize = remainingBytes();
+        auto remainderSize = remainingBytesIncludingValue();
         if (m_Buffer.empty())
         {
             m_Buffer.resize(std::max(DEFAULT_BUFFER_SIZE, size));
@@ -152,7 +153,12 @@ namespace Yson
         return contentSize >= size;
     }
 
-    size_t BinaryStreamReader::remainingBytes() const
+    size_t BinaryStreamReader::remainingBytesAfterValue() const
+    {
+        return size_t(m_Buffer.data() + m_Buffer.size() - m_End);
+    }
+
+    size_t BinaryStreamReader::remainingBytesIncludingValue() const
     {
         return size_t(m_Buffer.data() + m_Buffer.size() - m_Start);
     }

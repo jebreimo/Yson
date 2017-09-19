@@ -43,7 +43,9 @@ namespace Yson
     private:
         bool fillBuffer(size_t size);
 
-        size_t remainingBytes() const;
+        size_t remainingBytesAfterValue() const;
+
+        size_t remainingBytesIncludingValue() const;
 
         std::istream* m_Stream;
         std::vector<char> m_Buffer;

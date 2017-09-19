@@ -190,8 +190,14 @@ namespace
     void runScript(std::pair<const char*, size_t> buffer,
                    const std::string& script)
     {
-        UBJsonReader reader(buffer.first, buffer.second);
-        Y_CALL(runScript(reader, script));
+        UBJsonReader bufferReader(buffer.first, buffer.second);
+        Y_CALL(runScript(bufferReader, script));
+        std::stringstream ss(std::ios_base::binary | std::ios_base::in
+                             | std::ios_base::out);
+        ss.write(buffer.first, buffer.second);
+        ss.seekg(0);
+        UBJsonReader streamReader(ss);
+        Y_CALL(runScript(streamReader, script));
     }
 
     void failingScript(std::pair<const char*, size_t> buffer,
@@ -259,7 +265,7 @@ namespace
         Y_CALL(runScript(S(doc), "v ekvkvkv!!l !^"));
     }
 
-    void test_EmptyString()
+    void test_SkipSubstructures()
     {
         Y_CALL(runScript(S("[{U\02**U\x03}]"), "v ev!l !^"));
         Y_CALL(runScript(S("{U\02**[U\x03[$U#U\x02\01\02]U\02##SU\x04%%%%}"), "v ekk~l !^"));
@@ -270,5 +276,5 @@ namespace
            test_Read,
            test_OptimizedArray,
            test_OptimizedObject,
-           test_EmptyString);
+           test_SkipSubstructures);
 }
