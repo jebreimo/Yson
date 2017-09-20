@@ -8,6 +8,7 @@
 #include "JsonTokenizer.hpp"
 
 #include <tuple>
+#include "../Common/DefaultBufferSize.hpp"
 #include "../Common/ThrowYsonException.hpp"
 #include "JsonTokenizerUtilities.hpp"
 #include "TextBufferReader.hpp"
@@ -18,16 +19,19 @@ namespace Yson
     JsonTokenizer::JsonTokenizer(std::istream& stream,
                                  const char* buffer,
                                  size_t bufferSize)
-            : m_TextReader(new TextStreamReader(stream, buffer, bufferSize))
+        : m_TextReader(new TextStreamReader(stream, buffer, bufferSize)),
+          m_ChunkSize(getDefaultBufferSize())
     {}
 
     JsonTokenizer::JsonTokenizer(const std::string& fileName)
-            : m_TextReader(new TextFileReader(fileName)),
-              m_FileName(fileName)
+        : m_TextReader(new TextFileReader(fileName)),
+          m_FileName(fileName),
+          m_ChunkSize(getDefaultBufferSize())
     {}
 
     JsonTokenizer::JsonTokenizer(const char* buffer, size_t bufferSize)
-            : m_TextReader(new TextBufferReader(buffer, bufferSize))
+        : m_TextReader(new TextBufferReader(buffer, bufferSize)),
+          m_ChunkSize(getDefaultBufferSize())
     {}
 
     JsonTokenizer::~JsonTokenizer() = default;

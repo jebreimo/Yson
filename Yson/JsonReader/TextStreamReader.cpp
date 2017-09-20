@@ -11,26 +11,30 @@
 #include <istream>
 #include "../../Ystring/Conversion.hpp"
 #include "../../Ystring/EncodingInfo.hpp"
+#include "../Common/DefaultBufferSize.hpp"
 
 namespace Yson
 {
     using namespace Ystring;
 
     TextStreamReader::TextStreamReader()
-            : m_Stream()
-    {}
+        : m_Stream()
+    {
+        m_Buffer.reserve(getDefaultBufferSize());
+    }
 
     TextStreamReader::TextStreamReader(std::istream& stream,
                                        const char* buffer,
                                        size_t bufferSize,
                                        Encoding_t sourceEncoding)
-            : m_Stream(&stream)
+        : m_Stream(&stream)
     {
         if (sourceEncoding != Encoding::UNKNOWN)
         {
             m_Converter.reset(new Conversion::Converter(
                     sourceEncoding, Ystring::Encoding::UTF_8));
         }
+        m_Buffer.reserve(std::max(getDefaultBufferSize(), bufferSize));
         if (buffer && bufferSize)
             m_Buffer.insert(m_Buffer.end(), buffer, buffer + bufferSize);
     }

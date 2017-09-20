@@ -8,6 +8,7 @@
 #include "../Yson/UBJsonReader.hpp"
 #include "../Externals/Ytest/Ytest.hpp"
 #include "../Yson/YsonException.hpp"
+#include "../Yson/Common/DefaultBufferSize.hpp"
 
 namespace
 {
@@ -106,6 +107,7 @@ namespace
         Y_CALL(readSucceeds<int8_t>("U\x7F", 127));
         Y_CALL(readSucceeds<uint8_t>("U\x80", 128));
         Y_CALL(readSucceeds<int16_t>("U\x80", 128));
+        Y_CALL(readSucceeds<uint32_t>("l\x20\x21\x22\x23", 0x20212223));
         Y_CALL(readFails<int8_t>("U\x80"));
 
         Y_CALL(readSucceeds<int8_t>("i\xFF", -1));
@@ -271,10 +273,32 @@ namespace
         Y_CALL(runScript(S("{U\02**[U\x03[$U#U\x02\01\02]U\02##SU\x04%%%%}"), "v ekk~l !^"));
     }
 
+    void test_MultiBufferValue()
+    {
+        auto globalBufferSize = getDefaultBufferSize();
+        setDefaultBufferSize(10);
+        try
+        {
+            auto buffer = S("SU\x14" "12345678901234567890");
+            std::stringstream ss(std::ios_base::binary | std::ios_base::in
+                                  | std::ios_base::out);
+            ss.write(buffer.first, buffer.second);
+            ss.seekg(0);
+            UBJsonReader reader(ss);
+            reader.nextValue();
+            Y_EQUAL(Yson::read<std::string>(reader), buffer.first);
+        }
+        catch(...)
+        {
+            setDefaultBufferSize(globalBufferSize);
+        }
+    }
+
     Y_TEST(test_Basics,
            test_NextDocumentValue,
            test_Read,
            test_OptimizedArray,
            test_OptimizedObject,
-           test_SkipSubstructures);
+           test_SkipSubstructures,
+           test_MultiBufferValue);
 }

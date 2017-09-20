@@ -8,29 +8,28 @@
 #include "BinaryStreamReader.hpp"
 #include <cassert>
 #include <istream>
+#include "../Common/DefaultBufferSize.hpp"
 #include "FromBigEndian.hpp"
 
 namespace Yson
 {
-    namespace
-    {
-        constexpr size_t DEFAULT_BUFFER_SIZE = 64 * 1024;
-    }
-
     BinaryStreamReader::BinaryStreamReader()
-            : m_Stream(nullptr),
-              m_Start(m_Buffer.data()),
-              m_End(m_Buffer.data())
-    {}
+        : m_Stream(nullptr)
+    {
+        m_Buffer.reserve(getDefaultBufferSize());
+        m_Start = m_End = m_Buffer.data();
+    }
 
     BinaryStreamReader::BinaryStreamReader(std::istream& stream,
                                            const char* buffer,
                                            size_t bufferSize)
-            : m_Stream(&stream),
-              m_Buffer(buffer, buffer ? buffer + bufferSize : buffer),
-              m_Start(m_Buffer.data()),
-              m_End(m_Buffer.data())
-    {}
+        : m_Stream(&stream)
+    {
+        m_Buffer.reserve(getDefaultBufferSize());
+        if (buffer)
+            m_Buffer.assign(buffer, buffer + bufferSize);
+        m_End = m_Start = m_Buffer.data();
+    }
 
     bool BinaryStreamReader::advance(size_t size)
     {
@@ -107,7 +106,7 @@ namespace Yson
         }
 
         if (remainderSize)
-            memcpy(buffer, m_Start, size);
+            memcpy(buffer, m_Start, remainderSize);
         m_End = m_Start += remainderSize;
         m_Stream->read(static_cast<char*>(buffer) + remainderSize,
                        size - remainderSize);
@@ -134,7 +133,7 @@ namespace Yson
         auto remainderSize = remainingBytesIncludingValue();
         if (m_Buffer.empty())
         {
-            m_Buffer.resize(std::max(DEFAULT_BUFFER_SIZE, size));
+            m_Buffer.resize(std::max(m_Buffer.capacity(), size));
         }
         else
         {

@@ -58,6 +58,8 @@ set(SOURCE_FILES
     Yson/Common/AssignInteger.hpp
     Yson/Common/Base64.cpp
     Yson/Common/Base64.hpp
+    Yson/Common/DefaultBufferSize.cpp
+    Yson/Common/DefaultBufferSize.hpp
     Yson/Common/DetailedValueType.cpp
     Yson/Common/GetDetailedValueType.cpp
     Yson/Common/GetDetailedValueType.hpp

@@ -48,8 +48,6 @@ namespace Yson
 
         void setChunkSize(size_t value);
     private:
-        static constexpr size_t DEFAULT_CHUNK_SIZE = 64 * 1024;
-
         bool internalNext();
 
         bool fillBuffer();
@@ -64,6 +62,6 @@ namespace Yson
         size_t m_LineNumber = 1;
         size_t m_ColumnNumber = 1;
         JsonTokenType m_TokenType = JsonTokenType::INVALID_TOKEN;
-        size_t m_ChunkSize = DEFAULT_CHUNK_SIZE;
+        size_t m_ChunkSize;
     };
 }

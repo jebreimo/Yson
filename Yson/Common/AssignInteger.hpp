@@ -69,7 +69,7 @@ namespace Yson
 
     template <typename T, typename U>
     bool assignIntegerImpl(T& destination, U source,
-                           UnsignedSigned, DestinationIsGreater)
+                           UnsignedSigned, DestinationIsGreaterOrEqual)
     {
         if (0 <= source)
         {
@@ -81,7 +81,7 @@ namespace Yson
 
     template <typename T, typename U>
     bool assignIntegerImpl(T& destination, U source,
-                           UnsignedSigned, DestinationIsSmallerOrEqual)
+                           UnsignedSigned, DestinationIsSmaller)
     {
         if (0 <= source && source <= U(std::numeric_limits<T>::max()))
         {
@@ -106,10 +106,18 @@ namespace Yson
                 sizeof(T) < sizeof(U),
                 DestinationIsSmaller,
                 DestinationIsGreaterOrEqual>::type;
-        using DifferentSignednessSizeType = typename SelectTypeIf<
+        using SignedUnsignedSizeType = typename SelectTypeIf<
                 sizeof(U) < sizeof(T),
                 DestinationIsGreater,
                 DestinationIsSmallerOrEqual>::type;
+        using UnsignedSignedSizeType = typename SelectTypeIf<
+                sizeof(U) <= sizeof(T),
+                DestinationIsGreaterOrEqual,
+                DestinationIsSmaller>::type;
+        using DifferentSignednessSizeType = typename SelectTypeIf<
+                std::is_signed<T>::value && std::is_unsigned<U>::value,
+                SignedUnsignedSizeType,
+                UnsignedSignedSizeType>::type;
         using SizeType = typename SelectTypeIf<
                 std::is_signed<T>::value == std::is_signed<U>::value,
                 SameSignednessSizeType,
