@@ -20,23 +20,69 @@ namespace Yson
 {
     #ifdef IS_BIG_ENDIAN
 
-    template <typename T>
-    void appendBigEndian(std::vector<char>& buffer, T value)
+    template <size_t N>
+    void appendBigEndian(std::vector<char>& buffer, const void* value)
     {
-        auto bytes = reinterpret_cast<char*>(&value);
-        buffer.insert(buffer.end(), bytes, bytes + sizeof(value));
+        auto bytes = static_cast<const char*>(&value);
+        buffer.insert(buffer.end(), bytes, bytes + N);
     }
 
     #else
 
-    template <typename T>
-    void appendBigEndian(std::vector<char>& buffer, T value)
+    template <size_t N>
+    void appendBigEndian(std::vector<char>& buffer, const void* value)
     {
         auto first = buffer.size();
-        buffer.resize(first + sizeof(value));
-        auto bytes = reinterpret_cast<char*>(&value);
-        for (unsigned i = 0; i < sizeof(value); ++i)
-            buffer[first + i] = bytes[sizeof(value) - i - 1];
+        buffer.resize(first + N);
+        for (unsigned i = 0; i < N; ++i)
+            buffer[first + i] = static_cast<const char*>(value)[N - i - 1];
+    }
+
+    template <>
+    inline void appendBigEndian<1>(std::vector<char>& buffer, const void* value)
+    {
+        buffer.push_back(static_cast<const char*>(value)[0]);
+    }
+
+    template <>
+    inline void appendBigEndian<2>(std::vector<char>& buffer, const void* value)
+    {
+        auto first = buffer.size();
+        buffer.resize(first + 2);
+        auto dst = buffer.data() + first;
+        auto src = static_cast<const char*>(value);
+        dst[0] = src[1];
+        dst[1] = src[0];
+    }
+
+    template <>
+    inline void appendBigEndian<4>(std::vector<char>& buffer, const void* value)
+    {
+        auto first = buffer.size();
+        buffer.resize(first + 4);
+        auto dst = buffer.data() + first;
+        auto src = static_cast<const char*>(value);
+        dst[0] = src[3];
+        dst[1] = src[2];
+        dst[2] = src[1];
+        dst[3] = src[0];
+    }
+
+    template <>
+    inline void appendBigEndian<8>(std::vector<char>& buffer, const void* value)
+    {
+        auto first = buffer.size();
+        buffer.resize(first + 8);
+        auto dst = buffer.data() + first;
+        auto src = static_cast<const char*>(value);
+        dst[0] = src[7];
+        dst[1] = src[6];
+        dst[2] = src[5];
+        dst[3] = src[4];
+        dst[4] = src[3];
+        dst[5] = src[2];
+        dst[6] = src[1];
+        dst[7] = src[0];
     }
 
     #endif
@@ -52,7 +98,7 @@ namespace Yson
     template <typename IntT>
     void writeValue(std::vector<char>& buffer, IntT value)
     {
-        appendBigEndian(buffer, value);
+        appendBigEndian<sizeof(IntT)>(buffer, &value);
     }
 
     template <>
@@ -71,7 +117,7 @@ namespace Yson
     void writeValueWithMarker(std::vector<char>& buffer, IntT value)
     {
         buffer.push_back(UBJsonValueTraits<IntT>::marker());
-        appendBigEndian(buffer, value);
+        writeValue(buffer, value);
     }
 
     template <typename T, typename U>
