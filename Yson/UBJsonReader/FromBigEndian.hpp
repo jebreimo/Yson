@@ -17,6 +17,13 @@ namespace Yson
 
     inline void fromBigEndian(size_t count, char* buffer, size_t unitSize)
     {}
+
+    template <int N>
+    void fromBigEndian(char* dst, const char* src)
+    {
+        memcpy(dst, src, N);
+    }
+
     #else
 
     template <int N>
@@ -49,6 +56,56 @@ namespace Yson
       std::swap(buffer[1], buffer[6]);
       std::swap(buffer[2], buffer[5]);
       std::swap(buffer[3], buffer[4]);
+    }
+
+    template <int N>
+    void fromBigEndian(void* dst, const void* src)
+    {
+        for (int i = 0; i < N; ++i)
+            dst[i] = src[N - i];
+    }
+
+    template <>
+    inline void fromBigEndian<1>(void* dst, const void* src)
+    {
+        auto cdst = static_cast<char*>(dst);
+        auto csrc = static_cast<const char*>(src);
+        *cdst = *csrc;
+    }
+
+    template <>
+    inline void fromBigEndian<2>(void* dst, const void* src)
+    {
+        auto cdst = static_cast<char*>(dst);
+        auto csrc = static_cast<const char*>(src);
+        cdst[0] = csrc[1];
+        cdst[1] = csrc[0];
+    }
+
+    template <>
+    inline void fromBigEndian<4>(void* dst, const void* src)
+    {
+        auto cdst = static_cast<char*>(dst);
+        auto csrc = static_cast<const char*>(src);
+        cdst[0] = csrc[3];
+        cdst[1] = csrc[2];
+        cdst[2] = csrc[1];
+        cdst[3] = csrc[0];
+    }
+
+    template <>
+    inline void fromBigEndian<8>(void* dst, const void* src)
+    {
+        auto cdst = static_cast<char*>(dst);
+        auto csrc = static_cast<const char*>(src);
+        cdst[0] = csrc[7];
+        cdst[1] = csrc[6];
+        cdst[2] = csrc[5];
+        cdst[3] = csrc[4];
+        cdst[4] = csrc[3];
+        cdst[5] = csrc[2];
+        cdst[6] = csrc[1];
+        cdst[7] = csrc[0];
     }
 
     inline void fromBigEndian(size_t size, char* buffer)

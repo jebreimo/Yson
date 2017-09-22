@@ -26,7 +26,7 @@ namespace Yson
 
         bool peek(char* value) override;
 
-        bool read(size_t size, size_t unitSize) override;
+        bool read(size_t size) override;
 
         size_t size() override;
 
@@ -37,6 +37,5 @@ namespace Yson
         const char* m_TokenEnd;
         const char* m_BufferStart;
         const char* m_BufferEnd;
-        std::vector<char> m_InternalBuffer;
     };
 }

@@ -23,7 +23,7 @@ namespace Yson
 
         bool peek(char* value) override;
 
-        bool read(size_t size, size_t unitSize) override;
+        bool read(size_t size) override;
 
         char front() const override;
 

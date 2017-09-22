@@ -30,10 +30,12 @@ namespace Yson
     {
         Members(UBJsonTokenizer&& tokenizer)
                 : tokenizer(std::move(tokenizer))
-        {}
+        {
+            scopes.reserve(50);
+        }
 
         UBJsonTokenizer tokenizer;
-        std::stack<Scope> scopes;
+        std::vector<Scope> scopes;
         UBJsonArrayReader arrayReader;
         UBJsonDocumentReader documentReader;
         UBJsonObjectReader objectReader;
@@ -52,10 +54,6 @@ namespace Yson
         : UBJsonReader(new Members(UBJsonTokenizer(fileName)))
     {}
 
-    UBJsonReader::UBJsonReader(char* buffer, size_t bufferSize)
-        : UBJsonReader(new Members(UBJsonTokenizer(buffer, bufferSize)))
-    {}
-
     UBJsonReader::UBJsonReader(const char* buffer, size_t bufferSize)
         : UBJsonReader(new Members(UBJsonTokenizer(buffer, bufferSize)))
     {}
@@ -68,8 +66,8 @@ namespace Yson
     UBJsonReader::UBJsonReader(UBJsonReader::Members* members)
         : m_Members(members)
     {
-        m_Members->scopes.push({&m_Members->documentReader,
-                                UBJsonReaderState()});
+        m_Members->scopes.push_back({&m_Members->documentReader,
+                                     UBJsonReaderState()});
     }
 
     UBJsonReader::UBJsonReader(UBJsonReader&&) = default;
@@ -103,19 +101,19 @@ namespace Yson
         if (state == UBJsonReaderState::AT_VALUE)
         {
             if (tokenType == UBJsonTokenType::START_OBJECT_TOKEN)
-                m_Members->scopes.push(
+                m_Members->scopes.push_back(
                         {&m_Members->objectReader,
                          UBJsonReaderState(UBJsonReaderState::AT_START)});
             else if (tokenType == UBJsonTokenType::START_ARRAY_TOKEN)
-                m_Members->scopes.push(
+                m_Members->scopes.push_back(
                         {&m_Members->arrayReader,
                          UBJsonReaderState(UBJsonReaderState::AT_START)});
             else if (tokenType == UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN)
-                m_Members->scopes.push(
+                m_Members->scopes.push_back(
                         {&m_Members->optimizedArrayReader,
                          makeState(m_Members->tokenizer)});
             else if (tokenType == UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN)
-                m_Members->scopes.push(
+                m_Members->scopes.push_back(
                         {&m_Members->optimizedObjectReader,
                          makeState(m_Members->tokenizer)});
             else
@@ -145,7 +143,7 @@ namespace Yson
             while (scopeReader->nextValue(m_Members->tokenizer, state))
             {}
         }
-        m_Members->scopes.pop();
+        m_Members->scopes.pop_back();
         currentScope().state.state = UBJsonReaderState::AFTER_VALUE;
     }
 
@@ -496,18 +494,19 @@ namespace Yson
     void UBJsonReader::assertStateIsKeyOrValue() const
     {
         auto state = currentScope().state.state;
-        if (state != UBJsonReaderState::AT_KEY
-            && state != UBJsonReaderState::AT_VALUE)
+        if (state == UBJsonReaderState::AT_KEY
+            || state == UBJsonReaderState::AT_VALUE)
         {
-            UBJSON_READER_THROW("Current token is not a key or a value.",
-                                m_Members->tokenizer);
+            return;
         }
+        UBJSON_READER_THROW("Current token is not a key or a value.",
+                            m_Members->tokenizer);
     }
 
     UBJsonReader::Scope& UBJsonReader::currentScope() const
     {
         if (m_Members)
-            return m_Members->scopes.top();
+            return m_Members->scopes.back();
         YSON_THROW("Uninitialized UBJsonReader.");
     }
 

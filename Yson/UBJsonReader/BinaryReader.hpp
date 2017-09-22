@@ -23,7 +23,7 @@ namespace Yson
 
         virtual size_t position() const = 0;
 
-        virtual bool read(size_t size, size_t unitSize = 1) = 0;
+        virtual bool read(size_t size) = 0;
 
         virtual bool read(void* buffer, size_t size, size_t unitSize = 1) = 0;
 

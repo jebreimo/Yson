@@ -13,6 +13,7 @@
 #include "../YsonDefinitions.hpp"
 #include "../Common/StringView.hpp"
 #include "BinaryReader.hpp"
+#include "FromBigEndian.hpp"
 #include "UBJsonTokenType.hpp"
 
 namespace Yson
@@ -25,8 +26,6 @@ namespace Yson
                         size_t bufferSize = 0);
 
         UBJsonTokenizer(const std::string& fileName);
-
-        UBJsonTokenizer(char* buffer, size_t bufferSize);
 
         UBJsonTokenizer(const char* buffer, size_t bufferSize);
 
@@ -59,7 +58,12 @@ namespace Yson
         template <typename T>
         T tokenAs() const
         {
-            return *static_cast<const T*>(tokenData());
+            assert(tokenSize() == sizeof(T));
+            T tmp = *static_cast<const T*>(tokenData());
+            T result;
+            fromBigEndian<sizeof(T)>(reinterpret_cast<char*>(&result),
+                                     reinterpret_cast<const char*>(&tmp));
+            return result;
         }
     private:
         void readSizedToken();

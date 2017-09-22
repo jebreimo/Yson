@@ -8,15 +8,26 @@
 #pragma once
 #include <cstdint>
 #include "../Common/ThrowYsonException.hpp"
+#include "FromBigEndian.hpp"
 #include "UBJsonTokenType.hpp"
 
 namespace Yson
 {
-    template <typename T, typename U>
+    template <typename T, typename U,
+              typename std::enable_if<sizeof(U) == 1, int>::type = 0>
     T convertIntegerImpl(const void* value)
     {
-        auto tmp = static_cast<const U*>(value);
         return static_cast<T>(*static_cast<const U*>(value));
+    }
+
+    template <typename T, typename U,
+              typename std::enable_if<sizeof(U) != 1, int>::type = 0>
+    T convertIntegerImpl(const void* value)
+    {
+        U tmp = *static_cast<const U*>(value);
+        U result;
+        fromBigEndian<sizeof(U)>(&result, &tmp);
+        return static_cast<T>(result);
     }
 
     template <typename T>

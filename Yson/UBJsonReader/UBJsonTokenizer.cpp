@@ -8,7 +8,6 @@
 #include "UBJsonTokenizer.hpp"
 #include "BinaryBufferReader.hpp"
 #include "BinaryFileReader.hpp"
-#include "BinaryMutableBufferReader.hpp"
 #include "ThrowUBJsonReaderException.hpp"
 #include "UBJsonTokenizerUtilities.hpp"
 
@@ -23,10 +22,6 @@ namespace Yson
     UBJsonTokenizer::UBJsonTokenizer(const std::string& fileName)
             : m_Reader(new BinaryFileReader(fileName)),
               m_FileName(fileName)
-    {}
-
-    UBJsonTokenizer::UBJsonTokenizer(char* buffer, size_t bufferSize)
-            : m_Reader(new BinaryMutableBufferReader(buffer, bufferSize))
     {}
 
     UBJsonTokenizer::UBJsonTokenizer(const char* buffer, size_t bufferSize)
@@ -71,23 +66,23 @@ namespace Yson
                 return true;
             UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
         case UBJsonTokenType::INT16_TOKEN:
-            if (m_Reader->read(2, 2))
+            if (m_Reader->read(2))
                 return true;
             UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
         case UBJsonTokenType::INT32_TOKEN:
-            if (m_Reader->read(4, 4))
+            if (m_Reader->read(4))
                 return true;
             UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
         case UBJsonTokenType::INT64_TOKEN:
-            if (m_Reader->read(8, 8))
+            if (m_Reader->read(8))
                 return true;
             UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
         case UBJsonTokenType::FLOAT32_TOKEN:
-            if (m_Reader->read(4, 4))
+            if (m_Reader->read(4))
                 return true;
             UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
         case UBJsonTokenType::FLOAT64_TOKEN:
-            if (m_Reader->read(8, 8))
+            if (m_Reader->read(8))
                 return true;
             UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
         case UBJsonTokenType::CHAR_TOKEN:

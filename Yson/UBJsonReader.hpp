@@ -22,8 +22,6 @@ namespace Yson
 
         explicit UBJsonReader(const std::string& fileName);
 
-        UBJsonReader(char* buffer, size_t bufferSize);
-
         UBJsonReader(const char* buffer, size_t bufferSize);
 
         UBJsonReader(std::istream& stream,

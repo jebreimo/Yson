@@ -27,19 +27,13 @@ namespace Yson
 
     const void* BinaryBufferReader::data() const
     {
-        if (m_InternalBuffer.empty())
-            return m_TokenStart;
-        else
-            return m_InternalBuffer.data();
+        return m_TokenStart;
     }
 
     char BinaryBufferReader::front() const
     {
         assert(m_TokenStart != m_TokenEnd);
-        if (m_InternalBuffer.empty())
-            return *m_TokenStart;
-        else
-            return m_InternalBuffer.front();
+        return *m_TokenStart;
     }
 
     bool BinaryBufferReader::peek(char* value)
@@ -57,20 +51,11 @@ namespace Yson
         return m_TokenStart - m_BufferStart;
     }
 
-    bool BinaryBufferReader::read(size_t size, size_t unitSize)
+    bool BinaryBufferReader::read(size_t size)
     {
         auto actualSize = std::min<size_t>(size, m_BufferEnd - m_TokenEnd);
         m_TokenStart = m_TokenEnd;
         m_TokenEnd += actualSize;
-        if (unitSize == 1)
-        {
-            m_InternalBuffer.clear();
-        }
-        else
-        {
-            m_InternalBuffer.assign(m_TokenStart, m_TokenEnd);
-            fromBigEndian(actualSize, m_InternalBuffer.data(), unitSize);
-        }
         return actualSize == size;
     }
 
@@ -79,7 +64,6 @@ namespace Yson
         auto actualSize = std::min<size_t>(size, m_BufferEnd - m_TokenEnd);
         m_TokenStart = m_TokenEnd;
         m_TokenEnd += actualSize;
-        m_InternalBuffer.clear();
         if (actualSize != size)
         {
             // Moves m_TokenStart to the end of the buffer to "emulate"
@@ -96,9 +80,6 @@ namespace Yson
 
     size_t BinaryBufferReader::size()
     {
-        if (m_InternalBuffer.empty())
-            return m_TokenEnd - m_TokenStart;
-        else
-            return m_InternalBuffer.size();
+        return m_TokenEnd - m_TokenStart;
     }
 }

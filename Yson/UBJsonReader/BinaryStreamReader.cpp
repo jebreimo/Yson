@@ -77,7 +77,7 @@ namespace Yson
         return 0;
     }
 
-    bool BinaryStreamReader::read(size_t size, size_t unitSize)
+    bool BinaryStreamReader::read(size_t size)
     {
         m_Start = m_End;
         auto remainderSize = remainingBytesAfterValue();
@@ -87,8 +87,6 @@ namespace Yson
                 return false;
         }
         m_End = m_Start + size;
-        if (unitSize > 1)
-            fromBigEndian(size, m_Start, unitSize);
         return true;
     }
 
