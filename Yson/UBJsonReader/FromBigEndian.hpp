@@ -18,9 +18,58 @@ namespace Yson
     inline void fromBigEndian(size_t count, char* buffer, size_t unitSize)
     {}
     #else
+
+    template <int N>
+    void fromBigEndian(char* buffer)
+    {
+        std::reverse(buffer, buffer + N);
+    }
+
+    template <>
+    inline void fromBigEndian<1>(char* /*buffer*/)
+    {}
+
+    template <>
+    inline void fromBigEndian<2>(char* buffer)
+    {
+      std::swap(buffer[0], buffer[1]);
+    }
+
+    template <>
+    inline void fromBigEndian<4>(char* buffer)
+    {
+      std::swap(buffer[0], buffer[3]);
+      std::swap(buffer[1], buffer[2]);
+    }
+
+    template <>
+    inline void fromBigEndian<8>(char* buffer)
+    {
+      std::swap(buffer[0], buffer[7]);
+      std::swap(buffer[1], buffer[6]);
+      std::swap(buffer[2], buffer[5]);
+      std::swap(buffer[3], buffer[4]);
+    }
+
     inline void fromBigEndian(size_t size, char* buffer)
     {
-        std::reverse(buffer, buffer + size);
+        switch (size)
+        {
+        case 1:
+          break;
+        case 2:
+          fromBigEndian<2>(buffer);
+          break;
+        case 4:
+          fromBigEndian<4>(buffer);
+          break;
+        case 8:
+          fromBigEndian<8>(buffer);
+          break;
+        default:
+          std::reverse(buffer, buffer + size);
+          break;
+        }
     }
 
     inline void fromBigEndian(size_t size, char* buffer, size_t unitSize)
