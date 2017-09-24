@@ -9,6 +9,10 @@
 #include <cstddef>
 #include <string>
 
+#if defined(__clang__) && __clang_major__ >= 9
+    #define YSON_STD_STRINGVIEW
+#endif
+
 #if defined(YSON_STD_STRINGVIEW)
     #include <string_view>
 #elif defined(YSON_EXPERIMENTAL_STRING_VIEW)
