@@ -22,7 +22,7 @@ namespace
         Y_ASSERT(tokenizer.next());
         Y_EQUAL(tokenizer.tokenType(), UBJsonTokenType::INT16_TOKEN);
         Y_EQUAL(tokenizer.tokenSize(), 2);
-        Y_EQUAL(*static_cast<const int16_t*>(tokenizer.tokenData()), 0x1020);
+        Y_EQUAL(tokenizer.tokenAs<int16_t>(), 0x1020);
         Y_ASSERT(tokenizer.next());
         Y_EQUAL(tokenizer.tokenType(), UBJsonTokenType::END_OBJECT_TOKEN);
         Y_EQUAL(tokenizer.tokenSize(), 1);
@@ -38,7 +38,7 @@ namespace
         Y_ASSERT(tokenizer.next());
         Y_EQUAL(tokenizer.tokenType(), expectedTokenType);
         Y_EQUAL(tokenizer.tokenSize(), sizeof(T));
-        Y_EQUAL(*static_cast<const T*>(tokenizer.tokenData()), expectedValue);
+        Y_EQUAL(tokenizer.tokenAs<T>(), expectedValue);
     }
 
     void testStringToken(const std::string& buffer,

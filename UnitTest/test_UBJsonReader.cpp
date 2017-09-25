@@ -121,7 +121,7 @@ namespace
 
     void test_OptimizedArray()
     {
-        char doc[] = "[$d#i\x03" "\x41\x8c\x00\x00" "\x41\x8a\x00\x00"
+        char doc[] = "[$d#I\x00\x03" "\x41\x8c\x00\x00" "\x41\x8a\x00\x00"
                 "\x41\x89\x00\x00";
         UBJsonReader reader(doc, sizeof(doc) - 1);
         Y_ASSERT(reader.nextValue());

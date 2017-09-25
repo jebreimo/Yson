@@ -18,6 +18,15 @@ namespace
         return std::string(s, s + N - 1);
     }
 
+    void test_Integer()
+    {
+        std::ostringstream stream(std::ios_base::out | std::ios_base::binary);
+        UBJsonWriter writer(stream);
+        writer.value(int64_t(0x00FF00FF00FF00FFLL));
+        writer.flush();
+        Y_EQUAL(stream.str(), S("L\x00\xFF\x00\xFF\x00\xFF\x00\xFF"));
+    }
+
     void test_Array()
     {
         std::ostringstream stream(std::ios_base::out | std::ios_base::binary);
@@ -65,7 +74,8 @@ namespace
         Y_EQUAL(stream.str(), S("SU\x06Snorre"));
     }
 
-    Y_TEST(test_Array,
+    Y_TEST(test_Integer,
+           test_Array,
            test_Object,
            test_OptimizedArray,
            test_WriteBinary,

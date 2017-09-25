@@ -112,8 +112,6 @@ set(SOURCE_FILES
     Yson/UBJsonReader/BinaryBufferReader.hpp
     Yson/UBJsonReader/BinaryFileReader.cpp
     Yson/UBJsonReader/BinaryFileReader.hpp
-    Yson/UBJsonReader/BinaryMutableBufferReader.cpp
-    Yson/UBJsonReader/BinaryMutableBufferReader.hpp
     Yson/UBJsonReader/BinaryReader.hpp
     Yson/UBJsonReader/BinaryStreamReader.cpp
     Yson/UBJsonReader/BinaryStreamReader.hpp
@@ -139,7 +137,6 @@ set(SOURCE_FILES
     Yson/UBJsonReader/UBJsonScopeReader.hpp
     Yson/UBJsonReader/UBJsonTokenizer.cpp
     Yson/UBJsonReader/UBJsonTokenizer.hpp
-    Yson/UBJsonReader/UBJsonTokenizerUtilities.cpp
     Yson/UBJsonReader/UBJsonTokenizerUtilities.hpp
     Yson/UBJsonReader/UBJsonTokenType.cpp
     Yson/UBJsonReader/UBJsonTokenType.hpp
