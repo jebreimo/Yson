@@ -61,8 +61,10 @@ namespace Yson
     template <int N>
     void fromBigEndian(void* dst, const void* src)
     {
+        auto cdst = static_cast<char*>(dst);
+        auto csrc = static_cast<const char*>(src);
         for (int i = 0; i < N; ++i)
-            dst[i] = src[N - i];
+            cdst[i] = csrc[N - i];
     }
 
     template <>
