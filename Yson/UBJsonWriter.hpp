@@ -24,11 +24,15 @@ namespace Yson
 
         UBJsonWriter(std::ostream& stream);
 
-        UBJsonWriter(UBJsonWriter&&) = default;
+        UBJsonWriter(const UBJsonWriter&) = delete;
+
+        UBJsonWriter(UBJsonWriter&&) noexcept;
 
         ~UBJsonWriter() override;
 
-        UBJsonWriter& operator=(UBJsonWriter&&) = default;
+        UBJsonWriter& operator=(const UBJsonWriter&) = delete;
+
+        UBJsonWriter& operator=(UBJsonWriter&&) noexcept;
 
         std::ostream& stream();
 
@@ -91,6 +95,9 @@ namespace Yson
 
         UBJsonWriter& flush() override;
     private:
+        UBJsonWriter(std::unique_ptr<std::ostream> streamPtr,
+                     std::ostream* stream);
+
         UBJsonWriter& beginStructure(UBJsonValueType structureType,
                                      const UBJsonParameters& parameters);
 
@@ -104,34 +111,7 @@ namespace Yson
         template <typename T>
         UBJsonWriter& writeFloat(T value);
 
-        struct Context
-        {
-            Context() {}
-
-            Context(UBJsonValueType structureType)
-                    : structureType(structureType)
-            {}
-
-            Context(UBJsonValueType structureType,
-                    ptrdiff_t size,
-                    UBJsonValueType valueType = UBJsonValueType::UNKNOWN)
-                    : index(0),
-                      size(size),
-                      structureType(structureType),
-                      valueType(valueType)
-            {}
-
-            ptrdiff_t index = 0;
-            ptrdiff_t size = -1;
-            UBJsonValueType structureType = UBJsonValueType::UNKNOWN;
-            UBJsonValueType valueType = UBJsonValueType::UNKNOWN;
-        };
-
-        std::unique_ptr<std::ostream> m_StreamPtr;
-        std::ostream* m_Stream;
-        mutable std::vector<char> m_Buffer;
-        std::string m_Key;
-        std::stack<Context> m_Contexts;
-        bool m_StrictIntegerSizes;
+        struct Members;
+        std::unique_ptr<Members> m_Members;
     };
 }

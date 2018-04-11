@@ -20,8 +20,8 @@ namespace Yson
     public:
         JsonWriter(JsonFormatting formatting = JsonFormatting::NONE);
 
-        JsonWriter(const std::string& fileName,
-                   JsonFormatting formatting = JsonFormatting::NONE);
+        explicit JsonWriter(const std::string& fileName,
+                            JsonFormatting formatting = JsonFormatting::NONE);
 
         JsonWriter(std::ostream& stream,
                    JsonFormatting formatting = JsonFormatting::NONE);
@@ -151,7 +151,7 @@ namespace Yson
 
         void write(const char* s, size_t size);
 
-        JsonWriter(std::unique_ptr<std::ostream>&& streamPtr,
+        JsonWriter(std::unique_ptr<std::ostream> streamPtr,
                    std::ostream* stream,
                    JsonFormatting formatting = JsonFormatting::NONE);
 

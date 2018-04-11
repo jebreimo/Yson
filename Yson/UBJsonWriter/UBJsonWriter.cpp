@@ -20,49 +20,96 @@ namespace Yson
     namespace
     {
         size_t MAX_BUFFER_SIZE = 1024 * 1024;
+
+        struct Context
+        {
+            Context() {}
+
+            Context(UBJsonValueType structureType)
+                    : structureType(structureType)
+            {}
+
+            Context(UBJsonValueType structureType,
+                    ptrdiff_t size,
+                    UBJsonValueType valueType = UBJsonValueType::UNKNOWN)
+                    : index(0),
+                      size(size),
+                      structureType(structureType),
+                      valueType(valueType)
+            {}
+
+            ptrdiff_t index = 0;
+            ptrdiff_t size = -1;
+            UBJsonValueType structureType = UBJsonValueType::UNKNOWN;
+            UBJsonValueType valueType = UBJsonValueType::UNKNOWN;
+        };
     }
+
+    struct UBJsonWriter::Members
+    {
+        std::unique_ptr<std::ostream> streamPtr;
+        std::ostream* stream = nullptr;
+        mutable std::vector<char> buffer;
+        std::string key;
+        std::stack<Context> contexts;
+        bool strictIntegerSizes = false;
+    };
 
     UBJsonWriter::UBJsonWriter()
         : UBJsonWriter(std::cout)
     {}
 
     UBJsonWriter::UBJsonWriter(const std::string& fileName)
-        : m_StreamPtr(new std::ofstream(getUnicodeFileName(fileName),
-                                        std::ios_base::binary)),
-          m_Stream(m_StreamPtr.get()),
-          m_StrictIntegerSizes(false)
-    {
-        m_Contexts.push(Context());
-        m_Buffer.reserve(MAX_BUFFER_SIZE);
-    }
+        : UBJsonWriter(std::make_unique<std::ofstream>(getUnicodeFileName(fileName),
+                                                       std::ios_base::binary),
+                       nullptr)
+    {}
 
     UBJsonWriter::UBJsonWriter(std::ostream& stream)
-        : m_Stream(&stream),
-          m_StrictIntegerSizes(false)
+        : UBJsonWriter(std::unique_ptr<std::ostream>(), &stream)
+    {}
+
+    UBJsonWriter::UBJsonWriter(std::unique_ptr<std::ostream> streamPtr,
+                               std::ostream* stream)
+        : m_Members(std::make_unique<Members>())
     {
-        m_Contexts.push(Context());
-        m_Buffer.reserve(MAX_BUFFER_SIZE);
+        m_Members->streamPtr = move(streamPtr);
+        m_Members->stream =  m_Members->streamPtr
+                             ? m_Members->streamPtr.get()
+                             : stream;;
+        m_Members->contexts.push(Context());
+        m_Members->buffer.reserve(MAX_BUFFER_SIZE);
     }
+
+    UBJsonWriter::UBJsonWriter(UBJsonWriter&& other) noexcept
+        : m_Members(move(other.m_Members))
+    {}
 
     UBJsonWriter::~UBJsonWriter()
     {
         UBJsonWriter::flush();
     }
 
+    UBJsonWriter& UBJsonWriter::operator=(UBJsonWriter&& other) noexcept
+    {
+        m_Members = move(other.m_Members);
+        return *this;
+    }
+
     std::ostream& UBJsonWriter::stream()
     {
         flush();
-        return *m_Stream;
+        return *m_Members->stream;
     }
 
     const std::string& UBJsonWriter::key() const
     {
-        return m_Key;
+        return m_Members->key;
     }
 
     UBJsonWriter& UBJsonWriter::key(const std::string& key)
     {
-        m_Key = key;
+        m_Members->key = key;
         return *this;
     }
 
@@ -102,16 +149,16 @@ namespace Yson
     UBJsonWriter& UBJsonWriter::null()
     {
         beginValue();
-        if (m_Contexts.top().valueType == UBJsonValueType::UNKNOWN)
-            m_Buffer.push_back('Z');
+        if (m_Members->contexts.top().valueType == UBJsonValueType::UNKNOWN)
+            m_Members->buffer.push_back('Z');
         return *this;
     }
 
     UBJsonWriter& UBJsonWriter::boolean(bool value)
     {
         beginValue();
-        if (m_Contexts.top().valueType == UBJsonValueType::UNKNOWN)
-            m_Buffer.push_back(value ? 'T' : 'F');
+        if (m_Members->contexts.top().valueType == UBJsonValueType::UNKNOWN)
+            m_Members->buffer.push_back(value ? 'T' : 'F');
         return *this;
     }
 
@@ -149,7 +196,7 @@ namespace Yson
     {
         if (value <= INT16_MAX)
             return writeInteger<int16_t>(value);
-        else if (!m_StrictIntegerSizes)
+        else if (!m_Members->strictIntegerSizes)
             return writeInteger<int32_t>(value);
         YSON_THROW("uint16_t value " + std::to_string(value)
                    + " is greater than INT16_MAX");
@@ -159,7 +206,7 @@ namespace Yson
     {
         if (value <= INT32_MAX)
             return writeInteger<int32_t>(value);
-        else if (!m_StrictIntegerSizes)
+        else if (!m_Members->strictIntegerSizes)
             return writeInteger<int64_t>(value);
         YSON_THROW("uint32_t value " + std::to_string(value)
                    + " is greater than INT32_MAX");
@@ -186,11 +233,12 @@ namespace Yson
     UBJsonWriter& UBJsonWriter::value(const std::string& text)
     {
         beginValue();
-        auto& context = m_Contexts.top();
+        auto& context = m_Members->contexts.top();
         if (context.valueType == UBJsonValueType::UNKNOWN)
-            m_Buffer.push_back('S');
-        writeMinimalInteger(m_Buffer, text.size());
-        m_Buffer.insert(m_Buffer.end(), text.begin(), text.end());
+            m_Members->buffer.push_back('S');
+        writeMinimalInteger(m_Members->buffer, text.size());
+        m_Members->buffer.insert(m_Members->buffer.end(),
+                                 text.begin(), text.end());
         return *this;
     }
 
@@ -206,8 +254,8 @@ namespace Yson
     {
         beginArray(UBJsonParameters(size, UBJsonValueType::UINT_8));
         flush();
-        m_Stream->write(static_cast<const char*>(data), size);
-        m_Contexts.top().index = size;
+        m_Members->stream->write(static_cast<const char*>(data), size);
+        m_Members->contexts.top().index = size;
         return endArray();
     }
 
@@ -218,19 +266,19 @@ namespace Yson
 
     UBJsonWriter& UBJsonWriter::noop()
     {
-        m_Buffer.push_back('N');
+        m_Members->buffer.push_back('N');
         flush();
         return *this;
     }
 
     bool UBJsonWriter::isStrictIntegerSizesEnabled() const
     {
-        return m_StrictIntegerSizes;
+        return m_Members->strictIntegerSizes;
     }
 
     UBJsonWriter& UBJsonWriter::setStrictIntegerSizesEnabled(bool value)
     {
-        m_StrictIntegerSizes = value;
+        m_Members->strictIntegerSizes = value;
         return *this;
     }
 
@@ -242,34 +290,34 @@ namespace Yson
                || structureType == UBJsonValueType::ARRAY);
 
         beginValue();
-        auto& context = m_Contexts.top();
+        auto& context = m_Members->contexts.top();
         if (context.valueType == UBJsonValueType::UNKNOWN)
-            m_Buffer.push_back(char(structureType));
+            m_Members->buffer.push_back(char(structureType));
         if (parameters.size >= 0)
         {
             if (parameters.valueType != UBJsonValueType::UNKNOWN)
             {
-                m_Buffer.push_back('$');
-                m_Buffer.push_back(char(parameters.valueType));
+                m_Members->buffer.push_back('$');
+                m_Members->buffer.push_back(char(parameters.valueType));
             }
-            m_Buffer.push_back('#');
-            writeMinimalInteger(m_Buffer, int64_t(parameters.size));
+            m_Members->buffer.push_back('#');
+            writeMinimalInteger(m_Members->buffer, int64_t(parameters.size));
         }
-        m_Contexts.push(Context(structureType,
-                                parameters.size,
-                                parameters.valueType));
+        m_Members->contexts.push(Context(structureType,
+                                 parameters.size,
+                                 parameters.valueType));
         return *this;
     }
 
     UBJsonWriter& UBJsonWriter::endStructure(UBJsonValueType structureType)
     {
         auto endChar = structureType == UBJsonValueType::OBJECT ? '}' : ']';
-        auto& context = m_Contexts.top();
+        auto& context = m_Members->contexts.top();
         if (context.structureType == structureType)
         {
             if (context.size == -1)
             {
-                m_Buffer.push_back(endChar);
+                m_Members->buffer.push_back(endChar);
             }
             else if (context.index != context.size)
             {
@@ -292,21 +340,23 @@ namespace Yson
             YSON_THROW("Ending structure " + toString(context.structureType)
                        + " as if it was a " + toString(structureType));
         }
-        m_Contexts.pop();
+        m_Members->contexts.pop();
         return *this;
     }
 
     void UBJsonWriter::beginValue()
     {
-        if (m_Buffer.size() >= MAX_BUFFER_SIZE)
+        if (m_Members->buffer.size() >= MAX_BUFFER_SIZE)
             flush();
-        auto& context = m_Contexts.top();
+        auto& context = m_Members->contexts.top();
+        auto& key = m_Members->key;
         if (context.structureType == UBJsonValueType::OBJECT)
         {
-            writeMinimalInteger(m_Buffer, m_Key.size());
-            m_Buffer.insert(m_Buffer.end(), m_Key.begin(), m_Key.end());
+            writeMinimalInteger(m_Members->buffer, m_Members->key.size());
+            m_Members->buffer.insert(m_Members->buffer.end(),
+                                     key.begin(), key.end());
         }
-        m_Key.clear();
+        key.clear();
         if (context.index == context.size)
             YSON_THROW("Already at the end of optimized object or array.");
         ++context.index;
@@ -314,10 +364,11 @@ namespace Yson
 
     UBJsonWriter& UBJsonWriter::flush()
     {
-        if (m_Stream && !m_Buffer.empty())
+        if (m_Members->stream && !m_Members->buffer.empty())
         {
-            m_Stream->write(m_Buffer.data(), m_Buffer.size());
-            m_Buffer.clear();
+            m_Members->stream->write(m_Members->buffer.data(),
+                                     m_Members->buffer.size());
+            m_Members->buffer.clear();
         }
         return *this;
     }
@@ -326,11 +377,11 @@ namespace Yson
     UBJsonWriter& UBJsonWriter::writeFloat(T value)
     {
         beginValue();
-        auto& context = m_Contexts.top();
+        auto& context = m_Members->contexts.top();
         if (context.valueType == UBJsonValueType::UNKNOWN)
-            writeValueWithMarker(m_Buffer, value);
+            writeValueWithMarker(m_Members->buffer, value);
         else
-            writeFloatAs(m_Buffer, value, context.valueType);
+            writeFloatAs(m_Members->buffer, value, context.valueType);
         return *this;
     }
 
@@ -338,17 +389,17 @@ namespace Yson
     UBJsonWriter& UBJsonWriter::writeInteger(T value)
     {
         beginValue();
-        auto& context = m_Contexts.top();
+        auto& context = m_Members->contexts.top();
         if (context.valueType == UBJsonValueType::UNKNOWN)
         {
-            if (!m_StrictIntegerSizes)
-                writeMinimalInteger(m_Buffer, value);
+            if (!m_Members->strictIntegerSizes)
+                writeMinimalInteger(m_Members->buffer, value);
             else
-                writeValueWithMarker(m_Buffer, value);
+                writeValueWithMarker(m_Members->buffer, value);
         }
         else
         {
-            writeIntegerAs(m_Buffer, value, context.valueType);
+            writeIntegerAs(m_Members->buffer, value, context.valueType);
         }
         return *this;
     }

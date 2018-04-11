@@ -87,7 +87,7 @@ namespace Yson
         : JsonWriter(std::unique_ptr<std::ostream>(), &stream, formatting)
     {}
 
-    JsonWriter::JsonWriter(std::unique_ptr<std::ostream>&& streamPtr,
+    JsonWriter::JsonWriter(std::unique_ptr<std::ostream> streamPtr,
                            std::ostream* stream,
                            JsonFormatting formatting)
         : m_Members(new Members)
