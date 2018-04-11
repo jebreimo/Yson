@@ -98,6 +98,10 @@ namespace Yson
         UBJsonWriter(std::unique_ptr<std::ostream> streamPtr,
                      std::ostream* stream);
 
+        struct Members;
+
+        Members& members() const;
+
         UBJsonWriter& beginStructure(UBJsonValueType structureType,
                                      const UBJsonParameters& parameters);
 
@@ -111,7 +115,6 @@ namespace Yson
         template <typename T>
         UBJsonWriter& writeFloat(T value);
 
-        struct Members;
         std::unique_ptr<Members> m_Members;
     };
 }

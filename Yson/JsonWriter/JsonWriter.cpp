@@ -497,7 +497,7 @@ namespace Yson
     {
         if (m_Members)
             return *m_Members;
-        YSON_THROW("The members of this JsonWriter instance has been moved to another instance.");
+        YSON_THROW("The members of this JsonWriter instance have been moved to another instance.");
     }
 
     void JsonWriter::beginValue()
