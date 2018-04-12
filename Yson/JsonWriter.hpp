@@ -18,8 +18,21 @@ namespace Yson
     class YSON_API JsonWriter : public Writer
     {
     public:
+        /**
+         * @brief Creates a JSON writer that writes to an internal buffer.
+         *
+         * The buffer can be retrieved with the buffer() function.
+         *
+         * @param formatting the automatic formatting that will be used.
+         */
         JsonWriter(JsonFormatting formatting = JsonFormatting::NONE);
 
+        /**
+         * @brief Creates a JSON writer that creates and writes to a file
+         *      named @a fileName.
+         * @param fileName The UTF-8 encoded name of the file.
+         * @param formatting the automatic formatting that will be used.
+         */
         explicit JsonWriter(const std::string& fileName,
                             JsonFormatting formatting = JsonFormatting::NONE);
 
@@ -36,7 +49,9 @@ namespace Yson
 
         JsonWriter& operator=(JsonWriter&& rhs) noexcept;
 
-        std::ostream* stream();
+        std::ostream* stream() override;
+
+        std::pair<const void*, size_t> buffer() const override;
 
         const std::string& key() const override;
 

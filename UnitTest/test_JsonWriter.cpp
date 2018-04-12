@@ -126,6 +126,25 @@ namespace
         Y_EQUAL(ss.str(), expected);
     }
 
+
+    void test_SimpleObject_NoStream()
+    {
+        JsonWriter writer(JsonFormatting::FORMAT);
+        writer.beginObject()
+            .key("name")
+            .beginObject()
+            .endObject()
+            .endObject().flush();
+        std::string expected =
+                "{\n"
+                "  \"name\": {}\n"
+                "}";
+        auto bufferAndSize = writer.buffer();
+        std::string s(static_cast<const char*>(bufferAndSize.first),
+                      bufferAndSize.second);
+        Y_EQUAL(s, expected);
+    }
+
     template <typename T>
     void doTestInteger(T value,
                       const std::string& expected)
@@ -217,6 +236,7 @@ namespace
            test_ManualFormatting,
            test_SemiManualFormatting,
            test_SimpleObject,
+           test_SimpleObject_NoStream,
            test_Integers,
            test_FloatingPointValues,
            test_FloatingPointInfinity,

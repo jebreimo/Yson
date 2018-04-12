@@ -23,6 +23,8 @@ namespace Yson
 {
     namespace
     {
+        constexpr size_t MAX_BUFFER_SIZE = 64 * 1024;
+
         struct Context
         {
             Context() = default;
@@ -51,8 +53,6 @@ namespace Yson
             AT_START_OF_LINE_BEFORE_COMMA,
             AFTER_COMMA
         };
-
-        size_t MAX_BUFFER_SIZE = 1024 * 1024;
     }
 
     struct JsonWriter::Members
@@ -63,17 +63,18 @@ namespace Yson
         std::string indentation;
         std::string key;
         std::array<char, 256> sprintfBuffer;
-        std::string buffer;
+        std::vector<char> buffer;
+        size_t maxBufferSize = MAX_BUFFER_SIZE;
         State state = AT_START_OF_VALUE_NO_COMMA;
         unsigned indentationWidth = 2;
         int languagExtensions = 0;
+        int floatingPointPrecision = 9;
         bool formattingEnabled = true;
         char indentationCharacter = ' ';
-        int floatingPointPrecision = 9;
     };
 
     JsonWriter::JsonWriter(JsonFormatting formatting)
-        : JsonWriter(std::unique_ptr<std::ostream>(), &std::cout, formatting)
+        : JsonWriter(std::unique_ptr<std::ostream>(), nullptr, formatting)
     {}
 
     JsonWriter::JsonWriter(const std::string& fileName,
@@ -101,6 +102,8 @@ namespace Yson
                      : JsonFormatting::NONE;
         m_Members->contexts.push(Context('\0', formatting));
         m_Members->buffer.reserve(MAX_BUFFER_SIZE);
+        if (!m_Members->stream)
+            m_Members->maxBufferSize = SIZE_MAX;
     }
 
     JsonWriter::JsonWriter(JsonWriter&& rhs) noexcept
@@ -123,6 +126,14 @@ namespace Yson
     {
         flush();
         return members().stream;
+    }
+
+    std::pair<const void*, size_t> JsonWriter::buffer() const
+    {
+        auto& m = members();
+        if (m.stream)
+            return {nullptr, 0};
+        return {m.buffer.data(), m.buffer.size()};
     }
 
     const std::string& JsonWriter::key() const
@@ -371,7 +382,7 @@ namespace Yson
             return *this;
 
         auto& m = members();
-        m.buffer.append(count, ' ');
+        m.buffer.resize(m.buffer.size() + count, ' ');
         switch (m.state)
         {
         case AT_START_OF_LINE_NO_COMMA:
@@ -460,31 +471,34 @@ namespace Yson
     JsonWriter& JsonWriter::flush()
     {
         auto& m = members();
-        *m.stream << m.buffer;
-        m.buffer.clear();
+        if (m.stream && !m.buffer.empty())
+        {
+            m.stream->write(m.buffer.data(), m.buffer.size());
+            m.buffer.clear();
+        }
         return *this;
     }
 
     void JsonWriter::write(const std::string& s)
     {
         auto& m = members();
-        if (m.buffer.size() + s.size() <= MAX_BUFFER_SIZE)
+        if (m.buffer.size() + s.size() <= m.maxBufferSize)
         {
-            m.buffer.append(s);
+            m.buffer.insert(m.buffer.end(), s.begin(), s.end());
         }
         else
         {
             flush();
-            *m.stream << s;
+            m.stream->write(s.data(), s.size());
         }
     }
 
     void JsonWriter::write(const char* s, size_t size)
     {
         auto& m = members();
-        if (m.buffer.size() + size <= MAX_BUFFER_SIZE)
+        if (m.buffer.size() + size <= m.maxBufferSize)
         {
-            m.buffer.append(s, size);
+            m.buffer.insert(m.buffer.end(), s, s + size);
         }
         else
         {

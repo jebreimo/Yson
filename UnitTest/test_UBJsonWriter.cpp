@@ -47,6 +47,17 @@ namespace
         Y_EQUAL(stream.str(), S("{U\x03Keyl\xFF\xBB\x77\x33}"));
     }
 
+    void test_Object_NoStream()
+    {
+        UBJsonWriter writer;
+        writer.beginObject().key("Key").value(
+                int32_t(0xFFBB7733)).endObject().flush();
+        auto bufferAndSize = writer.buffer();
+        std::string s(static_cast<const char*>(bufferAndSize.first),
+                      bufferAndSize.second);
+        Y_EQUAL(s, S("{U\x03Keyl\xFF\xBB\x77\x33}"));
+    }
+
     void test_OptimizedArray()
     {
         std::ostringstream stream(std::ios_base::out | std::ios_base::binary);
@@ -77,6 +88,7 @@ namespace
     Y_TEST(test_Integer,
            test_Array,
            test_Object,
+           test_Object_NoStream,
            test_OptimizedArray,
            test_WriteBinary,
            test_WriteString);

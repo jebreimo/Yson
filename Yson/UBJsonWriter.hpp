@@ -34,7 +34,9 @@ namespace Yson
 
         UBJsonWriter& operator=(UBJsonWriter&&) noexcept;
 
-        std::ostream& stream();
+        std::ostream* stream() override;
+
+        std::pair<const void*, size_t> buffer() const override;
 
         const std::string& key() const override;
 

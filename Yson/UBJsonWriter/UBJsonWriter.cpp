@@ -19,11 +19,11 @@ namespace Yson
 {
     namespace
     {
-        size_t MAX_BUFFER_SIZE = 1024 * 1024;
+        constexpr size_t MAX_BUFFER_SIZE = 64 * 1024;
 
         struct Context
         {
-            Context() {}
+            Context() = default;
 
             Context(UBJsonValueType structureType,
                     ptrdiff_t size,
@@ -48,11 +48,12 @@ namespace Yson
         mutable std::vector<char> buffer;
         std::string key;
         std::stack<Context> contexts;
+        size_t maxBufferSize = MAX_BUFFER_SIZE;
         bool strictIntegerSizes = false;
     };
 
     UBJsonWriter::UBJsonWriter()
-        : UBJsonWriter(std::cout)
+        : UBJsonWriter(std::unique_ptr<std::ostream>(), nullptr)
     {}
 
     UBJsonWriter::UBJsonWriter(const std::string& fileName)
@@ -72,9 +73,11 @@ namespace Yson
         m_Members->streamPtr = move(streamPtr);
         m_Members->stream =  m_Members->streamPtr
                              ? m_Members->streamPtr.get()
-                             : stream;;
+                             : stream;
         m_Members->contexts.push(Context());
         m_Members->buffer.reserve(MAX_BUFFER_SIZE);
+        if (!m_Members->stream)
+            m_Members->maxBufferSize = SIZE_MAX;
     }
 
     UBJsonWriter::UBJsonWriter(UBJsonWriter&& other) noexcept
@@ -92,10 +95,18 @@ namespace Yson
         return *this;
     }
 
-    std::ostream& UBJsonWriter::stream()
+    std::ostream* UBJsonWriter::stream()
     {
         flush();
-        return *members().stream;
+        return members().stream;
+    }
+
+    std::pair<const void*, size_t> UBJsonWriter::buffer() const
+    {
+        auto& m = members();
+        if (m.stream)
+            return {nullptr, 0};
+        return {m.buffer.data(), m.buffer.size()};
     }
 
     const std::string& UBJsonWriter::key() const
@@ -355,7 +366,7 @@ namespace Yson
     void UBJsonWriter::beginValue()
     {
         auto& m = members();
-        if (m.buffer.size() >= MAX_BUFFER_SIZE)
+        if (m.buffer.size() >= m.maxBufferSize)
             flush();
         auto& context = m.contexts.top();
         auto& key = m.key;

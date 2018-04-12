@@ -18,8 +18,31 @@ namespace Yson
     public:
         virtual ~Writer() = default;
 
+        virtual std::ostream* stream() = 0;
+
+        /**
+         * @brief Returns the writer's internal buffer.
+         *
+         * The buffer is only available if the writer isn't associated with
+         * a stream (i.e. stream() returns nullptr). If the writer is
+         * associated with a stream, this function returns nullptr and 0.
+         *
+         * @return A pointer to the buffer and the buffer's size.
+         */
+        virtual std::pair<const void*, size_t> buffer() const = 0;
+
         virtual const std::string& key() const = 0;
 
+        /**
+         * @brief Sets the key (or name) of the next value in an object.
+         *
+         * The key is ignored if the current structure isn't an object (i.e.
+         * array or at the start of the start of the document).
+         *
+         * @param key the value name. Non-JSON characters in @a key are
+         *      automatically escaped.
+         * @return A reference to the instance.
+         */
         virtual Writer& key(const std::string& key) = 0;
 
         virtual Writer& beginArray() = 0;
