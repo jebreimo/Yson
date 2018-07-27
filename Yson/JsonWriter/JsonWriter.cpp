@@ -272,7 +272,6 @@ namespace Yson
     JsonWriter& JsonWriter::rawValue(const std::string& value)
     {
         beginValue();
-        auto& m = members();
         write(value);
         members().state = AT_END_OF_VALUE;
         return *this;
