@@ -9,7 +9,7 @@ fi
 
 if [ $# == 1 ]
 then
-    set INSTALL_DIR="-DCMAKE_PREFIX_PATH=$1"
+    set INSTALL_DIR="-DCMAKE_INSTALL_PREFIX=$1"
 else
     set INSTALL_DIR=
 fi
