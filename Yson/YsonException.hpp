@@ -12,7 +12,11 @@
 namespace Yson
 {
     #ifndef _NOEXCEPT
-        #define _NOEXCEPT
+        #if (defined(_MSC_VER)) && (_MSC_VER < 1910)
+            #define _NOEXCEPT
+        #else
+            #define _NOEXCEPT noexcept
+        #endif
     #endif
 
     /** @brief The exception class used by all functions in the Yson library.
