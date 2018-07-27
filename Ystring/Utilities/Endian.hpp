@@ -7,6 +7,7 @@
 //****************************************************************************
 #pragma once
 
+#include <type_traits>
 #include "../Endianness.hpp"
 #include "../PlatformDetails.hpp"
 #include "Union16.hpp"
@@ -60,6 +61,14 @@ namespace Ystring { namespace Utilities
     inline int32_t reverseBytes(int32_t v)
     {
         return (int32_t)reverseBytes((char32_t)v);
+    }
+
+    inline wchar_t reverseBytes(wchar_t v)
+    {
+        auto alias = reinterpret_cast<uint8_t*>(v);
+        for (int i = 0; i < sizeof(v) / 2; ++i)
+            alias[i] = alias[sizeof(v) - i - 1];
+        return v;
     }
 
     inline Union16 reverseBytes(Union16 value)
