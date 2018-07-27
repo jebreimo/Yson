@@ -5,6 +5,7 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
+#include <algorithm>
 #include <fstream>
 #include "../../Ystring/EncodingInfo.hpp"
 #include "../Common/GetUnicodeFileName.hpp"
