@@ -7,6 +7,7 @@
 //****************************************************************************
 #include "Converter.hpp"
 
+#include <cstring>
 #include <vector>
 #include "../EncodingInfo.hpp"
 #include "../PrivatePlatformDetails.hpp"
