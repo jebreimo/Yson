@@ -6,7 +6,9 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "BinaryStreamReader.hpp"
+
 #include <cassert>
+#include <cstring>
 #include <istream>
 #include "../Common/DefaultBufferSize.hpp"
 #include "FromBigEndian.hpp"
