@@ -6,7 +6,9 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "BinaryBufferReader.hpp"
+
 #include <cassert>
+#include <cstring>
 #include "FromBigEndian.hpp"
 
 namespace Yson
