@@ -7,8 +7,15 @@ then
     mkdir release.Yson
 fi
 
+if [ $# == 1 ]
+then
+    set INSTALL_DIR="-DCMAKE_PREFIX_PATH=$1"
+else
+    set INSTALL_DIR=
+fi
+
 cd release.Yson
-cmake -DCMAKE_BUILD_TYPE=Release $YSON_DIR
+cmake -DCMAKE_BUILD_TYPE=Release $INSTALL_DIR $YSON_DIR
 make install
 cd ..
 
@@ -18,6 +25,6 @@ then
 fi
 
 cd debug.Yson
-cmake -DCMAKE_BUILD_TYPE=Debug $YSON_DIR
+cmake -DCMAKE_BUILD_TYPE=Debug $INSTALL_DIR $YSON_DIR
 make install
 cd ..
