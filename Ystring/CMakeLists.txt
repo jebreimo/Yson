@@ -5,7 +5,7 @@
 ## This file is distributed under the Simplified BSD License.
 ## License text is included with the source distribution.
 ##****************************************************************************
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
 project(Yson_Ystring)
 
 set(PRIVATE_HEADERS
@@ -67,3 +67,5 @@ add_library(
     ${PRIVATE_HEADERS}
     ${SOURCE_FILES}
     )
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE Ystring=Yson_Ystring)

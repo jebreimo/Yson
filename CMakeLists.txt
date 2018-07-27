@@ -5,21 +5,12 @@
 ## This file is distributed under the Simplified BSD License.
 ## License text is included with the source distribution.
 ##****************************************************************************
-cmake_minimum_required(VERSION 2.8)
-project(Yson)
+cmake_minimum_required(VERSION 3.5)
+project(Yson VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
-
-add_definitions(-DYstring=Yson_Ystring)
-
-if(WIN32)
-    add_definitions(-D_SCL_SECURE_NO_WARNINGS
-                    -D_CRT_SECURE_NO_WARNINGS
-                    -DYSON_EXPORTS
-                    -DYSTRING_NO_AUTO_IMPORT)
-endif(WIN32)
 
 add_subdirectory(Ystring)
 
@@ -153,6 +144,16 @@ add_library(
     $<TARGET_OBJECTS:Yson_Ystring>
     )
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE Ystring=Yson_Ystring)
+
+if (WIN32)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        _SCL_SECURE_NO_WARNINGS
+        _CRT_SECURE_NO_WARNINGS
+        YSON_EXPORTS
+        YSTRING_NO_AUTO_IMPORT)
+endif (WIN32)
+
 set_target_properties(
     ${PROJECT_NAME}
     PROPERTIES
@@ -168,6 +169,11 @@ endif(HAS_YTEST)
 
 add_subdirectory(Miscellaneous)
 
-install(TARGETS ${PROJECT_NAME} DESTINATION lib)
+include(GNUInstallDirs)
+install(TARGETS ${PROJECT_NAME}
+    EXPORT yson-export
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
 install(FILES ${PUBLIC_HEADER_FILES}
     DESTINATION include/${PROJECT_NAME})
