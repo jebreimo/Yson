@@ -17,6 +17,7 @@
 #include "ThrowJsonReaderException.hpp"
 #include "../Common/ParseFloatingPoint.hpp"
 #include "../Common/ParseInteger.hpp"
+#include "../Common/IsJavaScriptIdentifier.hpp"
 
 namespace Yson
 {
@@ -162,7 +163,16 @@ namespace Yson
             }
             return ValueType::STRING;
         case JsonTokenType::VALUE:
-            return getValueType(m_Members->tokenizer.token());
+            {
+                auto type = getValueType(m_Members->tokenizer.token());
+                if (type != ValueType::INVALID
+                    || m_Members->scopes.top().second != JsonReaderState::AT_KEY
+                    || !isJavaScriptIdentifier(m_Members->tokenizer.token()))
+                {
+                    return type;
+                }
+                return ValueType::STRING;
+            }
         default:
             return ValueType::INVALID;
         }
@@ -187,7 +197,16 @@ namespace Yson
             }
             return DetailedValueType::STRING;
         case JsonTokenType::VALUE:
-            return getDetailedValueType(m_Members->tokenizer.token());
+            {
+                auto type = getDetailedValueType(m_Members->tokenizer.token());
+                if (type != DetailedValueType::INVALID
+                    || m_Members->scopes.top().second != JsonReaderState::AT_KEY
+                    || !isJavaScriptIdentifier(m_Members->tokenizer.token()))
+                {
+                    return type;
+                }
+                return DetailedValueType::STRING;
+            }
         default:
             return DetailedValueType::INVALID;
         }

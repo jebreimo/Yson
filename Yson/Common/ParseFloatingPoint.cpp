@@ -48,9 +48,9 @@ namespace Yson
             auto value = T(getDigit(str[i]));
             if (value > 9)
             {
-                if (str == "infinity" || str == "null" || str == "+infinity")
+                if (str == "Infinity" || str == "null" || str == "+Infinity")
                     return Result(std::numeric_limits<T>::infinity(), true);
-                if (str == "-infinity")
+                if (str == "-Infinity")
                     return Result(-std::numeric_limits<T>::infinity(), true);
                 if (str == "NaN")
                     return Result(std::numeric_limits<T>::quiet_NaN(), true);

@@ -7,9 +7,9 @@
 //****************************************************************************
 #pragma once
 
-#include <string>
+#include "StringView.hpp"
 
 namespace Yson
 {
-    bool isJavaScriptIdentifier(const std::string& str);
+    bool isJavaScriptIdentifier(const std::string_view& str);
 }

@@ -104,6 +104,13 @@ namespace
                              "\\\\\\\""));
     }
 
+    void test_SingleQuotedStringTokens()
+    {
+        Y_CALL(testNextToken("''", JsonTokenType::STRING, ""));
+        Y_CALL(testNextToken("'foo \\'bar\\' baz'", JsonTokenType::STRING,
+                             "foo \\'bar\\' baz"));
+    }
+
     void test_Newlines()
     {
         Y_CALL(testNextToken("\r\"string\"", JsonTokenType::STRING, "string"));
@@ -156,5 +163,6 @@ namespace
            test_Comments,
            test_Value,
            test_ValueTokens,
-           test_Whitespaces);
+           test_Whitespaces,
+           test_SingleQuotedStringTokens);
 }

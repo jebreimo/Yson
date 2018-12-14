@@ -222,6 +222,20 @@ namespace
         Y_CALL(assertRead<std::string>("\"100\\t200\\r\"", "100\t200\r"));
     }
 
+    void test_read_single_quoted_string()
+    {
+        Y_CALL(assertRead<std::string>("'100'", "100"));
+        Y_CALL(assertRead<std::string>("'100\\n'", "100\n"));
+        Y_CALL(assertRead<std::string>("'100\\t200\\r'", "100\t200\r"));
+        Y_CALL(assertRead<std::string>("'10\"0'", "10\"0"));
+        Y_CALL(assertRead<std::string>("'10\\'0'", "10'0"));
+    }
+
+    void test_surrogate_pair()
+    {
+        Y_CALL(assertRead<std::string>("'\\uD83C\\uDFBC'", "\360\237\216\274"));
+    }
+
     void test_read_binary()
     {
         std::string doc = "\"SGVsbG8=\"";
@@ -366,6 +380,21 @@ namespace
         Y_CALL(failingScript(R"({"a":2})", "vekve"));
     }
 
+    void test_object_with_unquoted_keys()
+    {
+        char text[] = R"({key: 123)";
+        JsonReader reader(text, sizeof(text));
+
+        Y_ASSERT(reader.nextValue());
+        reader.enter();
+        Y_ASSERT(reader.nextKey());
+        Y_EQUAL(read<std::string>(reader), "key");
+        Y_EQUAL(reader.valueType(true), ValueType::STRING);
+        Y_EQUAL(reader.detailedValueType(true), DetailedValueType::STRING);
+        Y_ASSERT(reader.nextValue());
+        Y_EQUAL(read<std::string>(reader), "123");
+    }
+
     void test_non_ASCII_characters()
     {
         Y_CALL(runScript(R"("º")", "vS!^"));
@@ -412,10 +441,13 @@ namespace
            test_read_floating_point,
            test_read_integer,
            test_read_string,
+           test_read_single_quoted_string,
+           test_surrogate_pair,
            test_read_binary,
            test_array,
            test_document,
            test_object,
+           test_object_with_unquoted_keys,
            test_non_ASCII_characters,
            test_end_of_document,
            test_EscapedString,

@@ -42,7 +42,7 @@
                 : StringView(nullptr, 0)
             {}
 
-            StringView(const char* data)
+            explicit StringView(const char* data)
                 : StringView(data, std::strlen(data))
             {}
 

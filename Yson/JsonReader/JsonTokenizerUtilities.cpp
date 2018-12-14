@@ -12,7 +12,8 @@
 
 namespace Yson
 {
-    Result nextStringToken(std::string_view string, bool isEndOfFile);
+    Result nextStringToken(std::string_view string, bool isEndOfFile,
+                           char quotes);
 
     JsonTokenType determineCommentType(std::string_view string);
 
@@ -55,7 +56,9 @@ namespace Yson
         case ',':
             return Result(JsonTokenType::COMMA, string.begin() + 1);
         case '"':
-            return nextStringToken(string, isEndOfFile);
+            return nextStringToken(string, isEndOfFile, '"');
+        case '\'':
+            return nextStringToken(string, isEndOfFile, '\'');
         case '/':
             return nextCommentToken(string, isEndOfFile);
         default:
@@ -63,10 +66,10 @@ namespace Yson
         }
     }
 
-    Result nextStringToken(std::string_view string, bool isEndOfFile)
+    Result nextStringToken(std::string_view string, bool isEndOfFile, char quotes)
     {
         assert(!string.empty());
-        assert(string[0] == '\"');
+        assert(string[0] == quotes);
         bool valid = true;
         bool escape = false;
         for (auto it = string.begin() + 1; it != string.end(); ++it)
@@ -81,7 +84,7 @@ namespace Yson
             {
                 escape = false;
             }
-            else if (*it == '"')
+            else if (*it == quotes)
             {
                 return Result(valid ? JsonTokenType::STRING
                                     : JsonTokenType::INVALID_TOKEN, ++it);

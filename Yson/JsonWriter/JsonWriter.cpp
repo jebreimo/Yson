@@ -17,7 +17,7 @@
 #include "../Common/Base64.hpp"
 #include "../Common/GetUnicodeFileName.hpp"
 #include "../Common/ThrowYsonException.hpp"
-#include "IsJavaScriptIdentifier.hpp"
+#include "../Common/IsJavaScriptIdentifier.hpp"
 
 namespace Yson
 {
