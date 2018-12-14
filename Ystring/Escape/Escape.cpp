@@ -62,7 +62,30 @@ namespace Ystring
             char32_t ch;
             first = last;
             if (unescape(ch, first, str.end()))
-                Encodings::addUtf8(back_inserter(result), ch);
+            {
+                if ((ch & 0xFC00) != 0xD800
+                    || first == str.end() || *first != '\\')
+                {
+                    Encodings::addUtf8(back_inserter(result), ch);
+                }
+                else
+                {
+                    char32_t ch2;
+                    if (unescape(ch2, first, str.end())
+                        && (ch2 & 0xFC00) == 0xDC00)
+                    {
+                        ch -= 0xD800;
+                        ch *= 0x400;
+                        ch += ch2 - 0xDC00 + 0x10000;
+                        Encodings::addUtf8(back_inserter(result), ch);
+                    }
+                    else
+                    {
+                        Encodings::addUtf8(back_inserter(result), ch);
+                        Encodings::addUtf8(back_inserter(result), ch2);
+                    }
+                }
+            }
             last = std::find(first, str.end(), '\\');
         }
         result.append(first, str.end());
