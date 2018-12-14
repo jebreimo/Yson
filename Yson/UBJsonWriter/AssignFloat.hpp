@@ -28,7 +28,7 @@ namespace Yson
     {
         if ((std::numeric_limits<T>::min() <= source
              && source <= std::numeric_limits<T>::max())
-            || !isfinite(source))
+            || !std::isfinite(source))
         {
             destination = static_cast<T>(source);
             return true;

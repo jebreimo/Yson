@@ -13,6 +13,8 @@ namespace Yson
     class BinaryReader
     {
     public:
+        virtual ~BinaryReader() = default;
+
         virtual bool advance(size_t count) = 0;
 
         virtual const void* data() const = 0;

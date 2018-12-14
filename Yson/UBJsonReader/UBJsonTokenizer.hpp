@@ -21,11 +21,11 @@ namespace Yson
     class YSON_API UBJsonTokenizer
     {
     public:
-        UBJsonTokenizer(std::istream& stream,
-                        const char* buffer = nullptr,
-                        size_t bufferSize = 0);
+        explicit UBJsonTokenizer(std::istream& stream,
+                                 const char* buffer = nullptr,
+                                 size_t bufferSize = 0);
 
-        UBJsonTokenizer(const std::string& fileName);
+        explicit UBJsonTokenizer(const std::string& fileName);
 
         UBJsonTokenizer(const char* buffer, size_t bufferSize);
 
