@@ -5,7 +5,7 @@
 ## This file is distributed under the Simplified BSD License.
 ## License text is included with the source distribution.
 ##****************************************************************************
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.7)
 project(Yson VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -97,8 +97,8 @@ set(SOURCE_FILES
     Yson/JsonReader/TextStreamReader.hpp
     Yson/JsonReader/TextStreamReader.cpp
     Yson/JsonWriter/JsonWriter.cpp
-    Yson/JsonWriter/IsJavaScriptIdentifier.cpp
-    Yson/JsonWriter/IsJavaScriptIdentifier.hpp
+    Yson/Common/IsJavaScriptIdentifier.cpp
+    Yson/Common/IsJavaScriptIdentifier.hpp
     Yson/UBJsonReader/BinaryBufferReader.cpp
     Yson/UBJsonReader/BinaryBufferReader.hpp
     Yson/UBJsonReader/BinaryFileReader.cpp

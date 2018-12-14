@@ -5,7 +5,7 @@
 ## This file is distributed under the Simplified BSD License.
 ## License text is included with the source distribution.
 ##****************************************************************************
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.7)
 project(Yson_Ystring)
 
 set(PRIVATE_HEADERS

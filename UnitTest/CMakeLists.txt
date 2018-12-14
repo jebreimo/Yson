@@ -5,7 +5,7 @@
 ## This file is distributed under the Simplified BSD License.
 ## License text is included with the source distribution.
 ##****************************************************************************
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.7)
 
 set(PARENT_PROJECT Yson)
 project(${PARENT_PROJECT}Test)
@@ -16,6 +16,7 @@ set(SOURCE_FILES
     test_GetValueType.cpp
     test_Base64.cpp
     test_GetValueType.cpp
+    test_IsJavaScriptIdentifier.cpp
     test_JsonReader.cpp
     test_JsonTokenizer.cpp
     test_JsonWriter.cpp
@@ -23,8 +24,7 @@ set(SOURCE_FILES
     test_ParseDouble.cpp
     test_UBJsonReader.cpp
     test_UBJsonTokenizer.cpp
-    test_UBJsonWriter.cpp
-    )
+    test_UBJsonWriter.cpp)
 
 add_executable(${PROJECT_NAME}
                ${SOURCE_FILES})
