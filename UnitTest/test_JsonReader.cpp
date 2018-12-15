@@ -397,6 +397,11 @@ namespace
         Y_CALL(runScript("[1, 2, ]", "vevIvI!l!^"));
     }
 
+    void test_non_base2_numbers()
+    {
+        Y_CALL(runScript("[0x24, 0x101, 0o567]", "vevIvIvI!l!^"));
+    }
+
     void test_object_with_unquoted_keys()
     {
         char text[] = R"({key: 123)";
@@ -466,6 +471,7 @@ namespace
            test_document,
            test_object,
            test_trailing_commas,
+           test_non_base2_numbers,
            test_object_with_unquoted_keys,
            test_non_ASCII_characters,
            test_end_of_document,

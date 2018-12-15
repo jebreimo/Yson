@@ -177,7 +177,7 @@ namespace Yson
         case UBJsonTokenType::STRING_TOKEN:
             if (analyzeStrings)
             {
-                auto type = getExtendedValueType(m_Members->tokenizer.token());
+                auto type = getValueType(m_Members->tokenizer.token());
                 if (type != ValueType::INVALID)
                     return type;
             }
@@ -232,7 +232,7 @@ namespace Yson
         case UBJsonTokenType::STRING_TOKEN:
             if (analyzeStrings)
             {
-                auto type = getExtendedDetailedValueType(
+                auto type = getDetailedValueType(
                         m_Members->tokenizer.token());
                 if (type != DetailedValueType::INVALID)
                     return type;

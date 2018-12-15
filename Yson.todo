@@ -5,7 +5,7 @@
     + Support Infinity and NaN in reader
     + Support multi-line strings in reader
     + Support trailing commas in reader
-    - Support hexadecimal numbers (and octal and binary) in reader
+    + Support hexadecimal numbers (and octal and binary) in reader
     - Support multi-line strings in writer
     - Support Infinity and NaN in writer
     - Support hexadecimal numbers (and octal and binary) in writer

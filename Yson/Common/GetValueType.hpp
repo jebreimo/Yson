@@ -16,7 +16,5 @@ namespace Yson
 {
     YSON_API ValueType getValueType(std::string_view str);
 
-    YSON_API ValueType getExtendedValueType(std::string_view str);
-
     YSON_API ValueType getValueType(const std::string& str);
 }

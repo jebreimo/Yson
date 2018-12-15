@@ -40,34 +40,6 @@ namespace Yson
                 return ValueType::INVALID;
             assumedType = ValueType::INTEGER;
         }
-        if (getDigit(str[i]) <= 9)
-            return getNumberValueType(str.substr(i));
-
-        if (assumedType != ValueType::UNKNOWN)
-            return ValueType::INVALID;
-
-        if (str == "true")
-            return ValueType::BOOLEAN;
-        if (str == "null")
-            return ValueType::NULL_VALUE;
-        if (str == "false")
-            return ValueType::BOOLEAN;
-
-        return ValueType::INVALID;
-    }
-
-    ValueType getExtendedValueType(std::string_view str)
-    {
-        if (str.empty())
-            return ValueType::INVALID;
-        auto assumedType = ValueType::UNKNOWN;
-        size_t i = 0;
-        if (str[i] == '-' || str[i] == '+')
-        {
-            if (++i == str.size())
-                return ValueType::INVALID;
-            assumedType = ValueType::INTEGER;
-        }
         if (str[i] == '0')
         {
             if (++i == str.size())
@@ -90,7 +62,7 @@ namespace Yson
         else if (getDigit(str[i]) <= 9)
             return getNumberValueType(str.substr(i));
 
-        if (str.substr(i) == "infinity")
+        if (str.substr(i) == "Infinity")
             return ValueType::FLOAT;
         if (str == "NaN")
             return ValueType::FLOAT;

@@ -16,7 +16,4 @@ namespace Yson
 {
     YSON_API DetailedValueType getDetailedValueType(
             std::string_view str);
-
-    YSON_API DetailedValueType getExtendedDetailedValueType(
-            std::string_view str);
 }

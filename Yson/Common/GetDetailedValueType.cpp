@@ -43,37 +43,6 @@ namespace Yson
                 return DetailedValueType::INVALID;
             assumedType = DetailedValueType::BIG_INT;
         }
-        if (getDigit(str[i]) <= 9)
-            return getNumberType(str.substr(i), negative);
-
-        if (assumedType != DetailedValueType::UNKNOWN)
-            return DetailedValueType::INVALID;
-
-        if (str == "true")
-            return DetailedValueType::BOOLEAN;
-        if (str == "null")
-            return DetailedValueType::NULL_VALUE;
-        if (str == "false")
-            return DetailedValueType::BOOLEAN;
-
-        return DetailedValueType::INVALID;
-    }
-
-    DetailedValueType getExtendedDetailedValueType(
-            std::string_view str)
-    {
-        if (str.empty())
-            return DetailedValueType::INVALID;
-        auto assumedType = DetailedValueType::UNKNOWN;
-        size_t i = 0;
-        bool negative = false;
-        if (str[i] == '-' || str[i] == '+')
-        {
-            negative = str[i] == '-';
-            if (++i == str.size())
-                return DetailedValueType::INVALID;
-            assumedType = DetailedValueType::BIG_INT;
-        }
         if (str[i] == '0')
         {
             if (++i == str.size())
@@ -102,7 +71,7 @@ namespace Yson
             return getNumberType(str.substr(i), negative);
         }
 
-        if (str.substr(i) == "infinity")
+        if (str.substr(i) == "Infinity")
             return DetailedValueType::FLOAT_64;
         if (str == "NaN")
             return DetailedValueType::FLOAT_64;
