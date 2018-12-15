@@ -34,8 +34,10 @@ namespace Yson
         case JsonReaderState::AFTER_VALUE:
             if (!readComma(tokenizer, JsonTokenType::END_ARRAY))
                 return {JsonReaderState::AT_END, false};
-            readStartOfValue(tokenizer);
-            return {JsonReaderState::AT_VALUE, true};
+            if (readStartOfValue(tokenizer, JsonTokenType::END_ARRAY))
+                return {JsonReaderState::AT_VALUE, true};
+            else
+                return {JsonReaderState::AT_END, false};
         case JsonReaderState::AT_END:
             return {JsonReaderState::AT_END, false};
         default:

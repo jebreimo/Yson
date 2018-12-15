@@ -4,9 +4,14 @@
     + Support unquoted keys
     + Support Infinity and NaN in reader
     + Support multi-line strings in reader
+    + Support trailing commas in reader
     - Support hexadecimal numbers (and octal and binary) in reader
-    - Support trailing commas in reader
     - Support multi-line strings in writer
     - Support Infinity and NaN in writer
     - Support hexadecimal numbers (and octal and binary) in writer
     - Support additional whitespace in reader
+    - Improve performance when tokenizing strings and multiline strings:
+        - Add a new token type INTERNAL_STRING
+        - Don't modify m_TokenStart and m_TokenEnd in nextToken()
+        - tokenType() returns STRING for both INTERNAL_STRING and INTERNAL_MULTILINE_STRING
+        - token() modifies buffer, m_TokenStart and m_TokenEnd and set token type to STRING
