@@ -53,9 +53,17 @@ namespace Yson
             case JsonTokenType::END_OBJECT:
             case JsonTokenType::COLON:
             case JsonTokenType::COMMA:
-            case JsonTokenType::STRING:
             case JsonTokenType::VALUE:
                 m_ColumnNumber += m_TokenEnd - m_TokenStart;
+                return true;
+            case JsonTokenType::STRING:
+                m_ColumnNumber += m_TokenEnd-- - m_TokenStart++;
+                return true;
+            case JsonTokenType::INTERNAL_MULTILINE_STRING:
+                addLinesAndColumns(m_LineNumber, m_ColumnNumber,
+                                   countLinesAndColumns(token()));
+                removeLineContinuations();
+                m_TokenType = JsonTokenType::STRING;
                 return true;
             case JsonTokenType::INCOMPLETE_TOKEN:
                 break;
@@ -85,10 +93,7 @@ namespace Yson
 
     std::string_view JsonTokenizer::token() const
     {
-        if (m_TokenType == JsonTokenType::STRING)
-            return makeStringView(m_TokenStart + 1, m_TokenEnd - 1);
-        else
-            return makeStringView(m_TokenStart, m_TokenEnd);
+        return makeStringView(m_TokenStart, m_TokenEnd);
     }
 
     std::string JsonTokenizer::tokenString() const
@@ -131,13 +136,13 @@ namespace Yson
     {
         if (m_TokenType == JsonTokenType::END_OF_FILE)
             return false;
-        if (m_TokenEnd != m_TokenStart)
+        if (m_NextToken != m_TokenStart)
         {
-            m_TokenStart = m_TokenEnd;
+            m_TokenStart = m_NextToken;
             auto token = nextToken(makeStringView(m_TokenStart, m_BufferEnd));
             if (!token.isIncomplete)
             {
-                m_TokenEnd = token.endOfToken;
+                m_NextToken = m_TokenEnd = token.endOfToken;
                 m_TokenType = token.tokenType;
                 return true;
             }
@@ -157,7 +162,7 @@ namespace Yson
                         isEndOfFile);
                 if (!token.isIncomplete)
                 {
-                    m_TokenEnd = token.endOfToken;
+                    m_NextToken = m_TokenEnd = token.endOfToken;
                     m_TokenType = token.tokenType;
                     return true;
                 }
@@ -181,7 +186,7 @@ namespace Yson
         {
             std::copy(m_TokenStart, m_BufferEnd, m_Buffer.begin());
             m_Buffer.resize(m_BufferEnd - m_TokenStart);
-            m_TokenStart = m_TokenEnd = m_BufferStart;
+            m_TokenStart = m_TokenEnd = m_NextToken = m_BufferStart;
             m_BufferEnd = m_BufferStart + m_Buffer.size();
         }
         else if (m_TokenStart == m_BufferEnd)
@@ -192,8 +197,46 @@ namespace Yson
         if (!m_TextReader->read(m_Buffer, m_ChunkSize))
             return false;
 
-        m_BufferStart = m_TokenStart = m_TokenEnd = m_Buffer.data();
+        m_BufferStart = m_TokenStart = m_TokenEnd = m_NextToken = m_Buffer.data();
         m_BufferEnd = m_Buffer.data() + m_Buffer.size();
         return true;
+    }
+
+    std::pair<char*, char*> findLineContinuation(char* from, char* to)
+    {
+        while (true)
+        {
+            auto next = std::find(from, to, '\\');
+            if (next == to || next + 1 == to)
+                return {to, to};
+            if (*(next + 1) == '\n')
+                return {next, next + 2};
+            if (*(next + 1) == '\r')
+            {
+                if (next + 2 != to && *(next + 2) == '\n')
+                    return {next, next + 3};
+                return {next, next + 2};
+            }
+            from = next + 2;
+        }
+    }
+
+    void JsonTokenizer::removeLineContinuations()
+    {
+        assert(m_TokenEnd - m_TokenStart >= 2);
+        ++m_TokenStart;
+        auto from = &m_Buffer[0] + (m_TokenStart - m_Buffer.data());
+        auto to = &m_Buffer[0] + (m_TokenEnd - m_Buffer.data()) - 1;
+        auto next = findLineContinuation(from, to);
+        auto dst = next.first;
+        from = next.second;
+        while (from != to)
+        {
+            next = findLineContinuation(from, to);
+            std::copy(from, next.first, dst);
+            dst += next.first - from;
+            from = next.second;
+        }
+        m_TokenEnd = dst;
     }
 }

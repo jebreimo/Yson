@@ -52,6 +52,8 @@ namespace Yson
 
         bool fillBuffer();
 
+        void removeLineContinuations();
+
         std::unique_ptr<TextReader> m_TextReader;
         std::string m_FileName;
         std::string m_Buffer;
@@ -59,6 +61,7 @@ namespace Yson
         const char* m_BufferEnd = nullptr;
         const char* m_TokenStart = nullptr;
         const char* m_TokenEnd = nullptr;
+        const char* m_NextToken = nullptr;
         size_t m_LineNumber = 1;
         size_t m_ColumnNumber = 1;
         JsonTokenType m_TokenType = JsonTokenType::INVALID_TOKEN;

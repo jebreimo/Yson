@@ -32,6 +32,7 @@ namespace Yson
         CASE_TYPE(BLOCK_COMMENT);
         CASE_TYPE(WHITESPACE);
         CASE_TYPE(NEWLINE);
+        CASE_TYPE(INTERNAL_MULTILINE_STRING);
         }
         return "<unknown token type: " + std::to_string(int(type)) + ">";
     }

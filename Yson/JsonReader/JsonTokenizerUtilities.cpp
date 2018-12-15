@@ -70,34 +70,51 @@ namespace Yson
     {
         assert(!string.empty());
         assert(string[0] == quotes);
-        bool valid = true;
         bool escape = false;
-        for (auto it = string.begin() + 1; it != string.end(); ++it)
+        auto tokenType = JsonTokenType::STRING;
+        for (size_t i = 1, n = string.size(); i < n; ++i)
         {
-            if (*it < 0x20 && 0 < *it)
+            auto c = string[i];
+            if (c < 0x20 && 0 < c)
             {
-                if (*it == '\n')
-                    return Result(JsonTokenType::INVALID_TOKEN, it);
-                valid = false;
+                if (!escape)
+                {
+                    if (c == '\n')
+                        return {JsonTokenType::INVALID_TOKEN, &string[i]};
+                    tokenType = JsonTokenType::INVALID_TOKEN;
+                }
+                else if (c == '\n')
+                {
+                    tokenType = JsonTokenType::INTERNAL_MULTILINE_STRING;
+                }
+                else if (c == '\r')
+                {
+                    if (i + 1 < n && string[i + 1] == '\n')
+                        ++i;
+                    tokenType = JsonTokenType::INTERNAL_MULTILINE_STRING;
+                }
+                else
+                {
+                    tokenType = JsonTokenType::INVALID_TOKEN;
+                }
             }
-            else if (escape)
+            if (escape)
             {
                 escape = false;
             }
-            else if (*it == quotes)
+            else if (c == quotes)
             {
-                return Result(valid ? JsonTokenType::STRING
-                                    : JsonTokenType::INVALID_TOKEN, ++it);
+                return {tokenType, string.data() + i + 1};
             }
-            else if (*it == '\\')
+            else if (c == '\\')
             {
                 escape = true;
             }
         }
         if (isEndOfFile)
-            return Result(JsonTokenType::INVALID_TOKEN, string.end());
+            return {JsonTokenType::INVALID_TOKEN, string.end()};
         else
-            return Result(JsonTokenType::STRING, string.end(), true);
+            return {tokenType, string.end(), true};
     }
 
     Result findEndOfBlockComment(std::string_view string,

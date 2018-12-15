@@ -22,13 +22,13 @@ namespace Yson
 {
     struct UBJsonReader::Scope
     {
-        UBJsonScopeReader* reader;
+        UBJsonScopeReader* reader = nullptr;
         UBJsonReaderState state;
     };
 
     struct UBJsonReader::Members
     {
-        Members(UBJsonTokenizer&& tokenizer)
+        explicit Members(UBJsonTokenizer&& tokenizer)
                 : tokenizer(std::move(tokenizer))
         {
             scopes.reserve(50);
@@ -43,8 +43,7 @@ namespace Yson
         UBJsonOptimizedObjectReader optimizedObjectReader;
     };
 
-    UBJsonReader::UBJsonReader()
-    {}
+    UBJsonReader::UBJsonReader() = default;
 
     UBJsonReader::UBJsonReader(std::istream& stream)
         : UBJsonReader(new Members(UBJsonTokenizer(stream)))
@@ -70,11 +69,11 @@ namespace Yson
                                      UBJsonReaderState()});
     }
 
-    UBJsonReader::UBJsonReader(UBJsonReader&&) = default;
+    UBJsonReader::UBJsonReader(UBJsonReader&&) noexcept = default;
 
     UBJsonReader::~UBJsonReader() = default;
 
-    UBJsonReader& UBJsonReader::operator=(UBJsonReader&&) = default;
+    UBJsonReader& UBJsonReader::operator=(UBJsonReader&&) noexcept = default;
 
     bool UBJsonReader::nextValue()
     {
@@ -147,6 +146,11 @@ namespace Yson
         currentScope().state.state = UBJsonReaderState::AFTER_VALUE;
     }
 
+    ValueType UBJsonReader::valueType() const
+    {
+        return valueType(false);
+    }
+
     ValueType UBJsonReader::valueType(bool analyzeStrings) const
     {
         assertStateIsKeyOrValue();
@@ -187,6 +191,11 @@ namespace Yson
         default:
             UBJSON_READER_THROW("Invalid token.", m_Members->tokenizer);
         }
+    }
+
+    DetailedValueType UBJsonReader::detailedValueType() const
+    {
+        return detailedValueType(false);
     }
 
     DetailedValueType UBJsonReader::detailedValueType(

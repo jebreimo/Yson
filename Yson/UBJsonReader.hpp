@@ -30,13 +30,13 @@ namespace Yson
 
         UBJsonReader(const UBJsonReader&) = delete;
 
-        UBJsonReader(UBJsonReader&&);
+        UBJsonReader(UBJsonReader&&) noexcept;
 
         ~UBJsonReader() override;
 
         UBJsonReader& operator=(const UBJsonReader&) = delete;
 
-        UBJsonReader& operator=(UBJsonReader&&);
+        UBJsonReader& operator=(UBJsonReader&&) noexcept;
 
         bool nextValue() override;
 
@@ -48,10 +48,14 @@ namespace Yson
 
         void leave() override;
 
-        ValueType valueType(bool analyzeStrings = false) const override;
+        ValueType valueType() const;
+
+        ValueType valueType(bool analyzeStrings) const override;
+
+        DetailedValueType detailedValueType() const;
 
         DetailedValueType detailedValueType(
-                bool analyzeStrings = false) const override;
+                bool analyzeStrings) const override;
 
         bool isOptimizedArray() const;
 

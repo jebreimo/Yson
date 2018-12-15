@@ -157,12 +157,26 @@ namespace
         Y_CALL(testNoNextToken("\t", JsonTokenType::END_OF_FILE, ""));
     }
 
+    void test_MultilineStrings()
+    {
+        Y_CALL(testNextToken("'ABC \\\nDEF'", JsonTokenType::STRING,
+                             "ABC DEF"));
+        Y_CALL(testNextToken("'ABC \\\rDEF'", JsonTokenType::STRING,
+                             "ABC DEF"));
+        Y_CALL(testNextToken("'ABC \\\r\nDEF'", JsonTokenType::STRING,
+                             "ABC DEF"));
+        Y_CALL(testNoNextToken("'ABC \\\n\rDEF'",
+                               JsonTokenType::INVALID_TOKEN,
+                               "'ABC \\\n\rDEF'"));
+    }
+
     Y_TEST(test_Basics,
            test_StringTokens,
+           test_SingleQuotedStringTokens,
            test_Newlines,
            test_Comments,
            test_Value,
            test_ValueTokens,
            test_Whitespaces,
-           test_SingleQuotedStringTokens);
+           test_MultilineStrings);
 }

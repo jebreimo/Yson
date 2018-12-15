@@ -30,13 +30,13 @@ namespace Yson
 
         JsonReader(const JsonReader&) = delete;
 
-        JsonReader(JsonReader&&);
+        JsonReader(JsonReader&&) noexcept;
 
         ~JsonReader() override;
 
         JsonReader& operator=(const JsonReader&) = delete;
 
-        JsonReader& operator=(JsonReader&&);
+        JsonReader& operator=(JsonReader&&) noexcept;
 
         bool nextDocument() override;
 
@@ -48,10 +48,14 @@ namespace Yson
 
         void leave() override;
 
-        ValueType valueType(bool analyzeStrings = false) const override;
+        ValueType valueType() const;
+
+        ValueType valueType(bool analyzeStrings) const override;
+
+        DetailedValueType detailedValueType() const;
 
         DetailedValueType detailedValueType(
-                bool analyzeStrings = false) const override;
+                bool analyzeStrings) const override;
 
         bool readNull() const override;
 

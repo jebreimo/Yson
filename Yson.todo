@@ -1,11 +1,12 @@
 - Make reader and writer compatible with Json5
     + Support ''-strings in reader
-    - Allow multi-line strings in reader
-    - Support trailing commas in reader
-    - Allow additional whitespace in reader
-    + Support Infinity and NaN in reader
-    - Support Infinity and NaN in writer
-    - Support hexadecimal numbers (and octal and binary) in reader
-    - Support hexadecimal numbers (and octal and binary) in writer
     + Support surrogate pairs in reader
     + Support unquoted keys
+    + Support Infinity and NaN in reader
+    + Support multi-line strings in reader
+    - Support hexadecimal numbers (and octal and binary) in reader
+    - Support trailing commas in reader
+    - Support multi-line strings in writer
+    - Support Infinity and NaN in writer
+    - Support hexadecimal numbers (and octal and binary) in writer
+    - Support additional whitespace in reader

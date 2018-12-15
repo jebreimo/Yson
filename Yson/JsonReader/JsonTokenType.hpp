@@ -33,7 +33,10 @@ namespace Yson
           */
         BLOCK_COMMENT,
         WHITESPACE,
-        NEWLINE
+        NEWLINE,
+        /** Used internally in JsonTokenizer.
+          */
+        INTERNAL_MULTILINE_STRING
     };
 
     std::string toString(JsonTokenType type);

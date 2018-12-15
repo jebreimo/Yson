@@ -23,7 +23,7 @@ namespace Yson
 {
     struct JsonReader::Members
     {
-        Members(JsonTokenizer&& tokenizer)
+        explicit Members(JsonTokenizer&& tokenizer)
                 : tokenizer(std::move(tokenizer))
         {}
 
@@ -32,10 +32,14 @@ namespace Yson
         JsonArrayReader arrayReader;
         JsonDocumentReader documentReader;
         JsonObjectReader objectReader;
+
+        JsonReaderState& currentState()
+        {
+            return scopes.top().second;
+        }
     };
 
-    JsonReader::JsonReader()
-    {}
+    JsonReader::JsonReader() = default;
 
     JsonReader::JsonReader(std::istream& stream)
             : JsonReader(stream, nullptr, 0)
@@ -58,7 +62,7 @@ namespace Yson
     JsonReader::JsonReader(std::istream& stream,
                            const char* buffer,
                            size_t bufferSize)
-            : m_Members(new Members(JsonTokenizer(stream, buffer, 0)))
+            : m_Members(new Members(JsonTokenizer(stream, buffer, bufferSize)))
     {
         m_Members->scopes.push({&m_Members->documentReader,
                                 JsonReaderState::INITIAL_STATE});
@@ -66,9 +70,9 @@ namespace Yson
 
     JsonReader::~JsonReader() = default;
 
-    JsonReader::JsonReader(JsonReader&&) = default;
+    JsonReader::JsonReader(JsonReader&&) noexcept = default;
 
-    JsonReader& JsonReader::operator=(JsonReader&&) = default;
+    JsonReader& JsonReader::operator=(JsonReader&&) noexcept = default;
 
     bool JsonReader::nextDocument()
     {
@@ -99,7 +103,7 @@ namespace Yson
 
     void JsonReader::enter()
     {
-        auto state = m_Members->scopes.top().second;
+        auto state = m_Members->currentState();
         auto tokenType = m_Members->tokenizer.tokenType();
         if (state == JsonReaderState::AT_VALUE)
         {
@@ -129,7 +133,7 @@ namespace Yson
                     "Cannot call leave() when not inside an array or object",
                     m_Members->tokenizer);
         }
-        if (m_Members->scopes.top().second != JsonReaderState::AT_END)
+        if (m_Members->currentState() != JsonReaderState::AT_END)
         {
             auto& scope = m_Members->scopes.top();
             while (true)
@@ -142,7 +146,12 @@ namespace Yson
             }
         }
         m_Members->scopes.pop();
-        m_Members->scopes.top().second = JsonReaderState::AFTER_VALUE;
+        m_Members->currentState() = JsonReaderState::AFTER_VALUE;
+    }
+
+    ValueType JsonReader::valueType() const
+    {
+        return valueType(false);
     }
 
     ValueType JsonReader::valueType(bool analyzeStrings) const
@@ -166,7 +175,7 @@ namespace Yson
             {
                 auto type = getValueType(m_Members->tokenizer.token());
                 if (type != ValueType::INVALID
-                    || m_Members->scopes.top().second != JsonReaderState::AT_KEY
+                    || m_Members->currentState() != JsonReaderState::AT_KEY
                     || !isJavaScriptIdentifier(m_Members->tokenizer.token()))
                 {
                     return type;
@@ -176,6 +185,11 @@ namespace Yson
         default:
             return ValueType::INVALID;
         }
+    }
+
+    DetailedValueType JsonReader::detailedValueType() const
+    {
+        return detailedValueType(false);
     }
 
     DetailedValueType JsonReader::detailedValueType(bool analyzeStrings) const
@@ -200,7 +214,7 @@ namespace Yson
             {
                 auto type = getDetailedValueType(m_Members->tokenizer.token());
                 if (type != DetailedValueType::INVALID
-                    || m_Members->scopes.top().second != JsonReaderState::AT_KEY
+                    || m_Members->currentState() != JsonReaderState::AT_KEY
                     || !isJavaScriptIdentifier(m_Members->tokenizer.token()))
                 {
                     return type;
@@ -357,7 +371,7 @@ namespace Yson
 
     bool JsonReader::readBinary(void* buffer, size_t& size)
     {
-        auto state = m_Members->scopes.top().second;
+        auto state = m_Members->currentState();
         if (state != JsonReaderState::AT_VALUE)
         {
             JSON_READER_THROW("Current token is not a key or a value.",
@@ -376,7 +390,7 @@ namespace Yson
 
     void JsonReader::assertStateIsKeyOrValue() const
     {
-        auto state = m_Members->scopes.top().second;
+        auto state = m_Members->currentState();
         if (state != JsonReaderState::AT_KEY
             && state != JsonReaderState::AT_VALUE)
         {

@@ -231,9 +231,20 @@ namespace
         Y_CALL(assertRead<std::string>("'10\\'0'", "10'0"));
     }
 
-    void test_surrogate_pair()
+    void test_read_surrogate_pair()
     {
         Y_CALL(assertRead<std::string>("'\\uD83C\\uDFBC'", "\360\237\216\274"));
+        Y_CALL(assertRead<std::string>("'\\uD83C'", "\355\240\274"));
+        Y_CALL(assertRead<std::string>("'\\uD83CK'", "\355\240\274K"));
+        Y_CALL(assertRead<std::string>("'\\uD83C\\''", "\355\240\274'"));
+    }
+
+    void test_read_multiline_string()
+    {
+        Y_CALL(assertRead<std::string>("'Line 1.\\\n Line 1 continued.'",
+                                       "Line 1. Line 1 continued."));
+        Y_CALL(assertRead<std::string>("'Line 1.\\\r\n Line 1 continued.'",
+                                       "Line 1. Line 1 continued."));
     }
 
     void test_read_binary()
@@ -442,7 +453,8 @@ namespace
            test_read_integer,
            test_read_string,
            test_read_single_quoted_string,
-           test_surrogate_pair,
+           test_read_surrogate_pair,
+           test_read_multiline_string,
            test_read_binary,
            test_array,
            test_document,
