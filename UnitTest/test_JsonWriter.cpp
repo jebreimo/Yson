@@ -185,9 +185,9 @@ namespace
         JsonWriter writer(ss);
         Y_THROWS(writer.value(std::numeric_limits<double>::infinity()),
                  std::logic_error);
-        writer.setNonFiniteFloatsAsStringsEnabled(true);
+        writer.setNonFiniteFloatsEnabled(true);
         writer.value(std::numeric_limits<double>::infinity()).flush();
-        Y_EQUAL(ss.str(), "\"infinity\"");
+        Y_EQUAL(ss.str(), "Infinity");
     }
 
     void test_UnquotedValueNames()

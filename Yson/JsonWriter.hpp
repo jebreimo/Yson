@@ -136,17 +136,17 @@ namespace Yson
         JsonWriter& setLanguageExtensions(int value);
 
         /** @brief Returns true if special floating point values will be
-          *     written as strings.
+          *     written as values.
           *
           * When this flag is enabled, the special values not-a-number and
-          * positive and negative infinity are written as "NaN", "infinity"
-          * and "-infinity" respectively. If it is disabled, the write
+          * positive and negative infinity are written as "NaN", "Infinity"
+          * and "-Infinity" respectively. If it is disabled, the write
           * functions will throw an exception if it encounters any of these
           * values.
           */
-        bool isNonFiniteFloatsAsStringsEnabled() const;
+        bool isNonFiniteFloatsEnabled() const;
 
-        JsonWriter& setNonFiniteFloatsAsStringsEnabled(bool value);
+        JsonWriter& setNonFiniteFloatsEnabled(bool value);
 
         bool isUnquotedValueNamesEnabled() const;
 
@@ -191,7 +191,7 @@ namespace Yson
 
         enum LanguageExtensions
         {
-            NON_FINITE_FLOATS_AS_STRINGS = 1,
+            NON_FINITE_FLOATS = 1,
             UNQUOTED_VALUE_NAMES = 8
         };
 

@@ -436,14 +436,14 @@ namespace Yson
         return *this;
     }
 
-    bool JsonWriter::isNonFiniteFloatsAsStringsEnabled() const
+    bool JsonWriter::isNonFiniteFloatsEnabled() const
     {
-        return languageExtension(NON_FINITE_FLOATS_AS_STRINGS);
+        return languageExtension(NON_FINITE_FLOATS);
     }
 
-    JsonWriter& JsonWriter::setNonFiniteFloatsAsStringsEnabled(bool value)
+    JsonWriter& JsonWriter::setNonFiniteFloatsEnabled(bool value)
     {
-        return setLanguageExtension(NON_FINITE_FLOATS_AS_STRINGS, value);
+        return setLanguageExtension(NON_FINITE_FLOATS, value);
     }
 
     bool JsonWriter::isUnquotedValueNamesEnabled() const
@@ -747,7 +747,7 @@ namespace Yson
             write(m.sprintfBuffer.data(), size);
             m.state = AT_END_OF_VALUE;
         }
-        else if (!languageExtension(NON_FINITE_FLOATS_AS_STRINGS))
+        else if (!languageExtension(NON_FINITE_FLOATS))
         {
             YSON_THROW(std::string("Illegal floating point value '")
                        + std::to_string(number) + "'");
@@ -755,11 +755,11 @@ namespace Yson
         else
         {
             if (std::isnan(number))
-                value("NaN");
+                rawValue("NaN");
             else if (number < 0)
-                value("-infinity");
+                rawValue("-Infinity");
             else
-                value("infinity");
+                rawValue("Infinity");
         }
         return *this;
     }
