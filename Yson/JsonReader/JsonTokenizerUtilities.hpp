@@ -39,4 +39,6 @@ namespace Yson
 
     void addLinesAndColumns(size_t& lineNumber, size_t& columnNumber,
                             std::pair<size_t, size_t> addend);
+
+    std::pair<char*, char*> findLineContinuation(char* from, char* to);
 }

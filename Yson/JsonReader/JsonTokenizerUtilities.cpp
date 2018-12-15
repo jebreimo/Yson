@@ -275,4 +275,23 @@ namespace Yson
             columnNumber = addend.second;
         }
     }
+
+    std::pair<char*, char*> findLineContinuation(char* from, char* to)
+    {
+        while (true)
+        {
+            auto next = std::find(from, to, '\\');
+            if (next == to || next + 1 == to)
+                return {to, to};
+            if (*(next + 1) == '\n')
+                return {next, next + 2};
+            if (*(next + 1) == '\r')
+            {
+                if (next + 2 != to && *(next + 2) == '\n')
+                    return {next, next + 3};
+                return {next, next + 2};
+            }
+            from = next + 2;
+        }
+    }
 }
