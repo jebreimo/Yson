@@ -231,6 +231,29 @@ namespace
         Y_EQUAL(ss.str(), "[true,false,null]");
     }
 
+    void test_MultiLineStrings()
+    {
+        std::stringstream ss;
+        JsonWriter writer(ss);
+        writer.setMultilineStringsEnabled(true).setMaximumLineWidth(8);
+        writer.value("12345678901234567890").flush();
+        Y_EQUAL(ss.str(),
+                "\"123456\\\n"
+                "7890123\\\n"
+                "4567890\"");
+    }
+
+    void test_MultiLineStringsWithEscape()
+    {
+        std::stringstream ss;
+        JsonWriter writer(ss);
+        writer.setMultilineStringsEnabled(true).setMaximumLineWidth(8);
+        writer.value("12345\"678901").flush();
+        Y_EQUAL(ss.str(),
+                "\"12345\\\n"
+                "\\\"678901\"");
+    }
+
     Y_TEST(test_Basics,
            test_EscapedString,
            test_ManualFormatting,
@@ -242,5 +265,7 @@ namespace
            test_FloatingPointInfinity,
            test_UnquotedValueNames,
            test_FormatAndFlat,
-           test_SpecialValues);
+           test_SpecialValues,
+           test_MultiLineStrings,
+           test_MultiLineStringsWithEscape);
 }

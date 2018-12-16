@@ -18,6 +18,7 @@
 #include "../Common/GetUnicodeFileName.hpp"
 #include "../Common/ThrowYsonException.hpp"
 #include "../Common/IsJavaScriptIdentifier.hpp"
+#include "JsonWriterUtilities.hpp"
 
 namespace Yson
 {
@@ -71,6 +72,7 @@ namespace Yson
         int floatingPointPrecision = 9;
         bool formattingEnabled = true;
         char indentationCharacter = ' ';
+        int maximumLineWidth = 120;
     };
 
     JsonWriter::JsonWriter(JsonFormatting formatting)
@@ -252,10 +254,20 @@ namespace Yson
         beginValue();
         auto& m = members();
         m.buffer.push_back('"');
-        if (!Ystring::hasUnescapedCharacters(text))
-            write(text);
+        if (!languageExtension(MULTILINE_STRINGS))
+        {
+            if (!Ystring::hasUnescapedCharacters(text))
+                write(text);
+            else
+                write(Ystring::escape(text));
+        }
         else
-            write(Ystring::escape(text));
+        {
+            if (!Ystring::hasUnescapedCharacters(text))
+                writeMultiLine(text);
+            else
+                writeMultiLine(Ystring::escape(text));
+        }
         m.buffer.push_back('"');
         m.state = AT_END_OF_VALUE;
         return *this;
@@ -456,6 +468,29 @@ namespace Yson
         return setLanguageExtension(UNQUOTED_VALUE_NAMES, value);
     }
 
+    bool JsonWriter::isMultilineStringsEnabled() const
+    {
+        return languageExtension(MULTILINE_STRINGS);
+    }
+
+    JsonWriter& JsonWriter::setMultilineStringsEnabled(bool value)
+    {
+        return setLanguageExtension(MULTILINE_STRINGS, value);
+    }
+
+    int JsonWriter::maximumLineWidth() const
+    {
+        return m_Members->maximumLineWidth;
+    }
+
+    JsonWriter& JsonWriter::setMaximumLineWidth(int value)
+    {
+        if (value < 8)
+            YSON_THROW("Maximum line width can not be less than 8.");
+        m_Members->maximumLineWidth = value;
+        return *this;
+    }
+
     int JsonWriter::floatingPointPrecision() const
     {
         return members().floatingPointPrecision;
@@ -480,16 +515,7 @@ namespace Yson
 
     void JsonWriter::write(const std::string& s)
     {
-        auto& m = members();
-        if (m.buffer.size() + s.size() <= m.maxBufferSize)
-        {
-            m.buffer.insert(m.buffer.end(), s.begin(), s.end());
-        }
-        else
-        {
-            flush();
-            m.stream->write(s.data(), s.size());
-        }
+        write(s.data(), s.size());
     }
 
     void JsonWriter::write(const char* s, size_t size)
@@ -503,6 +529,37 @@ namespace Yson
         {
             flush();
             m.stream->write(s, size);
+        }
+    }
+
+    void JsonWriter::writeMultiLine(const std::string& s)
+    {
+        auto maxWidth = size_t(m_Members->maximumLineWidth);
+        if (s.size() <= maxWidth / 2)
+        {
+            write(s.data(), s.size());
+        }
+        else
+        {
+            auto n = maxWidth - getCurrentLineWidth(m_Members->buffer,
+                                                    maxWidth);
+            size_t from = 0;
+            if (n > 2)
+            {
+                auto to = findSplitPos(s, n - 1);
+                write(s.data(), to);
+                from = to;
+            }
+            while (true)
+            {
+                auto to = findSplitPos(s, from + maxWidth - 1);
+                if (from == to)
+                    break;
+                m_Members->buffer.push_back('\\');
+                m_Members->buffer.push_back('\n');
+                write(s.data() + from, to - from);
+                from = to;
+            }
         }
     }
 

@@ -58,6 +58,8 @@ set(SOURCE_FILES
     Yson/Common/GetUnicodeFileName.hpp
     Yson/Common/GetValueType.cpp
     Yson/Common/GetValueType.hpp
+    Yson/Common/IsJavaScriptIdentifier.cpp
+    Yson/Common/IsJavaScriptIdentifier.hpp
     Yson/Common/MakeReader.cpp
     Yson/Common/ParseFloatingPoint.cpp
     Yson/Common/ParseFloatingPoint.hpp
@@ -97,8 +99,8 @@ set(SOURCE_FILES
     Yson/JsonReader/TextStreamReader.hpp
     Yson/JsonReader/TextStreamReader.cpp
     Yson/JsonWriter/JsonWriter.cpp
-    Yson/Common/IsJavaScriptIdentifier.cpp
-    Yson/Common/IsJavaScriptIdentifier.hpp
+    Yson/JsonWriter/JsonWriterUtilities.cpp
+    Yson/JsonWriter/JsonWriterUtilities.hpp
     Yson/UBJsonReader/BinaryBufferReader.cpp
     Yson/UBJsonReader/BinaryBufferReader.hpp
     Yson/UBJsonReader/BinaryFileReader.cpp

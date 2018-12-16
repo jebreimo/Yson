@@ -152,6 +152,14 @@ namespace Yson
 
         JsonWriter& setUnquotedValueNamesEnabled(bool value);
 
+        bool isMultilineStringsEnabled() const;
+
+        JsonWriter& setMultilineStringsEnabled(bool value);
+
+        int maximumLineWidth() const;
+
+        JsonWriter& setMaximumLineWidth(int value);
+
         int floatingPointPrecision() const;
 
         JsonWriter& setFloatingPointPrecision(int value);
@@ -165,6 +173,8 @@ namespace Yson
         void write(const std::string& s);
 
         void write(const char* s, size_t size);
+
+        void writeMultiLine(const std::string& s);
 
         JsonWriter(std::unique_ptr<std::ostream> streamPtr,
                    std::ostream* stream,
@@ -192,7 +202,8 @@ namespace Yson
         enum LanguageExtensions
         {
             NON_FINITE_FLOATS = 1,
-            UNQUOTED_VALUE_NAMES = 8
+            MULTILINE_STRINGS = 2,
+            UNQUOTED_VALUE_NAMES = 4
         };
 
         bool languageExtension(LanguageExtensions ext) const;
