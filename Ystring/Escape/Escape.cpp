@@ -104,6 +104,15 @@ namespace Ystring
             return c < 32 || c == '"' || c == '\\' || (127 <= c && c < 160);
         }
 
+        void appendHex(std::string& dst, char32_t value)
+        {
+            for (auto i = 0; i < 4; ++i)
+            {
+                auto shift = (3 - i) * 4;
+                dst.push_back(toCharDigit((value >> shift) & 0xF));
+            }
+        }
+
         void escapeCharacter(std::string& dst, char32_t chr)
         {
             dst.push_back('\\');
@@ -118,16 +127,25 @@ namespace Ystring
             case '\\': dst.push_back('\\'); break;
             default:
             {
-                if (chr > 0xFFFFu)
+                if (chr < 0x10000u)
                 {
-                    YSTRING_THROW("Character " + std::to_string(int64_t(chr))
-                                  + " has more than 4 hex digits.");
+                    dst.push_back('u');
+                    for (auto i = 0; i < 4; ++i)
+                    {
+                        auto shift = (3 - i) * 4;
+                        dst.push_back(toCharDigit((chr >> shift) & 0xF));
+                    }
                 }
-                dst.push_back('u');
-                for (auto i = 0; i < 4; ++i)
+                else
                 {
-                    auto shift = (3 - i) * 4;
-                    dst.push_back(toCharDigit((chr >> shift) & 0xF));
+                    chr -= 0x10000;
+                    auto hi = ((chr >> 10) & 0x3F) | 0xD800;
+                    auto lo = (chr & 0x3F) | 0xDC00;
+                    dst.push_back('u');
+                    appendHex(dst, hi);
+                    dst.push_back('\\');
+                    dst.push_back('u');
+                    appendHex(dst, lo);
                 }
             }
                 break;

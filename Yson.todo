@@ -8,7 +8,6 @@
     + Support hexadecimal numbers (and octal and binary) in reader
     + Support Infinity and NaN in writer
     + Support multi-line strings in writer
-    - Support surrogate pairs in writer
     - Improve performance when tokenizing strings and multiline strings:
         - Add a new token type INTERNAL_STRING
         - Don't modify m_TokenStart and m_TokenEnd in nextToken()
