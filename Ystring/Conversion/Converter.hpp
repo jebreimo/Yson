@@ -36,7 +36,15 @@ namespace Ystring { namespace Conversion
           */
         Converter(Encoding_t sourceEncoding, Encoding_t destinationEncoding);
 
+        Converter(Converter&&);
+
+        Converter(const Converter&) = delete;
+
         ~Converter();
+
+        Converter& operator=(Converter&&);
+
+        Converter& operator=(const Converter&) = delete;
 
         /** @brief Returns the size (in 32-bit code points) of the internal
           *     buffer used during conversion.
@@ -55,28 +63,80 @@ namespace Ystring { namespace Conversion
           */
         void setBufferSize(size_t value);
 
+        /** @brief Sets the error handling policies for both the decoder
+          *     and encoder at once.
+          */
         void setErrorHandlingPolicy(ErrorHandlingPolicy_t value);
 
+        /** @brief Returns the error handling policy for the decoder.
+          *
+          * The decoder is responsible for converting the source string from
+          * the source encoding to the "natural" unicode representation,
+          * i.e. UTF-32.
+          */
         ErrorHandlingPolicy_t decoderErrorHandlingPolicy() const;
 
+        /** @brief Sets the error handling policy for the decoder.
+          *
+          * The decoder is responsible for converting the source string from
+          * the source encoding to the "natural" unicode representation,
+          * i.e. UTF-32.
+          */
         void setDecoderErrorHandlingPolicy(ErrorHandlingPolicy_t value);
 
+        /** @brief Returns the error handling policy for the encoder.
+          */
         ErrorHandlingPolicy_t encoderErrorHandlingPolicy() const;
 
+        /** @brief Sets the error handling policy for the encoder.
+          *
+          * The encoder is responsible for converting the decoded
+          * character from UTF-32 to the destination encoding.
+          */
         void setEncoderErrorHandlingPolicy(ErrorHandlingPolicy_t value);
 
+        /** @brief Set the replacement character used by both the decoder
+          *     and encoder.
+          *
+          * The replacement character is used when the error handling policy
+          * is REPLACE.
+          */
         void setReplacementCharacter(char32_t value);
 
+        /** @brief Returns the replacement character used by the decoder.
+          *
+          * The default value is the unicode "REPLACEMENT CHARACTER".
+          */
         char32_t decoderReplacementCharacter() const;
 
+        /** @brief Set the replacement character used by the decoder.
+          *
+          * The replacement character is used when the error handling policy
+          * is REPLACE.
+          */
         void setDecoderReplacementCharacter(char32_t value);
 
+        /** @brief Returnes the replacement character used by the encoder.
+          *
+          * The default value is the unicode "REPLACEMENT CHARACTER" if the
+          * destination encoding supports this character, otherwise it will
+          * be the question mark character.
+          */
         char32_t encoderReplacementCharacter() const;
 
+        /** @brief Set the replacement character used by the encoder.
+          *
+          * The replacement character is used when the error handling policy
+          * is REPLACE.
+          */
         void setEncoderReplacementCharacter(char32_t value);
 
+        /** @brief Returns the source encoding.
+          */
         Encoding_t decoderEncoding() const;
 
+        /** @brief Returns the destination encoding.
+          */
         Encoding_t encoderEncoding() const;
 
         size_t convert(const char* source,
