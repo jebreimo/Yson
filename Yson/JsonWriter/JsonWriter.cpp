@@ -251,26 +251,15 @@ namespace Yson
 
     JsonWriter& JsonWriter::value(const std::string& text)
     {
-        beginValue();
-        auto& m = members();
-        m.buffer.push_back('"');
-        if (!languageExtension(MULTILINE_STRINGS))
+        if (!Ystring::hasUnescapedCharacters(text))
         {
-            if (!Ystring::hasUnescapedCharacters(text))
-                write(text);
-            else
-                write(Ystring::escape(text));
+            return writeString(text);
         }
         else
         {
-            if (!Ystring::hasUnescapedCharacters(text))
-                writeMultiLine(text);
-            else
-                writeMultiLine(Ystring::escape(text));
+            return writeString(Ystring::escape(
+                    text, isEscapeNonAsciiCharactersEnabled()));
         }
-        m.buffer.push_back('"');
-        m.state = AT_END_OF_VALUE;
-        return *this;
     }
 
     JsonWriter& JsonWriter::value(const std::wstring& text)
@@ -302,7 +291,7 @@ namespace Yson
 
     JsonWriter& JsonWriter::base64(const void* data, size_t size)
     {
-        return value(toBase64(data, size));
+        return writeString(toBase64(data, size));
     }
 
     JsonWriter& JsonWriter::indent()
@@ -478,6 +467,16 @@ namespace Yson
         return setLanguageExtension(MULTILINE_STRINGS, value);
     }
 
+    bool JsonWriter::isEscapeNonAsciiCharactersEnabled() const
+    {
+        return languageExtension(ESCAPE_NON_ASCII_CHARACTERS);
+    }
+
+    JsonWriter& JsonWriter::setEscapeNonAsciiCharactersEnabled(bool value)
+    {
+        return setLanguageExtension(ESCAPE_NON_ASCII_CHARACTERS, value);
+    }
+
     int JsonWriter::maximumLineWidth() const
     {
         return m_Members->maximumLineWidth;
@@ -561,6 +560,21 @@ namespace Yson
                 from = to;
             }
         }
+    }
+
+    JsonWriter& JsonWriter::writeString(const std::string& text)
+    {
+        beginValue();
+        auto& m = members();
+        m.buffer.push_back('"');
+        if (!languageExtension(MULTILINE_STRINGS))
+            write(text);
+        else
+            writeMultiLine(text);
+        m.buffer.push_back('"');
+        m.state = AT_END_OF_VALUE;
+        return *this;
+
     }
 
     JsonWriter::Members& JsonWriter::members() const

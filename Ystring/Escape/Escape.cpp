@@ -18,17 +18,21 @@ namespace Ystring
 
         bool isEscapable(char32_t c);
 
+        bool isEscapableOrNonAscii(char32_t c);
+
         bool unescape(char32_t& result,
                       std::string::const_iterator& first,
                       std::string::const_iterator last);
     }
 
-    std::string escape(const std::string& str)
+    std::string escape(const std::string& str,
+                       bool escapeNonAscii)
     {
         std::string result;
         auto first = begin(str);
         auto it = begin(str);
-        while (advanceUntil(it, end(str), isEscapable))
+        auto func = escapeNonAscii ? isEscapableOrNonAscii : isEscapable;
+        while (advanceUntil(it, end(str), func))
         {
             result.append(first, it);
             char32_t c;
@@ -45,10 +49,14 @@ namespace Ystring
         return end(str) != std::find(begin(str), end(str), '\\');
     }
 
-    bool hasUnescapedCharacters(const std::string& str)
+    bool hasUnescapedCharacters(const std::string& str,
+                                bool escapeNonAscii)
     {
         auto it = begin(str);
-        return advanceUntil(it, end(str), isEscapable);
+        if (escapeNonAscii)
+            return advanceUntil(it, end(str), isEscapableOrNonAscii);
+        else
+            return advanceUntil(it, end(str), isEscapable);
     }
 
     std::string unescape(const std::string& str)
@@ -102,6 +110,11 @@ namespace Ystring
         bool isEscapable(char32_t c)
         {
             return c < 32 || c == '"' || c == '\\' || (127 <= c && c < 160);
+        }
+
+        bool isEscapableOrNonAscii(char32_t c)
+        {
+            return c < 32 || c == '"' || c == '\\' || 127 <= c;
         }
 
         void appendHex(std::string& dst, char32_t value)

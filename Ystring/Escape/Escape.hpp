@@ -27,7 +27,8 @@ namespace Ystring
       * When escaping with backslashes the function does not use octal codes,
       * not even \\0 for value 0 as these are too easy to misinterpret.
       */
-    YSTRING_API std::string escape(const std::string& str);
+    YSTRING_API std::string escape(const std::string& str,
+                                   bool escapeNonAscii = false);
 
     /** @brief Returns true if @a str has characters that will be unescaped
       *     if unescape is called with the same parameters.
@@ -37,7 +38,8 @@ namespace Ystring
     /** @brief Returns true if @a str has characters that will be escaped
       *     if escape is called with the same parameters.
       */
-    YSTRING_API bool hasUnescapedCharacters(const std::string& str);
+    YSTRING_API bool hasUnescapedCharacters(const std::string& str,
+                                            bool escapeNonAscii = false);
 
     /** @brief Returns a copy of @a str where all escape sequences have been
       *     translated to the characters they represent.

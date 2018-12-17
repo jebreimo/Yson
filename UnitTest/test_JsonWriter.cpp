@@ -254,6 +254,15 @@ namespace
                 "\\\"678901\"");
     }
 
+    void test_EscapeNonAsciiCharacters()
+    {
+        std::stringstream ss;
+        JsonWriter writer(ss);
+        writer.setEscapeNonAsciiCharactersEnabled(true);
+        writer.value("ABC\"\360\220\220\267\"DEF").flush();
+        Y_EQUAL(ss.str(), "\"ABC\\\"\\uD801\\uDC37\\\"DEF\"");
+    }
+
     Y_TEST(test_Basics,
            test_EscapedString,
            test_ManualFormatting,
@@ -267,5 +276,6 @@ namespace
            test_FormatAndFlat,
            test_SpecialValues,
            test_MultiLineStrings,
-           test_MultiLineStringsWithEscape);
+           test_MultiLineStringsWithEscape,
+           test_EscapeNonAsciiCharacters);
 }
