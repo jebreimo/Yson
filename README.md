@@ -1,15 +1,26 @@
 Yson - JSON and UBJSON serialization and de-serialization made easy
 ===================================================================
 
-Yson provides classes for reading and writing JSON files, and is particularly well suited for serialization/de-serialization and processing very large JSON files. The library has two main classes: JsonReader and JsonWriter. JsonReader is somewhat inspired by .Net's [XmlReader](https://msdn.microsoft.com/en-us/library/system.xml.xmlreader.aspx) and makes it easy to iterate through the contents of a JSON file. JsonWriter is similarly inspired by .Net's [XmlWriter](https://msdn.microsoft.com/en-us/library/system.xml.xmlwriter.aspx) and writes JSON contents directly to a stream or file. 
+Yson provides classes for reading and writing JSON and
+[UBJSON](http://ubjson.org/) files, and is
+particularly well suited for serialization/de-serialization and processing
+very large JSON files. The library has two main interfaces: Reader and
+Writer, implemented respectively by JsonReader and UBJsonReader, and
+JsonWriter and UBJsonWriter. Reader is somewhat inspired by .Net's
+[XmlReader](https://msdn.microsoft.com/en-us/library/system.xml.xmlreader.aspx)
+and makes it easy to iterate through the contents of JSON files. Writer
+is similarly inspired by .Net's
+[XmlWriter](https://msdn.microsoft.com/en-us/library/system.xml.xmlwriter.aspx)
+and writes JSON contents directly to a stream or file. 
 
 JsonReader
 ==========
 
 Main features
 -------------
-* Supports all standard text encodings plus more.
-* Supports various extensions to the basic JSON syntax, including JavaScript comments and multiple documents in the same file.
+* Supports all standard text encodings (UTF-8, UTF-16, even UTF-32).
+* Supports most of [JSON5](https://spec.json5.org/) extension to the basic
+JSON syntax, including JavaScript comments and strings spanning multiple lines.
 * Memory-efficient and fairly fast when processing large files.
 * Released under the 2-clause *BSD Licence*.
 
@@ -141,12 +152,6 @@ int main()
 * single-word keys without quotes
 * multiple JSON top-level documents in a single file or stream (iterated over with *nextDocument()*).
 * support for the special floating point values NaN and positive and negative inifinity. 
-
-### The following encodings are supported and automatically detected:
-
-* UTF-8 with and without BOM (plain ASCII is also treated as UTF-8)
-* UTF-16 little-endian and big-endian, with and without BOM
-* UTF-32 little-endian and big-endian, with and without BOM
 
 JsonWriter
 ==========
