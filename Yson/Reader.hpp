@@ -16,35 +16,39 @@
 
 namespace Yson
 {
-    /** @brief Reader is the common interface for JsonReader and UBJsonReader.
-      */
+    /**
+     * @brief Reader is the common interface for JsonReader and UBJsonReader.
+     */
     class Reader
     {
     public:
         virtual ~Reader() = default;
 
-        /** @brief Moves to the next key inside the current object.
-          *
-          * If the returned value is true, then the key can be read with one
-          * of the read-functions.
-          * @return @arg true another key was found inside the current.
-          *         @arg false the Reader has reached the end of the object
-          *             without finding any more keys.
-          * @throw YsonException if the current location's immediate parent
-          *     isn't an object or if the source cannot be parsed.
-          */
+        /**
+         * @brief Moves to the next key in the current object.
+         *
+         * If the returned value is true, then the key can be read with one
+         * of the read-functions.
+         * @return @arg true another key was found inside the current.
+         *         @arg false the Reader has reached the end of the object
+         *             without finding any more keys.
+         * @throw YsonException if the current location's immediate parent
+         *     isn't an object or if the source cannot be parsed.
+         */
         virtual bool nextKey() = 0;
 
-        /** @brief Moves to the next value.
-          */
+        /**
+         * @brief Moves to the next value in the current array or object.
+         */
         virtual bool nextValue() = 0;
 
-        /** @brief Moves to the next document if the source consists of
-          *     mulitiple documents.
-          *
-          * This function makes it possible to read a file or buffer that
-          * consists of multiple JSON or Universal Binary JSON documents.
-          */
+        /**
+         * @brief Moves to the next document if the source consists of
+         *     mulitiple documents (i.e. top-level objects, arrays or values).
+         *
+         * This function makes it possible to read a file or buffer that
+         * consists of multiple JSON or Universal Binary JSON documents.
+         */
         virtual bool nextDocument() = 0;
 
         virtual void enter() = 0;
@@ -110,8 +114,24 @@ namespace Yson
                                   reader.columnNumber());
     }
 
+    /**
+     * @brief Auto-detects whether @a stream has JSON or UBJSON contents and
+     *      creates the corresponding instance of Reader.
+     * @param stream a stream positioned at the start of a JSON or UBJSON
+     *      document.
+     * @return an instance of either JsonReader or UBJsonReader.
+     * @throws YsonException if @a stream contains neither JSON nor UBJSON.
+     */
     YSON_API std::unique_ptr<Reader> makeReader(std::istream& stream);
 
+    /**
+     * @brief Auto-detects whether @a fileName has JSON or UBJSON contents and
+     *      creates the corresponding instance of Reader.
+     * @param fileName the name of file.
+     * @return an instance of either JsonReader or UBJsonReader.
+     * @throws YsonException if the given file contains neither JSON
+     *      nor UBJSON.
+     */
     YSON_API std::unique_ptr<Reader> makeReader(const std::string& fileName);
 
     YSON_API std::unique_ptr<Reader> makeReader(const char* buffer,

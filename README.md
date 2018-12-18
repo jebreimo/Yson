@@ -4,20 +4,21 @@ Yson - JSON and UBJSON serialization and de-serialization made easy
 Yson provides classes for reading and writing JSON and
 [UBJSON](http://ubjson.org/) files, and is
 particularly well suited for serialization/de-serialization and processing
-very large JSON files. The library has two main interfaces: Reader and
-Writer, implemented respectively by JsonReader and UBJsonReader, and
+very large JSON files. The library has two main interfaces: Reader
+implemented by JsonReader and UBJsonReader, and Writer, implemented by 
 JsonWriter and UBJsonWriter. Reader is somewhat inspired by .Net's
 [XmlReader](https://msdn.microsoft.com/en-us/library/system.xml.xmlreader.aspx)
-and makes it easy to iterate through the contents of JSON files. Writer
+and makes it easy to iterate through the contents of JSON and UBJSON files. Writer
 is similarly inspired by .Net's
 [XmlWriter](https://msdn.microsoft.com/en-us/library/system.xml.xmlwriter.aspx)
-and writes JSON contents directly to a stream or file. 
+and writes JSON and UBJSON contents directly to a stream or file. 
 
 JsonReader
 ==========
 
 Main features
 -------------
+* Reads files, streams and memory buffers.
 * Supports all standard text encodings (UTF-8, UTF-16, even UTF-32).
 * Supports most of [JSON5](https://spec.json5.org/) extension to the basic
 JSON syntax, including JavaScript comments and strings spanning multiple lines.
