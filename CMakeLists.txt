@@ -169,8 +169,6 @@ if (EXISTS "${CMAKE_SOURCE_DIR}/external/Ytest/CMakeLists.txt")
         COMMAND YsonTest)
 endif ()
 
-add_subdirectory(misc)
-
 export(TARGETS Yson
     NAMESPACE Yson::
     FILE YsonTargets.cmake)
