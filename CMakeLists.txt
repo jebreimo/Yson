@@ -30,20 +30,6 @@ set(PUBLIC_HEADER_FILES
     )
 
 set(SOURCE_FILES
-    include/Yson/DetailedValueType.hpp
-    include/Yson/DetailedValueType-impl.hpp
-    include/Yson/JsonReader.hpp
-    include/Yson/JsonWriter.hpp
-    include/Yson/Reader.hpp
-    include/Yson/StructureParameters.hpp
-    include/Yson/UBJsonReader.hpp
-    include/Yson/UBJsonValueType.hpp
-    include/Yson/UBJsonWriter.hpp
-    include/Yson/ValueType.hpp
-    include/Yson/Writer.hpp
-    include/Yson/YsonDefinitions.hpp
-    include/Yson/YsonException.hpp
-    include/Yson/YsonReaderException.hpp
     src/Yson/Common/AssignInteger.hpp
     src/Yson/Common/Base64.cpp
     src/Yson/Common/Base64.hpp
@@ -179,8 +165,8 @@ if (EXISTS "${CMAKE_SOURCE_DIR}/external/Ytest/CMakeLists.txt")
     add_subdirectory(tests/YsonTest)
 
     enable_testing()
-    add_test(tests/YsonTest
-        COMMAND tests/YsonTest)
+    add_test(YsonTest
+        COMMAND YsonTest)
 endif ()
 
 add_subdirectory(misc)
@@ -190,10 +176,25 @@ export(TARGETS Yson
     FILE YsonTargets.cmake)
 
 include(GNUInstallDirs)
-install(TARGETS Yson
-    EXPORT YsonExport
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-install(FILES ${PUBLIC_HEADER_FILES}
-    DESTINATION include/Yson)
+install(TARGETS Yson
+    EXPORT YsonTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+
+install(EXPORT YsonTargets
+    FILE
+        YtestTargets.cmake
+    NAMESPACE
+        Yson::
+    DESTINATION
+        ${CMAKE_INSTALL_LIBDIR}/cmake/Yson
+    )
+
+install(
+    DIRECTORY
+        include/
+    DESTINATION
+        ${CMAKE_INSTALL_INCLUDEDIR}
+    )
