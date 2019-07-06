@@ -8,7 +8,7 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "../../Ystring/Encoding.hpp"
+#include <Ystring/Encoding.hpp>
 #include "TextReader.hpp"
 #include "../YsonDefinitions.hpp"
 

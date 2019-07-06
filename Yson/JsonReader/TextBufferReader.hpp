@@ -7,7 +7,7 @@
 //****************************************************************************
 #pragma once
 #include <memory>
-#include "../../Ystring/Encoding.hpp"
+#include <Ystring/Encoding.hpp>
 #include "TextReader.hpp"
 
 namespace Ystring { namespace Conversion

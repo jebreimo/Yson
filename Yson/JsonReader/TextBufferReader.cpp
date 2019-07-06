@@ -8,8 +8,8 @@
 #include "TextBufferReader.hpp"
 
 #include <algorithm>
-#include "../../Ystring/Conversion.hpp"
-#include "../../Ystring/EncodingInfo.hpp"
+#include <Ystring/Conversion.hpp>
+#include <Ystring/EncodingInfo.hpp>
 
 namespace Yson
 {
@@ -49,7 +49,7 @@ namespace Yson
                     Ystring::Encoding::UTF_8));
         }
 
-        if (m_Converter->decoderEncoding() == Ystring::Encoding::UTF_8)
+        if (m_Converter->sourceEncoding() == Ystring::Encoding::UTF_8)
         {
             if (m_Offset + bytes != m_Size)
                 bytes = sizeWithoutIncompleteFinalCharacter(m_Buffer + m_Offset, bytes);

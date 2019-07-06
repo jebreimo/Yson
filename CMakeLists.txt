@@ -10,9 +10,7 @@ project(Yson VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
-
-add_subdirectory(Ystring)
+add_subdirectory(external/Ystring)
 
 set(PUBLIC_HEADER_FILES
     Yson/DetailedValueType.hpp
@@ -146,14 +144,27 @@ add_library(
     $<TARGET_OBJECTS:Yson_Ystring>
     )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE Ystring=Yson_Ystring)
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+        Ystring=Yson_Ystring)
+
+target_include_directories(Yson BEFORE
+    PUBLIC
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/Ystring/include
+    )
 
 if (WIN32)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
-        _SCL_SECURE_NO_WARNINGS
-        _CRT_SECURE_NO_WARNINGS
-        YSON_EXPORTS
-        YSTRING_NO_AUTO_IMPORT)
+    target_compile_definitions(${PROJECT_NAME}
+        PRIVATE
+            _SCL_SECURE_NO_WARNINGS
+            _CRT_SECURE_NO_WARNINGS
+            YSON_EXPORTS
+            YSTRING_NO_AUTO_IMPORT
+        )
 endif (WIN32)
 
 set_target_properties(

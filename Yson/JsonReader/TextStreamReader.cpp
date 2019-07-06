@@ -9,8 +9,8 @@
 
 #include <algorithm>
 #include <istream>
-#include "../../Ystring/Conversion.hpp"
-#include "../../Ystring/EncodingInfo.hpp"
+#include <Ystring/Conversion.hpp>
+#include <Ystring/EncodingInfo.hpp>
 #include "../Common/DefaultBufferSize.hpp"
 
 namespace Yson

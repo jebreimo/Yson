@@ -9,7 +9,7 @@
 #include <cassert>
 #include <fstream>
 #include <iostream>
-#include "../../Ystring/Conversion.hpp"
+#include <Ystring/Conversion.hpp>
 #include "../YsonException.hpp"
 #include "../Common/Base64.hpp"
 #include "../Common/GetUnicodeFileName.hpp"

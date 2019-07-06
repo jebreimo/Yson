@@ -4,8 +4,8 @@
 //****************************************************************************
 #include "GetUnicodeFileName.hpp"
 
-#include "../../Ystring/Conversion.hpp"
-#include "../../Ystring/YstringException.hpp"
+#include <Ystring/Conversion.hpp>
+#include <Ystring/YstringException.hpp>
 #include "../Common/ThrowYsonException.hpp"
 
 namespace Yson

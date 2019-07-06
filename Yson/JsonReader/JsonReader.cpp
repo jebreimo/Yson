@@ -6,7 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include <stack>
-#include "../../Ystring/Escape/Escape.hpp"
+#include <Ystring/Escape/Escape.hpp>
 #include "../Common/Base64.hpp"
 #include "../Common/GetDetailedValueType.hpp"
 #include "../Common/GetValueType.hpp"

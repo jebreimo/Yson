@@ -7,7 +7,7 @@
 //****************************************************************************
 #include <algorithm>
 #include <fstream>
-#include "../../Ystring/EncodingInfo.hpp"
+#include <Ystring/EncodingInfo.hpp>
 #include "../Common/GetUnicodeFileName.hpp"
 #include "../Common/ThrowYsonException.hpp"
 #include "../JsonReader.hpp"
