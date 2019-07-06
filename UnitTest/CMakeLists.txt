@@ -7,8 +7,7 @@
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.7)
 
-set(PARENT_PROJECT Yson)
-project(${PARENT_PROJECT}Test)
+project(YsonTest)
 
 set(SOURCE_FILES
     main.cpp
@@ -26,11 +25,9 @@ set(SOURCE_FILES
     test_UBJsonTokenizer.cpp
     test_UBJsonWriter.cpp)
 
-add_executable(${PROJECT_NAME}
+add_executable(YsonTest
                ${SOURCE_FILES})
 
-target_link_libraries(${PROJECT_NAME}
-                      ${PARENT_PROJECT}
-                      Ytest)
-
-add_test(${PARENT_PROJECT} ${PROJECT_NAME})
+target_link_libraries(YsonTest
+    Yson::Yson
+    Ytest::Ytest)

@@ -6,7 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "../Yson/UBJsonWriter.hpp"
-#include "../Externals/Ytest/Ytest.hpp"
+#include "Ytest/Ytest.hpp"
 
 namespace
 {

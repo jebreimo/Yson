@@ -6,7 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "../Yson/UBJsonReader.hpp"
-#include "../Externals/Ytest/Ytest.hpp"
+#include "Ytest/Ytest.hpp"
 #include "../Yson/YsonException.hpp"
 #include "../Yson/Common/DefaultBufferSize.hpp"
 

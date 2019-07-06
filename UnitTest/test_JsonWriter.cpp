@@ -9,7 +9,7 @@
 
 #include <limits>
 #include <sstream>
-#include "../Externals/Ytest/Ytest.hpp"
+#include "Ytest/Ytest.hpp"
 
 namespace
 {

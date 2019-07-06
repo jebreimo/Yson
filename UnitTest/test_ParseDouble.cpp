@@ -7,7 +7,7 @@
 //****************************************************************************
 #include "../Yson/Common/ParseFloatingPoint.hpp"
 
-#include "../Externals/Ytest/Ytest.hpp"
+#include "Ytest/Ytest.hpp"
 
 namespace
 {

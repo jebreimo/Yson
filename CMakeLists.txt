@@ -141,7 +141,7 @@ set(SOURCE_FILES
     )
 
 add_library(
-    ${PROJECT_NAME} SHARED
+    ${PROJECT_NAME} STATIC
     ${SOURCE_FILES}
     $<TARGET_OBJECTS:Yson_Ystring>
     )
@@ -162,18 +162,22 @@ set_target_properties(
         MACOSX_RPATH ON
         DEBUG_OUTPUT_NAME "${PROJECT_NAME}.debug")
 
-add_subdirectory(Externals)
+add_library(Yson::Yson ALIAS Yson)
 
-if (HAS_YTEST)
-     set(CTEST_OUTPUT_ON_FAILURE 1)
-     add_subdirectory(UnitTest)
-endif(HAS_YTEST)
+if (EXISTS "${CMAKE_SOURCE_DIR}/external/Ytest/CMakeLists.txt")
+    add_subdirectory(external/Ytest EXCLUDE_FROM_ALL)
+    add_subdirectory(UnitTest)
 
-add_subdirectory(Miscellaneous)
+    enable_testing()
+    add_test(UnitTest
+        COMMAND UnitTest)
+endif ()
+
+add_subdirectory(misc)
 
 include(GNUInstallDirs)
 install(TARGETS ${PROJECT_NAME}
-    EXPORT yson-export
+    EXPORT YsonExport
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 

@@ -7,7 +7,7 @@
 //****************************************************************************
 #include "../Yson/Common/Base64.hpp"
 
-#include "../Externals/Ytest/Ytest.hpp"
+#include "Ytest/Ytest.hpp"
 
 namespace
 {

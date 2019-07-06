@@ -8,7 +8,7 @@
 #include "../Yson/JsonReader.hpp"
 
 #include <sstream>
-#include "../Externals/Ytest/Ytest.hpp"
+#include "Ytest/Ytest.hpp"
 
 namespace
 {
