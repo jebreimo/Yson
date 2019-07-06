@@ -14,4 +14,7 @@ set(SOURCE_FILES
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
-target_link_libraries(${PROJECT_NAME} ${YSTRING_LIBRARY} Yson)
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        Yson::Ystring
+        Yson::Yson)

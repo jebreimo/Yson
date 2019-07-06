@@ -5,7 +5,7 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include "../Yson/UBJsonWriter.hpp"
+#include "Yson/UBJsonWriter.hpp"
 #include "Ytest/Ytest.hpp"
 
 namespace

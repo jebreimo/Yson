@@ -5,7 +5,7 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include "../Yson/Common/ParseFloatingPoint.hpp"
+#include "Yson/Common/ParseFloatingPoint.hpp"
 
 #include "Ytest/Ytest.hpp"
 

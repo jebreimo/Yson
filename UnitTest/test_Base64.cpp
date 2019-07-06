@@ -5,7 +5,7 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include "../Yson/Common/Base64.hpp"
+#include "Yson/Common/Base64.hpp"
 
 #include "Ytest/Ytest.hpp"
 

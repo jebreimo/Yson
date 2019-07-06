@@ -5,10 +5,10 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include "../Yson/UBJsonReader.hpp"
+#include "Yson/UBJsonReader.hpp"
 #include "Ytest/Ytest.hpp"
-#include "../Yson/YsonException.hpp"
-#include "../Yson/Common/DefaultBufferSize.hpp"
+#include "Yson/YsonException.hpp"
+#include "Yson/Common/DefaultBufferSize.hpp"
 
 namespace
 {

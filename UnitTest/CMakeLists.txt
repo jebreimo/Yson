@@ -7,8 +7,6 @@
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.7)
 
-project(YsonTest)
-
 set(SOURCE_FILES
     main.cpp
     test_GetDetailedValueType.cpp
@@ -30,4 +28,10 @@ add_executable(YsonTest
 
 target_link_libraries(YsonTest
     Yson::Yson
-    Ytest::Ytest)
+    Ytest::Ytest
+    )
+
+target_include_directories(YsonTest BEFORE
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}/src
+    )
