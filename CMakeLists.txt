@@ -176,14 +176,18 @@ add_library(Yson::Yson ALIAS Yson)
 
 if (EXISTS "${CMAKE_SOURCE_DIR}/external/Ytest/CMakeLists.txt")
     add_subdirectory(external/Ytest EXCLUDE_FROM_ALL)
-    add_subdirectory(UnitTest)
+    add_subdirectory(tests/YsonTest)
 
     enable_testing()
-    add_test(UnitTest
-        COMMAND UnitTest)
+    add_test(tests/YsonTest
+        COMMAND tests/YsonTest)
 endif ()
 
 add_subdirectory(misc)
+
+export(TARGETS Yson
+    NAMESPACE Yson::
+    FILE YsonTargets.cmake)
 
 include(GNUInstallDirs)
 install(TARGETS Yson
