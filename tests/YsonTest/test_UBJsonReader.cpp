@@ -17,7 +17,7 @@ namespace
     void test_Basics()
     {
         std::string doc("{i\x03KeySi\x0CHello world!"
-                                "i\x05" "Array[I\x10\x20U\xF0]}");
+                        "i\x05" "Array[I\x10\x20U\xF0]}");
         UBJsonReader reader(doc.data(), doc.size());
         Y_ASSERT(reader.nextValue());
         Y_EQUAL(reader.valueType(), ValueType::OBJECT);

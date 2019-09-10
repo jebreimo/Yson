@@ -7,7 +7,14 @@
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.7)
 
-set(SOURCE_FILES
+find_package(Ytest QUIET)
+
+if (NOT TARGET Ytest::Ytest)
+    message(VERBOSE "Ytest not found. Unit tests will not be built or run.")
+    return()
+endif()
+
+add_executable(YsonTest
     main.cpp
     test_GetDetailedValueType.cpp
     test_GetValueType.cpp
@@ -21,17 +28,19 @@ set(SOURCE_FILES
     test_ParseDouble.cpp
     test_UBJsonReader.cpp
     test_UBJsonTokenizer.cpp
-    test_UBJsonWriter.cpp)
+    test_UBJsonWriter.cpp
+    )
 
-add_executable(YsonTest
-               ${SOURCE_FILES})
+target_include_directories(YsonTest BEFORE
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}/src
+    )
 
 target_link_libraries(YsonTest
     Yson::Yson
     Ytest::Ytest
     )
 
-target_include_directories(YsonTest BEFORE
-    PRIVATE
-        ${CMAKE_SOURCE_DIR}/src
+add_test(YsonTest
+    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/YsonTest
     )

@@ -132,7 +132,8 @@ add_library(
 
 target_compile_definitions(Yson
     PRIVATE
-        Ystring=Yson_Ystring)
+        Ystring=Yson_Ystring
+    )
 
 target_include_directories(Yson BEFORE
     PUBLIC
@@ -143,47 +144,59 @@ target_include_directories(Yson BEFORE
         ${CMAKE_CURRENT_SOURCE_DIR}/external/Ystring/include
     )
 
-if (WIN32)
-    target_compile_definitions(Yson
-        PRIVATE
-            _SCL_SECURE_NO_WARNINGS
-            _CRT_SECURE_NO_WARNINGS
-            YSON_EXPORTS
-            YSTRING_NO_AUTO_IMPORT
-        )
-endif (WIN32)
+target_compile_definitions(Yson
+    PRIVATE
+        $<$<BOOL:${MSVC}>:_SCL_SECURE_NO_WARNINGS>
+        $<$<BOOL:${MSVC}>:_CRT_SECURE_NO_WARNINGS>
+    )
 
 set_target_properties(Yson
     PROPERTIES
         MACOSX_RPATH ON
-        DEBUG_OUTPUT_NAME "Yson.debug")
+        DEBUG_OUTPUT_NAME "Yson.debug"
+    )
 
 add_library(Yson::Yson ALIAS Yson)
 
+
+##
+## Unit tests
+##
+
 if (EXISTS "${CMAKE_SOURCE_DIR}/external/Ytest/CMakeLists.txt")
     add_subdirectory(external/Ytest EXCLUDE_FROM_ALL)
-    add_subdirectory(tests/YsonTest)
-
-    enable_testing()
-    add_test(YsonTest
-        COMMAND YsonTest)
 endif ()
+
+enable_testing()
+
+add_subdirectory(tests/YsonTest)
+
+
+##
+## "Export" the current build tree and make it possible for other modules
+## in the same build tree to locate it with find_package.
+##
 
 export(TARGETS Yson
     NAMESPACE Yson::
-    FILE YsonTargets.cmake)
+    FILE YsonConfig.cmake)
+
+
+##
+## Installation
+##
 
 include(GNUInstallDirs)
 
 install(TARGETS Yson
-    EXPORT YsonTargets
+    EXPORT YsonConfig
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
 
-install(EXPORT YsonTargets
+install(EXPORT YsonConfig
     FILE
-        YtestTargets.cmake
+        YsonConfig.cmake
     NAMESPACE
         Yson::
     DESTINATION
