@@ -7,6 +7,8 @@
 //****************************************************************************
 #pragma once
 
+#include "YsonVersion.hpp"
+
 /** @file
   * @brief Defines constants and macros shared by all the other files
   *     in @a Yson.

@@ -1,0 +1,36 @@
+//****************************************************************************
+// Copyright © 2020 Jan Erik Breimo. All rights reserved.
+// Created by Jan Erik Breimo on 2020-03-26.
+//
+// This file is distributed under the BSD License.
+// License text is included with the source distribution.
+//****************************************************************************
+#pragma once
+
+/**
+ * @file
+ * @brief Defines the current Yson version.
+ */
+
+/**
+ * @brief String representation of the complete version number.
+ */
+constexpr char YSON_VERSION[] = "@Yson_VERSION@";
+
+/**
+ * @brief Incremented if a new version is significantly incompatible
+ *      with the previous version.
+ */
+constexpr unsigned YSON_VERSION_MAJOR = @Yson_VERSION_MAJOR@;
+
+/**
+ * @brief Incremented when Yson's interface is modified without introducing
+ *      incompatibilities with previous versions.
+ */
+constexpr unsigned YSON_VERSION_MINOR = @Yson_VERSION_MINOR@;
+
+/**
+ * @brief Incremented when Yson's internals are modified without modifying
+ *      its interface.
+ */
+constexpr unsigned YSON_VERSION_PATCH = @Yson_VERSION_PATCH@;

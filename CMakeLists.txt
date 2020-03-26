@@ -8,9 +8,12 @@
 cmake_minimum_required(VERSION 3.7)
 project(Yson VERSION 1.0.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(external/Ystring)
+
+configure_file(include/Yson/YsonVersion.hpp.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Yson/YsonVersion.hpp @ONLY)
 
 set(PUBLIC_HEADER_FILES
     include/Yson/DetailedValueType.hpp
@@ -124,8 +127,7 @@ set(SOURCE_FILES
     src/Yson/UBJsonWriter/UBJsonWriterUtilities.hpp
     )
 
-add_library(
-    Yson STATIC
+add_library(Yson
     ${SOURCE_FILES}
     $<TARGET_OBJECTS:Yson_Ystring>
     )
