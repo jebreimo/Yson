@@ -10,7 +10,7 @@
 #include <cmath>
 #include <cstdint>
 #include <limits>
-#include <string>
+#include <optional>
 
 namespace Yson
 {
@@ -18,16 +18,14 @@ namespace Yson
     {
         int getDigit(char c)
         {
-            return uint8_t(c) ^ 0x30u;
+            return int(uint8_t(c) ^ 0x30u);
         }
 
         template <typename T>
-        std::pair<T, bool> parseFloatingPoint(std::string_view str)
+        std::optional<T> parseFloatingPoint(std::string_view str)
         {
-            typedef std::pair<T, bool> Result;
-            constexpr Result BadResult(T(0), false);
             if (str.empty())
-                return BadResult;
+                return {};
 
             size_t i = 0;
             // Get the sign of the number
@@ -36,12 +34,12 @@ namespace Yson
             {
                 negative = true;
                 if (++i == str.size())
-                    return BadResult;
+                    return {};
             }
             else if (str[0] == '+')
             {
                 if (++i == str.size())
-                    return BadResult;
+                    return {};
             }
 
             // Get the integer value
@@ -49,12 +47,12 @@ namespace Yson
             if (value > 9)
             {
                 if (str == "Infinity" || str == "null" || str == "+Infinity")
-                    return Result(std::numeric_limits<T>::infinity(), true);
+                    return std::numeric_limits<T>::infinity();
                 if (str == "-Infinity")
-                    return Result(-std::numeric_limits<T>::infinity(), true);
+                    return -std::numeric_limits<T>::infinity();
                 if (str == "NaN")
-                    return Result(std::numeric_limits<T>::quiet_NaN(), true);
-                return BadResult;
+                    return std::numeric_limits<T>::quiet_NaN();
+                return {};
             }
 
             bool underscore = false;
@@ -78,14 +76,15 @@ namespace Yson
             }
 
             if (underscore)
-                return BadResult;
+                return {};
 
             if (i == str.size())
-                return Result(!negative ? value : -value, true);
+                return !negative ? value : -value;
 
             // Get the fraction
-            int decimals = 0;
             underscore = true; // Makes underscore after point illegal.
+            int decimals = 0;
+            T fraction = {};
             if (str[i] == '.')
             {
                 for (++i; i < str.size(); ++i)
@@ -93,8 +92,8 @@ namespace Yson
                     auto digit = getDigit(str[i]);
                     if (digit <= 9)
                     {
-                        value *= 10;
-                        value += digit;
+                        fraction *= 10;
+                        fraction += digit;
                         underscore = false;
                         ++decimals;
                     }
@@ -113,28 +112,28 @@ namespace Yson
             int exponent = 0;
             if (i != str.size())
             {
-                if ((str[i] & 0xDF) != 'E')
-                    return BadResult;
+                if ((uint8_t(str[i]) & 0xDFu) != 'E')
+                    return {};
 
                 if (++i == str.size())
-                    return BadResult;
+                    return {};
 
                 bool negativeExponent = false;
                 if (str[i] == '-')
                 {
                     negativeExponent = true;
                     if (++i == str.size())
-                        return BadResult;
+                        return {};
                 }
                 else if (str[i] == '+')
                 {
                     if (++i == str.size())
-                        return BadResult;
+                        return {};
                 }
 
                 exponent += getDigit(str[i]);
                 if (exponent > 9)
-                    return BadResult;
+                    return {};
 
                 for (++i; i != str.size(); ++i)
                 {
@@ -147,48 +146,37 @@ namespace Yson
                     }
                     else if (str[i] != '_' || underscore)
                     {
-                        return BadResult;
+                        return {};
                     }
                     else
                     {
                         underscore = true;
                     }
                     if (exponent > std::numeric_limits<T>::max_exponent10)
-                        return BadResult;
+                        return {};
                 }
                 if (negativeExponent)
                     exponent = -exponent;
             }
 
-            exponent -= decimals;
-            if (exponent >= std::numeric_limits<T>::min_exponent10)
-            {
-              // Add the exponent
-              if (exponent)
-                  value *= pow(T(10), exponent);
-            }
-            else
-            {
-                // The value is awfully close to 0. Try to restore it in
-                // two steps.
-                value /= pow(T(10), decimals);
-                value *= pow(T(10), exponent + decimals);
-            }
+            if (exponent)
+                value *= pow(T(10), exponent);
+            if (fraction != 0)
+                value += fraction * pow(T(10), exponent - decimals);
 
             // Add the sign
             if (negative)
                 value = -value;
 
-            return Result(value, true);
+            return value;
         }
 
         template <typename T>
         bool parseImpl(std::string_view str, T& value)
         {
-            auto parsedValue = parseFloatingPoint<T>(str);
-            if (parsedValue.second)
+            if (auto parsedValue = parseFloatingPoint<T>(str))
             {
-                value = parsedValue.first;
+                value = *parsedValue;
                 return true;
             }
             return false;

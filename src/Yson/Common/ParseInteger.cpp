@@ -7,6 +7,7 @@
 //****************************************************************************
 #include "ParseInteger.hpp"
 #include <limits>
+#include <optional>
 #include <type_traits>
 #include <utility>
 #include "SelectTypeIf.hpp"
@@ -20,78 +21,83 @@ namespace Yson
         {
             if ('0' <= c && c <= '9')
                 return IntT(c - '0');
-            c &= 0xDF;
-            if ('A' <= c && c <= 'Z')
-                return IntT(10 + c - 'A');
+            auto u = uint8_t(c);
+            u &= 0xDFu;
+            if ('A' <= u && u <= 'Z')
+                return IntT(10 + u - 'A');
             return std::numeric_limits<IntT>::max();
         }
 
-        template <typename T, T Base, typename std::enable_if<std::is_signed<T>::value, int>::type = 0>
-        constexpr T maxPrecedingDigitsNegative()
+        template <typename T, T Base>
+        constexpr T maxPrecedingValueNegative()
         {
-            using U = typename std::make_unsigned<T>::type;
-            return T((U(1) << (sizeof(T) * 8 - 1)) / U(Base));
+            if constexpr (std::is_signed<T>::value)
+            {
+                using U = typename std::make_unsigned<T>::type;
+                return T((U(1) << (sizeof(T) * 8 - 1)) / U(Base));
+            }
+            else
+            {
+                return T(0);
+            }
         }
 
-        template <typename T, T Base, typename std::enable_if<std::is_unsigned<T>::value, int>::type = 0>
-        constexpr T maxPrecedingDigitsNegative()
-        {
-            return T(0);
-        }
-
-        template <typename T, T Base, typename std::enable_if<std::is_signed<T>::value, int>::type = 0>
+        template <typename T, T Base>
         constexpr T maxFinalDigitNegative()
         {
-            using U = typename std::make_unsigned<T>::type;
-            return T((U(1) << (sizeof(T) * 8 - 1)) % U(Base));
+            if constexpr (std::is_signed<T>::value)
+            {
+                using U = typename std::make_unsigned<T>::type;
+                return T((U(1) << (sizeof(T) * 8 - 1)) % U(Base));
+            }
+            else
+            {
+                return T(0);
+            }
         }
 
-        template <typename T, T Base, typename std::enable_if<std::is_unsigned<T>::value, int>::type = 0>
-        constexpr T maxFinalDigitNegative()
+        template <typename T, T Base>
+        constexpr T maxPrecedingValuePositive()
         {
-            return T(0);
+            if constexpr (std::is_signed<T>::value)
+            {
+                using U = typename std::make_unsigned<T>::type;
+                return T(U(~(U(1) << (sizeof(T) * 8 - 1))) / U(Base));
+            }
+            else
+            {
+                return T(~T(0)) / Base;
+            }
         }
 
-        template <typename T, T Base, typename std::enable_if<std::is_signed<T>::value, int>::type = 0>
-        constexpr T maxPrecedingDigitsPositive()
-        {
-            using U = typename std::make_unsigned<T>::type;
-            return T(U(~(U(1) << (sizeof(T) * 8 - 1))) / U(Base));
-        }
-
-        template <typename T, T Base, typename std::enable_if<std::is_unsigned<T>::value, int>::type = 0>
-        constexpr T maxPrecedingDigitsPositive()
-        {
-            return T(~T(0)) / Base;
-        }
-
-        template <typename T, T Base, typename std::enable_if<std::is_signed<T>::value, int>::type = 0>
+        template <typename T, T Base>
         constexpr T maxFinalDigitPositive()
         {
-            using U = typename std::make_unsigned<T>::type;
-            return T(U(~(U(1) << (sizeof(T) * 8 - 1))) % U(Base));
-        }
-
-        template <typename T, T Base, typename std::enable_if<std::is_unsigned<T>::value, int>::type = 0>
-        constexpr T maxFinalDigitPositive()
-        {
-            return T(~T(0)) % Base;
+            if constexpr (std::is_signed<T>::value)
+            {
+                using U = typename std::make_unsigned<T>::type;
+                return T(U(~(U(1) << (sizeof(T) * 8 - 1))) % U(Base));
+            }
+            else
+            {
+                return T(~T(0)) % Base;
+            }
         }
 
         template <typename IntT, IntT Base>
-        std::pair<IntT, bool> parsePositiveIntegerImpl(std::string_view str)
+        std::optional<IntT> parsePositiveIntegerImpl(std::string_view str)
         {
             if (str.empty())
-                return std::make_pair(0, false);
+                return {};
             IntT value = fromDigit<IntT>(str[0]);
             if (value >= Base)
-                return std::make_pair(0, false);
+                return {};
             for (size_t i = 1; i < str.size(); ++i)
             {
                 auto digit = fromDigit<IntT>(str[i]);
                 if (digit < Base
-                    && (value < maxPrecedingDigitsPositive<IntT, Base>()
-                        || (value == maxPrecedingDigitsPositive<IntT, Base>()
+                    && (value < maxPrecedingValuePositive<IntT, Base>()
+                        || (value == maxPrecedingValuePositive<IntT, Base>()
                             && digit <= maxFinalDigitPositive<IntT, Base>())))
                 {
                     value *= Base;
@@ -100,141 +106,114 @@ namespace Yson
                 else if (str[i] != '_' || i == str.size() - 1
                          || str[i - 1] == '_')
                 {
-                    return std::make_pair(0, false);
+                    return {};
                 }
             }
-            return std::make_pair(value, true);
-        }
-
-        struct IsSigned {};
-
-        struct IsUnsigned {};
-
-        template <typename IntT, IntT Base>
-        std::pair<IntT, bool> parseNegativeIntegerImpl(std::string_view str,
-                                                       IsSigned)
-        {
-            if (str.empty())
-                return std::make_pair(0, false);
-            IntT value = fromDigit<IntT>(str[0]);
-            if (value >= Base)
-                return std::make_pair(0, false);
-            for (size_t i = 1; i < str.size(); ++i)
-            {
-                auto digit = fromDigit<IntT>(str[i]);
-                if (digit < Base
-                    && (value < maxPrecedingDigitsNegative<IntT, Base>()
-                        || (value == maxPrecedingDigitsNegative<IntT, Base>()
-                            && digit <= maxFinalDigitNegative<IntT, Base>())))
-                {
-                    value *= Base;
-                    value += digit;
-                }
-                else if (str[i] != '_' || i == str.size() - 1
-                         || str[i - 1] == '_')
-                {
-                    return std::make_pair(0, false);
-                }
-            }
-            return std::make_pair(-value, true);
+            return value;
         }
 
         template <typename IntT, IntT Base>
-        std::pair<IntT, bool> parseNegativeIntegerImpl(std::string_view str,
-                                                       IsUnsigned)
+        std::optional<IntT> parseNegativeIntegerImpl(std::string_view str)
         {
-            if (str.empty())
-                return std::make_pair(0, false);
-            for (size_t i = 0; i < str.size(); ++i)
+            if constexpr (std::is_signed<IntT>::value)
             {
-                auto digit = fromDigit<IntT>(str[i]);
-                if (digit > 0)
-                    return std::make_pair(0, false);
+                if (str.empty())
+                    return {};
+                IntT value = fromDigit<IntT>(str[0]);
+                if (value >= Base)
+                    return {};
+                for (size_t i = 1; i < str.size(); ++i)
+                {
+                    auto digit = fromDigit<IntT>(str[i]);
+                    if (digit < Base
+                        && (value < maxPrecedingValueNegative<IntT, Base>()
+                            || (value == maxPrecedingValueNegative<IntT, Base>()
+                                && digit <= maxFinalDigitNegative<IntT, Base>())))
+                    {
+                        value *= Base;
+                        value += digit;
+                    }
+                    else if (str[i] != '_' || i == str.size() - 1
+                             || str[i - 1] == '_')
+                    {
+                        return {};
+                    }
+                }
+                return IntT(-value);
             }
-            return std::make_pair(0, true);
+            else
+            {
+                if (str.empty())
+                    return {};
+                for (char c : str)
+                {
+                    auto digit = fromDigit<IntT>(c);
+                    if (digit > 0)
+                        return {};
+                }
+                return IntT(0);
+            }
         }
 
         template <typename IntT>
-        std::pair<IntT, bool>
-        parseInteger(std::string_view str, bool detectBase)
+        std::optional<IntT> parseInteger(std::string_view str, bool detectBase)
         {
-            using Signedness = typename SelectTypeIf<
-                    std::is_signed<IntT>::value,
-                    IsSigned,
-                    IsUnsigned>::type;
-            using Result = std::pair<IntT, bool>;
+            static_assert(std::is_integral<IntT>());
+
             if (str.empty())
-                return Result(0, false);
+                return {};
 
             bool positive = true;
-            size_t i = 0;
             if (str[0] == '-')
             {
                 positive = false;
-                if (str.size() == 1)
-                    return Result(0, false);
-                i = 1;
+                str = str.substr(1);
             }
             else if (str[0] == '+')
             {
-                if (str.size() == 1)
-                    return Result(0, false);
-                i = 1;
+                str = str.substr(1);
             }
 
-            int64_t base = 10;
-            if (str[i] == '0' && detectBase)
+            if (str.empty())
+                return {};
+
+            if (str[0] == '0' && str.size() >= 3)
             {
-                if (++i == str.size())
-                    return Result(0, true);
-                auto str2 = str.substr(i + 1);
-                switch (str[i] | 0x20)
+                auto str2 = str.substr(2);
+                switch (uint8_t(str[1]) | 0x20u)
                 {
                 case 'b':
                     return positive ? parsePositiveIntegerImpl<IntT, 2>(str2)
-                                    : parseNegativeIntegerImpl<IntT, 2>(
-                                              str2, Signedness());
+                                    : parseNegativeIntegerImpl<IntT, 2>(str2);
                 case 'o':
                     return positive ? parsePositiveIntegerImpl<IntT, 8>(str2)
-                                    : parseNegativeIntegerImpl<IntT, 8>(
-                                              str2, Signedness());
+                                    : parseNegativeIntegerImpl<IntT, 8>(str2);
                 case 'x':
                     return positive ? parsePositiveIntegerImpl<IntT, 16>(str2)
-                                    : parseNegativeIntegerImpl<IntT, 16>(
-                                              str2, Signedness());
-                case '_':
-                    if (str2.empty())
-                        return Result(0, false);
-                    //[[fallthrough]]
+                                    : parseNegativeIntegerImpl<IntT, 16>(str2);
                 default:
-                    return positive ? parsePositiveIntegerImpl<IntT, 10>(str)
-                                    : parseNegativeIntegerImpl<IntT, 10>(
-                                              str, Signedness());
+                    break;
                 }
             }
-            if ('0' <= str[i] && str[i] <= '9')
+            if ('0' <= str[0] && str[0] <= '9')
             {
-                auto str2 = str.substr(i);
-                return positive ? parsePositiveIntegerImpl<IntT, 10>(str2)
-                                : parseNegativeIntegerImpl<IntT, 10>(
-                                          str2, Signedness());
+                return positive ? parsePositiveIntegerImpl<IntT, 10>(str)
+                                : parseNegativeIntegerImpl<IntT, 10>(str);
             }
-            if (str == "false")
-                return Result(0, true);
-            if (str == "null")
-                return Result(0, true);
+            if (str == "false" || str == "null")
+                return IntT(0);
             if (str == "true")
-                return Result(1, true);
-            return Result(0, false);
+                return IntT(1);
+            return {};
         }
 
         template <typename T>
         bool parseImpl(std::string_view str, T& value, bool detectBase)
         {
             auto parsedValue = parseInteger<T>(str, detectBase);
-            if (parsedValue.second)
+            if (parsedValue)
             {
-                value = parsedValue.first;
+                value = *parsedValue;
                 return true;
             }
             return false;
