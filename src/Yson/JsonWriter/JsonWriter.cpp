@@ -102,7 +102,7 @@ namespace Yson
         formatting = formatting != JsonFormatting::DEFAULT
                      ? formatting
                      : JsonFormatting::NONE;
-        m_Members->contexts.push(Context('\0', formatting));
+        m_Members->contexts.push(Context('\0', JsonParameters(formatting)));
         m_Members->buffer.reserve(MAX_BUFFER_SIZE);
         if (!m_Members->stream)
             m_Members->maxBufferSize = SIZE_MAX;

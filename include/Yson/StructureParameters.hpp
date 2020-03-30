@@ -18,17 +18,18 @@ namespace Yson
 
     struct JsonParameters
     {
-        JsonParameters()
-        {}
+        constexpr JsonParameters() noexcept = default;
 
-        JsonParameters(JsonFormatting formatting)
-                : formatting(formatting)
-        {}
+        constexpr explicit JsonParameters(JsonFormatting formatting) noexcept
+            : formatting(formatting)
+        {
+        }
 
-        JsonParameters(size_t valuesPerLine)
-                : valuesPerLine(valuesPerLine),
-                  formatting(JsonFormatting::FORMAT)
-        {}
+        constexpr explicit JsonParameters(size_t valuesPerLine) noexcept
+            : valuesPerLine(valuesPerLine),
+              formatting(JsonFormatting::FORMAT)
+        {
+        }
 
         size_t valuesPerLine = 1;
         JsonFormatting formatting = JsonFormatting::DEFAULT;
@@ -36,16 +37,18 @@ namespace Yson
 
     struct UBJsonParameters
     {
-        UBJsonParameters()
-        {}
+        constexpr UBJsonParameters() noexcept = default;
 
-        explicit UBJsonParameters(ptrdiff_t size)
-                : size(size)
-        {}
+        constexpr explicit UBJsonParameters(ptrdiff_t size) noexcept
+            : size(size)
+        {
+        }
 
-        UBJsonParameters(ptrdiff_t size, UBJsonValueType valueType)
-                : size(size), valueType(valueType)
-        {}
+        constexpr UBJsonParameters(ptrdiff_t size,
+                                   UBJsonValueType valueType) noexcept
+            : size(size), valueType(valueType)
+        {
+        }
 
         ptrdiff_t size = -1;
         UBJsonValueType valueType = UBJsonValueType::UNKNOWN;
@@ -53,21 +56,23 @@ namespace Yson
 
     struct StructureParameters
     {
-        StructureParameters()
-        {}
+        constexpr StructureParameters() noexcept = default;
 
-        StructureParameters(JsonParameters jsonParameters)
-                : jsonParameters(jsonParameters)
-        {}
+        constexpr StructureParameters(JsonParameters jsonParameters) noexcept
+            : jsonParameters(jsonParameters)
+        {
+        }
 
-        StructureParameters(UBJsonParameters parameters)
-                : ubJsonParameters(parameters)
-        {}
+        constexpr StructureParameters(UBJsonParameters parameters) noexcept
+            : ubJsonParameters(parameters)
+        {
+        }
 
-        StructureParameters(JsonParameters jsonParameters,
-                            UBJsonParameters parameters)
-                : ubJsonParameters(parameters), jsonParameters(jsonParameters)
-        {}
+        constexpr StructureParameters(JsonParameters jsonParameters,
+                                      UBJsonParameters parameters) noexcept
+            : ubJsonParameters(parameters), jsonParameters(jsonParameters)
+        {
+        }
 
         JsonParameters jsonParameters;
         UBJsonParameters ubJsonParameters;
