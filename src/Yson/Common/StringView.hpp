@@ -11,6 +11,8 @@
 
 #if defined(__clang__) && __clang_major__ >= 9
     #define YSON_STD_STRINGVIEW
+#elif defined(__GNUC__)
+    #define YSON_STD_STRINGVIEW
 #endif
 
 #if defined(YSON_STD_STRINGVIEW)

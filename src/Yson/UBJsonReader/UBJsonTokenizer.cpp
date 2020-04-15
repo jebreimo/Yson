@@ -6,6 +6,8 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "UBJsonTokenizer.hpp"
+
+#include <cstring>
 #include "BinaryBufferReader.hpp"
 #include "BinaryFileReader.hpp"
 #include "ThrowUBJsonReaderException.hpp"

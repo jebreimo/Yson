@@ -7,6 +7,7 @@
 //****************************************************************************
 #include "JsonTokenizer.hpp"
 
+#include <cassert>
 #include <tuple>
 #include "Yson/Common/DefaultBufferSize.hpp"
 #include "Yson/Common/ThrowYsonException.hpp"
