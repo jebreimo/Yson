@@ -6,16 +6,15 @@
 ## License text is included with the source distribution.
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.7)
-project(Yson VERSION 1.0.1 LANGUAGES CXX)
+project(Yson VERSION 1.0.2 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(external/Ystring)
 
-configure_file(include/Yson/YsonVersion.hpp.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Yson/YsonVersion.hpp @ONLY)
+configure_file(include/Yson/YsonVersion.hpp.in YsonVersion.hpp @ONLY)
 
-set(PUBLIC_HEADER_FILES
+add_library(Yson
     include/Yson/DetailedValueType.hpp
     include/Yson/DetailedValueType-impl.hpp
     include/Yson/JsonReader.hpp
@@ -30,9 +29,6 @@ set(PUBLIC_HEADER_FILES
     include/Yson/YsonDefinitions.hpp
     include/Yson/YsonException.hpp
     include/Yson/YsonReaderException.hpp
-    )
-
-set(SOURCE_FILES
     src/Yson/Common/AssignInteger.hpp
     src/Yson/Common/Base64.cpp
     src/Yson/Common/Base64.hpp
@@ -125,10 +121,6 @@ set(SOURCE_FILES
     src/Yson/UBJsonWriter/UBJsonWriter.cpp
     src/Yson/UBJsonWriter/UBJsonWriterUtilities.cpp
     src/Yson/UBJsonWriter/UBJsonWriterUtilities.hpp
-    )
-
-add_library(Yson
-    ${SOURCE_FILES}
     $<TARGET_OBJECTS:Yson_Ystring>
     )
 
@@ -141,6 +133,7 @@ target_include_directories(Yson BEFORE
     PUBLIC
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/external/Ystring/include
@@ -205,9 +198,11 @@ install(EXPORT YsonConfig
         ${CMAKE_INSTALL_LIBDIR}/cmake/Yson
     )
 
+file(GLOB_RECURSE PUBLIC_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
 install(
-    DIRECTORY
-        include/
+    FILES
+        ${PUBLIC_INCLUDES}
+        ${CMAKE_CURRENT_BINARY_DIR}/YsonVersion.hpp
     DESTINATION
-        ${CMAKE_INSTALL_INCLUDEDIR}
+        ${CMAKE_INSTALL_INCLUDEDIR}/Yson
     )
