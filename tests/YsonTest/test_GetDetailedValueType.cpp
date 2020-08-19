@@ -15,7 +15,7 @@ namespace
 
     void test(const std::string& s, DetailedValueType expectedType)
     {
-        auto result = getDetailedValueType(makeStringView(s));
+        auto result = getDetailedValueType(s);
         Y_EQUAL(result, expectedType);
     }
 

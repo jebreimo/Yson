@@ -16,27 +16,27 @@ namespace
     void success(const std::string& s, double expectedValue, double e = 1e-10)
     {
         double result;
-        Y_ASSERT(parse(makeStringView(s), result));
+        Y_ASSERT(parse(s, result));
         Y_EQUIVALENT(result, expectedValue, e);
     }
 
     void failure(const std::string& s)
     {
         double result;
-        Y_EQUAL(parse(makeStringView(s), result), false);
+        Y_EQUAL(parse(s, result), false);
     }
 
     void isNotANumber(const std::string& s)
     {
         double result;
-        Y_ASSERT(parse(makeStringView(s), result));
+        Y_ASSERT(parse(s, result));
         Y_ASSERT(isnan(result));
     }
 
     void isInfinite(const std::string& s, bool negative)
     {
         double result;
-        Y_ASSERT(parse(makeStringView(s), result));
+        Y_ASSERT(parse(s, result));
         Y_ASSERT(isinf(result));
         Y_EQUAL(result < 0, negative);
     }
