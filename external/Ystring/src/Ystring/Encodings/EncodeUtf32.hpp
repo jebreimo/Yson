@@ -16,29 +16,6 @@
 
 namespace Ystring { namespace Encodings
 {
-    template <bool SwapBytes, typename OutIt>
-    OutIt addUtf32(OutIt out, char32_t codePoint);
-
-    template <typename OutIt>
-    OutIt addUtf32(OutIt out, char32_t codePoint);
-
-    template <typename OutIt>
-    OutIt addUtf32LE(OutIt out, char32_t codePoint);
-
-    template <typename OutIt>
-    OutIt addUtf32BE(OutIt out, char32_t codePoint);
-
-    template<bool SwapBytes, typename OutIt>
-    OutIt addUtf32AsBytes(OutIt out, char32_t codePoint);
-
-    template <typename FwdIt>
-    size_t encodeUtf32(FwdIt& begin, FwdIt end, char32_t codePoint);
-
-    template <typename FwdIt>
-    size_t encodeUtf32LE(FwdIt& begin, FwdIt end, char32_t codePoint);
-
-    template <typename FwdIt>
-    size_t encodeUtf32BE(FwdIt& begin, FwdIt end, char32_t codePoint);
     using Ystring::Utilities::swapEndianness;
 
     namespace Detail
@@ -90,18 +67,6 @@ namespace Ystring { namespace Encodings
         return addUtf32<false>(out, codePoint);
     }
 
-    template <typename OutIt>
-    OutIt addUtf32LE(OutIt out, char32_t codePoint)
-    {
-        return addUtf32<IsBigEndian>(out, codePoint);
-    }
-
-    template <typename OutIt>
-    OutIt addUtf32BE(OutIt out, char32_t codePoint)
-    {
-        return addUtf32<IsLittleEndian>(out, codePoint);
-    }
-
     template<bool SwapBytes, typename OutIt>
     OutIt addUtf32AsBytes(OutIt out, char32_t codePoint)
     {
@@ -118,22 +83,6 @@ namespace Ystring { namespace Encodings
     size_t encodeUtf32(FwdIt& begin, FwdIt end, char32_t codePoint)
     {
         return Detail::encodeUtf32<false>(
-                begin, end, codePoint,
-                typename std::iterator_traits<FwdIt>::value_type());
-    }
-
-    template <typename FwdIt>
-    size_t encodeUtf32LE(FwdIt& begin, FwdIt end, char32_t codePoint)
-    {
-        return Detail::encodeUtf32<IsBigEndian>(
-                begin, end, codePoint,
-                typename std::iterator_traits<FwdIt>::value_type());
-    }
-
-    template <typename FwdIt>
-    size_t encodeUtf32BE(FwdIt& begin, FwdIt end, char32_t codePoint)
-    {
-        return Detail::encodeUtf32<IsLittleEndian>(
                 begin, end, codePoint,
                 typename std::iterator_traits<FwdIt>::value_type());
     }

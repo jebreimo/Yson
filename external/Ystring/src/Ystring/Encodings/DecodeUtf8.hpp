@@ -23,12 +23,12 @@ namespace Ystring { namespace Encodings
     {
         static inline bool isContinuation(uint8_t c)
         {
-            return (c & 0xC0) == 0x80;
+            return (c & 0xC0u) == 0x80;
         }
 
         static inline bool isAscii(char32_t c)
         {
-            return  (c & 0x80) == 0;
+            return  (c & 0x80u) == 0;
         }
 
         template<typename FwdIt>
@@ -68,7 +68,7 @@ namespace Ystring { namespace Encodings
                 }
                 if (!Detail::isContinuation(*it))
                     return std::make_tuple(first, it, DecoderResult::INVALID);
-                bit >>= 1;
+                bit >>= 1u;
             }
             if (((bits & 0xFC) ^ 0xFC) < 0xC)
                 return std::make_tuple(first, it, DecoderResult::INVALID);
@@ -82,8 +82,6 @@ namespace Ystring { namespace Encodings
     {
         auto tuple = nextInvalidUtf8CodePoint(begin, end);
         auto result = std::get<2>(tuple);
-        if (result == DecoderResult::OK)
-            return true;
         return result == DecoderResult::OK
                || (result == DecoderResult::INCOMPLETE && acceptIncomplete);
     }
@@ -122,7 +120,7 @@ namespace Ystring { namespace Encodings
         codePoint = *it & 0x3F;
         while (codePoint & bit)
         {
-            bit >>= 1;
+            bit >>= 1u;
             ++count;
         }
 
@@ -131,7 +129,7 @@ namespace Ystring { namespace Encodings
         FwdIt initialIt = it;
         while (++it != end && count && Detail::isContinuation(*it))
         {
-            codePoint <<= 6;
+            codePoint <<= 6u;
             codePoint |= *it & 0x3F;
             --count;
         }
@@ -143,56 +141,6 @@ namespace Ystring { namespace Encodings
             return incomplete ? DecoderResult::INCOMPLETE
                               : DecoderResult::INVALID;
         }
-
-        return DecoderResult::OK;
-    }
-
-    /** @brief Assigns the code point ending at @a it to @a codePoint.
-      */
-    template <typename BiIt>
-    DecoderResult_t prevUtf8CodePoint(char32_t& codePoint,
-                                      BiIt begin, BiIt& it)
-    {
-        if (it == begin)
-            return DecoderResult::END_OF_STRING;
-
-        BiIt initialIt = it;
-        --it;
-        if (Detail::isAscii(*it))
-        {
-            codePoint = (uint8_t)*it;
-            return DecoderResult::OK;
-        }
-
-        codePoint = 0;
-        uint8_t mask = 0xC0;
-        uint8_t bit = 0x20;
-        char32_t shift = 0;
-        while (Detail::isContinuation(*it))
-        {
-            if (bit == 1 || it == begin)
-            {
-                it = initialIt;
-                return DecoderResult::INVALID;
-            }
-            mask |= bit;
-            bit >>= 1;
-            codePoint |= char32_t(*it & 0x3F) << shift;
-            shift += 6;
-            --it;
-        }
-
-        uint8_t byte = *it;
-        if ((byte & mask) != uint8_t(mask << 1))
-        {
-            it = initialIt;
-            if ((byte & mask) != mask)
-                return DecoderResult::INVALID;
-            else
-                return DecoderResult::INCOMPLETE;
-        }
-
-        codePoint |= (byte & ~mask) << shift;
 
         return DecoderResult::OK;
     }
@@ -209,23 +157,6 @@ namespace Ystring { namespace Encodings
                 ++it;
             }
             while (it != end && Detail::isContinuation(*it));
-        }
-
-        return true;
-    }
-
-    template <typename BiIt>
-    bool skipPrevUtf8CodePoint(BiIt begin, BiIt& it, size_t count = 1)
-    {
-        for (auto i = 0u; i < count; ++i)
-        {
-            if (it == begin)
-                return false;
-            do
-            {
-                --it;
-            }
-            while (it != begin && Detail::isContinuation(*it));
         }
 
         return true;

@@ -15,76 +15,6 @@
 
 namespace Ystring { namespace Encodings
 {
-    template <bool SwapBytes, typename FwdIt>
-    DecoderResult_t nextUtf16CodePoint(char32_t& codePoint,
-                                       FwdIt& it, FwdIt end);
-
-    template <typename FwdIt>
-    DecoderResult_t nextUtf16LECodePoint(char32_t& codePoint,
-                                         FwdIt& it, FwdIt end)
-    {
-        return nextUtf16CodePoint<IsBigEndian>(codePoint, it, end);
-    }
-
-    template <typename FwdIt>
-    DecoderResult_t nextUtf16BECodePoint(char32_t& codePoint,
-                                         FwdIt& it, FwdIt end)
-    {
-        return nextUtf16CodePoint<IsLittleEndian>(codePoint, it, end);
-    }
-
-    template <bool SwapBytes, typename BiIt>
-    DecoderResult_t prevUtf16CodePoint(char32_t& codePoint,
-                                       BiIt begin, BiIt& it);
-
-    template <typename BiIt>
-    DecoderResult_t prevUtf16LECodePoint(char32_t& codePoint,
-                                         BiIt begin, BiIt& it)
-    {
-        return prevUtf16CodePoint<IsBigEndian>(codePoint, begin, it);
-    }
-
-    template <typename BiIt>
-    DecoderResult_t prevUtf16BECodePoint(char32_t& codePoint,
-                                         BiIt begin, BiIt& it)
-    {
-        return prevUtf16CodePoint<IsLittleEndian>(codePoint, begin, it);
-    }
-
-    template <bool SwapBytes, typename FwdIt>
-    bool skipNextUtf16CodePoint(FwdIt& it, FwdIt end, size_t count = 1);
-
-    template <typename FwdIt>
-    bool skipNextUtf16LECodePoint(FwdIt& it, FwdIt end, size_t count = 1)
-    {
-        return skipNextUtf16CodePoint<IsBigEndian>(it, end, count);
-    }
-
-    template <typename FwdIt>
-    bool skipNextUtf16BECodePoint(FwdIt& it, FwdIt end, size_t count = 1)
-    {
-        return skipNextUtf16CodePoint<IsLittleEndian>(it, end, count);
-    }
-
-    template <bool SwapBytes, typename BiIt>
-    bool skipPrevUtf16CodePoint(BiIt begin, BiIt& it, size_t count = 1);
-
-    template <typename BiIt>
-    bool skipPrevUtf16LECodePoint(BiIt begin, BiIt& it, size_t count = 1)
-    {
-        return skipPrevUtf16CodePoint<IsBigEndian>(begin, it, count);
-    }
-
-    template <typename BiIt>
-    bool skipPrevUtf16BECodePoint(BiIt begin, BiIt& it, size_t count = 1)
-    {
-        return skipPrevUtf16CodePoint<IsLittleEndian>(begin, it, count);
-    }
-
-    template<bool SwapBytes, typename FwdIt>
-    std::tuple<FwdIt, FwdIt, DecoderResult_t> nextInvalidUtf16CodePoint(
-            FwdIt it, FwdIt end);
-
     namespace Detail
     {
         template<typename T>
@@ -131,36 +61,6 @@ namespace Ystring { namespace Encodings
             chr.u8[SwapBytes ? 0 : 1] = *it++;
 
             word = chr.u16;
-            return DecoderResult::OK;
-        }
-
-        template <bool SwapBytes, typename FwdIt>
-        DecoderResult_t nextWord(char16_t& word, FwdIt& it, FwdIt end,
-                                 char16_t)
-        {
-            if (it == end)
-                return DecoderResult::END_OF_STRING;
-
-            word = *it++;
-            swapEndianness<SwapBytes>(word);
-
-            return DecoderResult::OK;
-        }
-
-        template <bool SwapBytes, typename FwdIt>
-        DecoderResult_t nextWord(char16_t& word, FwdIt& it, FwdIt end,
-                                 char32_t)
-        {
-            if (it == end)
-                return DecoderResult::END_OF_STRING;
-
-            auto word32 = *it++;
-            if (word32 > 0xFFFFu)
-                return DecoderResult::INVALID;
-
-            word = static_cast<char16_t>(word32);
-            swapEndianness<SwapBytes>(word);
-
             return DecoderResult::OK;
         }
 
@@ -242,7 +142,7 @@ namespace Ystring { namespace Encodings
             return DecoderResult::INVALID;
         }
 
-        codePoint = char32_t(chr & 0x3FF) << 10;
+        codePoint = char32_t(chr & 0x3FFu) << 10u;
 
         res = Detail::nextWord<SwapBytes>(chr, it, end, Utf16Type());
 
@@ -260,65 +160,14 @@ namespace Ystring { namespace Encodings
             return DecoderResult::INVALID;
         }
 
-        codePoint |= chr & 0x3FF;
-        codePoint += 0x10000;
-
-        return DecoderResult::OK;
-    }
-
-    template <bool SwapBytes, typename BiIt>
-    DecoderResult_t prevUtf16CodePoint(char32_t& codePoint,
-                                       BiIt begin, BiIt& it)
-    {
-        typedef typename std::iterator_traits<BiIt>::value_type CharType;
-        typedef typename Detail::Utf16CharType<CharType>::Type Utf16Type;
-
-        char16_t chr;
-        auto last = it;
-        auto res = Detail::prevWord<SwapBytes>(chr, begin, it, Utf16Type());
-        if (res != DecoderResult::OK)
-        {
-            it = last;
-            return res;
-        }
-
-        if (chr < 0xD800 || 0xE000 <= chr)
-        {
-            codePoint = chr;
-            return DecoderResult::OK;
-        }
-
-        if (chr < 0xDC00)
-        {
-            it = last;
-            return DecoderResult::INVALID;
-        }
-
-        codePoint = char32_t(chr) & 0x3FF;
-
-        res = Detail::prevWord<SwapBytes>(chr, begin, it, Utf16Type());
-        if (res != DecoderResult::OK)
-        {
-            if (res == DecoderResult::END_OF_STRING)
-                return DecoderResult::INCOMPLETE;
-            it = last;
-            return res;
-        }
-
-        if (chr < 0xD800 || 0xDC00 <= chr)
-        {
-            it = last;
-            return DecoderResult::INVALID;
-        }
-
-        codePoint |= (chr & 0x3FF) << 10;
+        codePoint |= chr & 0x3FFu;
         codePoint += 0x10000;
 
         return DecoderResult::OK;
     }
 
     template <bool SwapBytes, typename FwdIt>
-    bool skipNextUtf16CodePoint(FwdIt& it, FwdIt end, size_t count)
+    bool skipNextUtf16CodePoint(FwdIt& it, FwdIt end, size_t count = 1)
     {
         typedef typename std::iterator_traits<FwdIt>::value_type CharType;
         typedef typename Detail::Utf16CharType<CharType>::Type Utf16Type;
@@ -339,27 +188,16 @@ namespace Ystring { namespace Encodings
         return true;
     }
 
-    template <bool SwapBytes, typename BiIt>
-    bool skipPrevUtf16CodePoint(BiIt begin, BiIt& it, size_t count)
+    template <typename FwdIt>
+    bool skipNextUtf16LECodePoint(FwdIt& it, FwdIt end, size_t count = 1)
     {
-        typedef typename std::iterator_traits<BiIt>::value_type CharType;
-        typedef typename Detail::Utf16CharType<CharType>::Type Utf16Type;
+        return skipNextUtf16CodePoint<IsBigEndian>(it, end, count);
+    }
 
-        for (auto i = 0u; i < count; ++i)
-        {
-            char16_t chr;
-            auto res = Detail::prevWord<SwapBytes>(chr, begin, it,
-                                                   Utf16Type());
-            if (res != DecoderResult::OK)
-            {
-                if (res == DecoderResult::END_OF_STRING)
-                    return false;
-                continue;
-            }
-            if (0xDC00 <= chr && chr < 0xE000)
-                Detail::prevWord<SwapBytes>(chr, begin, it, Utf16Type());
-        }
-        return true;
+    template <typename FwdIt>
+    bool skipNextUtf16BECodePoint(FwdIt& it, FwdIt end, size_t count = 1)
+    {
+        return skipNextUtf16CodePoint<IsLittleEndian>(it, end, count);
     }
 
     template<bool SwapBytes, typename FwdIt>

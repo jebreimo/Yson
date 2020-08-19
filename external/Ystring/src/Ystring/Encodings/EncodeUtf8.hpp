@@ -22,27 +22,6 @@ namespace Ystring { namespace Encodings
       */
     static const size_t MAX_ENCODED_UTF8_LENGTH = 8;
 
-    /** @brief Adds @a codePoint encoded as UTF-8 to @a it.
-     *
-     *  @return the new iterator position.
-     */
-    template <typename OutputIt>
-    OutputIt addUtf8(OutputIt it, char32_t codePoint);
-
-    /** @brief Encodes a unicode code point as UTF-8.
-      *
-      * @note The function does not add a terminating 0 to @a buffer.
-      *
-      * @param buffer a buffer for the UTF-8 code point, it must be at least
-      *     as long as the encoding (i.e. 7 bytes to be error proof).
-      * @param chr the code point to be encoded
-      * @param bufferSize the size of @a buffer
-      * @return the length of the encoded code point, or 0 if @a bufferSize is
-      *     too small.
-      */
-    template <typename RndIt>
-    size_t encodeUtf8(RndIt& begin, RndIt end, char32_t c);
-
     /** @brief Encodes a unicode code point as UTF-8.
      *  @return the length of the encoded code point.
      */
@@ -63,13 +42,13 @@ namespace Ystring { namespace Encodings
             }
             else
             {
-                auto shift = (length - 1) * 6;
-                *it = (char)((0xFF << (8 - length)) | (c >> shift));
+                unsigned shift = (length - 1) * 6;
+                *it = (char)((0xFFu << (8 - length)) | (c >> shift));
                 ++it;
                 for (size_t i = 1; i < length; i++)
                 {
                     shift -= 6;
-                    *it = (char)(0x80 | ((c >> shift) & 0x3F));
+                    *it = (char)(0x80u | ((c >> shift) & 0x3F));
                     ++it;
                 }
             }
@@ -77,12 +56,27 @@ namespace Ystring { namespace Encodings
         }
     }
 
+    /** @brief Adds @a codePoint encoded as UTF-8 to @a it.
+     *
+     *  @return the new iterator position.
+     */
     template <typename OutputIt>
     OutputIt addUtf8(OutputIt it, char32_t c)
     {
         return Detail::addUtf8(it, c, utf8EncodedLength(c));
     }
 
+    /** @brief Encodes a unicode code point as UTF-8.
+      *
+      * @note The function does not add a terminating 0 to @a buffer.
+      *
+      * @param buffer a buffer for the UTF-8 code point, it must be at least
+      *     as long as the encoding (i.e. 7 bytes to be error proof).
+      * @param chr the code point to be encoded
+      * @param bufferSize the size of @a buffer
+      * @return the length of the encoded code point, or 0 if @a bufferSize is
+      *     too small.
+      */
     template <typename RndIt>
     size_t encodeUtf8(RndIt& begin, RndIt end, char32_t c)
     {

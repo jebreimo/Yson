@@ -16,28 +16,6 @@
 
 namespace Ystring { namespace Encodings
 {
-    template <bool SwapBytes, typename OutIt>
-    OutIt addUtf16(OutIt out, char32_t codePoint);
-
-    template <typename OutIt>
-    OutIt addUtf16(OutIt out, char32_t codePoint);
-
-    template <typename OutIt>
-    OutIt addUtf16LE(OutIt out, char32_t codePoint);
-
-    template <typename OutIt>
-    OutIt addUtf16BE(OutIt out, char32_t codePoint);
-
-    template <bool SwapBytes, typename OutIt>
-    OutIt addUtf16AsBytes(OutIt out, char32_t codePoint);
-
-    template <typename FwdIt>
-    size_t encodeUtf16(FwdIt& begin, FwdIt end, char32_t codePoint);
-    template <typename FwdIt>
-    size_t encodeUtf16LE(FwdIt& begin, FwdIt end, char32_t codePoint);
-    template <typename FwdIt>
-    size_t encodeUtf16BE(FwdIt& begin, FwdIt end, char32_t codePoint);
-
     using Ystring::Utilities::swapEndianness;
     using Ystring::Utilities::Union16;
 
@@ -46,7 +24,7 @@ namespace Ystring { namespace Encodings
     {
         if (codePoint <= 0xFFFF)
         {
-            char16_t word = (char16_t)codePoint;
+            auto word = char16_t(codePoint);
             swapEndianness<SwapBytes>(word);
             *out = word;
             return ++out;
@@ -54,8 +32,8 @@ namespace Ystring { namespace Encodings
         else
         {
             codePoint -= 0x10000;
-            char16_t word1 = char16_t(0xD800 | (codePoint >> 10));
-            char16_t word2 = char16_t(0xDC00 | (codePoint & 0x3FF));
+            auto word1 = char16_t(0xD800u | (codePoint >> 10u));
+            auto word2 = char16_t(0xDC00u | (codePoint & 0x3FFu));
             swapEndianness<SwapBytes>(word1);
             swapEndianness<SwapBytes>(word2);
             *out = word1;
@@ -68,18 +46,6 @@ namespace Ystring { namespace Encodings
     OutIt addUtf16(OutIt out, char32_t codePoint)
     {
         return addUtf16<false>(out, codePoint);
-    }
-
-    template <typename OutIt>
-    OutIt addUtf16LE(OutIt out, char32_t codePoint)
-    {
-        return addUtf16<IsBigEndian>(out, codePoint);
-    }
-
-    template <typename OutIt>
-    OutIt addUtf16BE(OutIt out, char32_t codePoint)
-    {
-        return addUtf16<IsLittleEndian>(out, codePoint);
     }
 
     template <bool SwapBytes, typename OutIt>
@@ -169,29 +135,5 @@ namespace Ystring { namespace Encodings
     size_t encodeUtf16(FwdIt& begin, FwdIt end, char32_t codePoint, char)
     {
         return encodeUtf16<SwapBytes>(begin, end, codePoint, uint8_t());
-    }
-
-    template <typename FwdIt>
-    size_t encodeUtf16(FwdIt& begin, FwdIt end, char32_t codePoint)
-    {
-        return encodeUtf16<false>(
-                begin, end, codePoint,
-                typename std::iterator_traits<FwdIt>::value_type());
-    }
-
-    template <typename FwdIt>
-    size_t encodeUtf16LE(FwdIt& begin, FwdIt end, char32_t codePoint)
-    {
-        return encodeUtf16<IsBigEndian>(
-                begin, end, codePoint,
-                typename std::iterator_traits<FwdIt>::value_type());
-    }
-
-    template <typename FwdIt>
-    size_t encodeUtf16BE(FwdIt& begin, FwdIt end, char32_t codePoint)
-    {
-        return encodeUtf16<IsLittleEndian>(
-                begin, end, codePoint,
-                typename std::iterator_traits<FwdIt>::value_type());
     }
 }}
