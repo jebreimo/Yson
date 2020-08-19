@@ -6,7 +6,7 @@
 ## License text is included with the source distribution.
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.7)
-project(Yson VERSION 1.0.2 LANGUAGES CXX)
+project(Yson VERSION 1.0.3 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -16,7 +16,6 @@ configure_file(include/Yson/YsonVersion.hpp.in YsonVersion.hpp @ONLY)
 
 add_library(Yson
     include/Yson/DetailedValueType.hpp
-    include/Yson/DetailedValueType-impl.hpp
     include/Yson/JsonReader.hpp
     include/Yson/JsonWriter.hpp
     include/Yson/Reader.hpp
