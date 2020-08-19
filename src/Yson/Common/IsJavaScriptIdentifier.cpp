@@ -6,7 +6,8 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "IsJavaScriptIdentifier.hpp"
-#include "StringView.hpp"
+#include <cctype>
+#include <string_view>
 #include "ValueTypeUtilities.hpp"
 
 namespace Yson

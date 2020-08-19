@@ -8,9 +8,9 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include "Yson/YsonDefinitions.hpp"
 #include "Yson/DetailedValueType.hpp"
-#include "StringView.hpp"
 
 namespace Yson
 {

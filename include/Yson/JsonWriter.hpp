@@ -11,7 +11,6 @@
 #include <memory>
 #include <string>
 #include "Writer.hpp"
-#include "YsonDefinitions.hpp"
 
 namespace Yson
 {

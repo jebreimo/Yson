@@ -8,7 +8,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "StringView.hpp"
+#include <string_view>
 #include "Yson/YsonDefinitions.hpp"
 
 namespace Yson

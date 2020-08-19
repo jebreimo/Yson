@@ -201,7 +201,7 @@ namespace Yson
                 if (strDigits < p.first.size())
                     return p.second;
                 if (strDigits == p.first.size()
-                    && isLessThanOrEqualNumber(str, makeStringView(p.first)))
+                    && isLessThanOrEqualNumber(str, p.first))
                     return p.second;
             }
             return DetailedValueType::BIG_INT;

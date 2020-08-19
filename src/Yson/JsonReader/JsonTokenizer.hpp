@@ -8,8 +8,8 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 #include "Yson/YsonDefinitions.hpp"
-#include "Yson/Common/StringView.hpp"
 #include "JsonTokenType.hpp"
 #include "TextReader.hpp"
 

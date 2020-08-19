@@ -94,7 +94,7 @@ namespace Yson
 
     std::string_view JsonTokenizer::token() const
     {
-        return makeStringView(m_TokenStart, m_TokenEnd);
+        return std::string_view(m_TokenStart, m_TokenEnd - m_TokenStart);
     }
 
     std::string JsonTokenizer::tokenString() const
@@ -140,7 +140,8 @@ namespace Yson
         if (m_NextToken != m_TokenStart)
         {
             m_TokenStart = m_NextToken;
-            auto token = nextToken(makeStringView(m_TokenStart, m_BufferEnd));
+            auto token = nextToken(std::string_view(m_TokenStart,
+                                                    m_BufferEnd - m_TokenStart));
             if (!token.isIncomplete)
             {
                 m_NextToken = m_TokenEnd = token.endOfToken;
@@ -159,7 +160,7 @@ namespace Yson
             if (!isEndOfFile || !m_Buffer.empty())
             {
                 auto token = nextToken(
-                        makeStringView(m_TokenStart, m_BufferEnd),
+                        std::string_view(m_TokenStart, m_BufferEnd - m_TokenStart),
                         isEndOfFile);
                 if (!token.isIncomplete)
                 {

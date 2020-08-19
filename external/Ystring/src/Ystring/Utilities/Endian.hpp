@@ -66,7 +66,7 @@ namespace Ystring { namespace Utilities
     inline wchar_t reverseBytes(wchar_t v)
     {
         auto alias = reinterpret_cast<uint8_t*>(v);
-        for (int i = 0; i < sizeof(v) / 2; ++i)
+        for (size_t i = 0; i < sizeof(v) / 2; ++i)
             alias[i] = alias[sizeof(v) - i - 1];
         return v;
     }

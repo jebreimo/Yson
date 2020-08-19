@@ -4,9 +4,11 @@
 //****************************************************************************
 #include "GetUnicodeFileName.hpp"
 
-#include <Ystring/Conversion.hpp>
-#include <Ystring/YstringException.hpp>
+#if defined(_WIN32) || defined(_WIN64)
+#include "Ystring/Conversion.hpp"
+#include "Ystring/YstringException.hpp"
 #include "ThrowYsonException.hpp"
+#endif
 
 namespace Yson
 {

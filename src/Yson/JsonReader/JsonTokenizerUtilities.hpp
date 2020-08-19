@@ -6,8 +6,8 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
+#include <string_view>
 #include "JsonTokenType.hpp"
-#include "Yson/Common/StringView.hpp"
 
 namespace Yson
 {

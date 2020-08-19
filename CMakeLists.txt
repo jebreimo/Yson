@@ -154,6 +154,22 @@ set_target_properties(Yson
 add_library(Yson::Yson ALIAS Yson)
 
 
+if (UPDATE_SINGLE_SRC)
+    find_package(Python3 COMPONENTS Interpreter REQUIRED)
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/tools/make_jsonwriter_cpp.sh.in
+        make_jsonwriter_cpp.sh)
+    add_custom_target(UpdateSingleSrc ALL
+        BYPRODUCTS
+            ${CMAKE_CURRENT_SOURCE_DIR}/single_src/JsonWriterComplete.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/single_src/JsonWriterComplete.cpp
+        COMMAND
+            sh "${CMAKE_CURRENT_BINARY_DIR}/make_jsonwriter_cpp.sh"
+        )
+    add_dependencies(UpdateSingleSrc Yson)
+endif ()
+
+
 ##
 ## Unit tests
 ##

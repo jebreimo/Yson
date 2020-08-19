@@ -7,7 +7,7 @@
 //****************************************************************************
 #pragma once
 
-#include "StringView.hpp"
+#include <string_view>
 
 namespace Yson
 {

@@ -31,17 +31,11 @@ set(PRIVATE_HEADERS
     src/Ystring/Conversion/Utf8Decoder.hpp
     src/Ystring/Conversion/Utf8Encoder.hpp
     src/Ystring/Encodings/DecoderResult.hpp
-    src/Ystring/Encodings/DecodeUtf16-impl.hpp
     src/Ystring/Encodings/DecodeUtf16.hpp
-    src/Ystring/Encodings/DecodeUtf32-impl.hpp
     src/Ystring/Encodings/DecodeUtf32.hpp
-    src/Ystring/Encodings/DecodeUtf8-impl.hpp
     src/Ystring/Encodings/DecodeUtf8.hpp
-    src/Ystring/Encodings/EncodeUtf16-impl.hpp
     src/Ystring/Encodings/EncodeUtf16.hpp
-    src/Ystring/Encodings/EncodeUtf32-impl.hpp
     src/Ystring/Encodings/EncodeUtf32.hpp
-    src/Ystring/Encodings/EncodeUtf8-impl.hpp
     src/Ystring/Encodings/EncodeUtf8.hpp
     src/Ystring/Escape/DecoderAlgorithms.hpp
     src/Ystring/Utilities/Endian.hpp

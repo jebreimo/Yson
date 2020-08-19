@@ -8,7 +8,7 @@
 #pragma once
 #include <cstdint>
 #include "Yson/YsonDefinitions.hpp"
-#include "StringView.hpp"
+#include <string_view>
 
 namespace Yson
 {

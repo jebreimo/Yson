@@ -10,8 +10,8 @@
 #include <iosfwd>
 #include <memory>
 #include <string>
+#include <string_view>
 #include "Yson/YsonDefinitions.hpp"
-#include "Yson/Common/StringView.hpp"
 #include "BinaryReader.hpp"
 #include "FromBigEndian.hpp"
 #include "UBJsonTokenType.hpp"

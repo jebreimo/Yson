@@ -70,7 +70,7 @@ namespace Yson
 
         constexpr StructureParameters(JsonParameters jsonParameters,
                                       UBJsonParameters parameters) noexcept
-            : ubJsonParameters(parameters), jsonParameters(jsonParameters)
+            : jsonParameters(jsonParameters), ubJsonParameters(parameters)
         {
         }
 

@@ -184,3 +184,4 @@ namespace Yson
         YSON_THROW("Not a Base64 string.");
     }
 }
+

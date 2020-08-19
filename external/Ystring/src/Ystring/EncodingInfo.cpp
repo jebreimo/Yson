@@ -7,6 +7,7 @@
 //****************************************************************************
 #include "Ystring/EncodingInfo.hpp"
 
+#include <cassert>
 #include <istream>
 #include <vector>
 #include "Encodings/DecodeUtf8.hpp"
