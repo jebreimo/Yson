@@ -180,10 +180,8 @@ namespace Ystring
                     result = result * 16 + tmp - 'A' + 10;
                 else if ('a' <= tmp && tmp <= 'f')
                     result = result * 16 + tmp - 'a' + 10;
-                else if (i < 4)
-                    YSTRING_THROW("Hexadecimal sequence is too short.");
                 else
-                    break;
+                    YSTRING_THROW("Hexadecimal sequence is too short.");
                 ++first;
             }
             return result;

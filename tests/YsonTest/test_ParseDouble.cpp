@@ -7,6 +7,7 @@
 //****************************************************************************
 #include "Yson/Common/ParseFloatingPoint.hpp"
 
+#include <cmath>
 #include "Ytest/Ytest.hpp"
 
 namespace
@@ -30,14 +31,14 @@ namespace
     {
         double result;
         Y_ASSERT(parse(s, result));
-        Y_ASSERT(isnan(result));
+        Y_ASSERT(std::isnan(result));
     }
 
     void isInfinite(const std::string& s, bool negative)
     {
         double result;
         Y_ASSERT(parse(s, result));
-        Y_ASSERT(isinf(result));
+        Y_ASSERT(std::isinf(result));
         Y_EQUAL(result < 0, negative);
     }
 
