@@ -177,7 +177,7 @@ namespace Yson
             if (str.empty())
                 return {};
 
-            if (str[0] == '0' && str.size() >= 3)
+            if (str[0] == '0' && str.size() >= 3 && detectBase)
             {
                 auto str2 = str.substr(2);
                 switch (uint8_t(str[1]) | 0x20u)

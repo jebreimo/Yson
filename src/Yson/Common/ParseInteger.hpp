@@ -7,26 +7,25 @@
 //****************************************************************************
 #pragma once
 #include <cstdint>
-#include "Yson/YsonDefinitions.hpp"
 #include <string_view>
 
 namespace Yson
 {
-    bool parse(std::string_view str, char& value, bool detectBase);
+    bool parse(std::string_view str, char& value, bool detectBase = false);
 
-    bool parse(std::string_view str, int8_t& value, bool detectBase);
+    bool parse(std::string_view str, int8_t& value, bool detectBase = false);
 
-    bool parse(std::string_view str, int16_t& value, bool detectBase);
+    bool parse(std::string_view str, int16_t& value, bool detectBase = false);
 
-    bool parse(std::string_view str, int32_t& value, bool detectBase);
+    bool parse(std::string_view str, int32_t& value, bool detectBase = false);
 
-    bool parse(std::string_view str, int64_t& value, bool detectBase);
+    bool parse(std::string_view str, int64_t& value, bool detectBase = false);
 
-    bool parse(std::string_view str, uint8_t& value, bool detectBase);
+    bool parse(std::string_view str, uint8_t& value, bool detectBase = false);
 
-    bool parse(std::string_view str, uint16_t& value, bool detectBase);
+    bool parse(std::string_view str, uint16_t& value, bool detectBase = false);
 
-    bool parse(std::string_view str, uint32_t& value, bool detectBase);
+    bool parse(std::string_view str, uint32_t& value, bool detectBase = false);
 
-    bool parse(std::string_view str, uint64_t& value, bool detectBase);
+    bool parse(std::string_view str, uint64_t& value, bool detectBase = false);
 }
