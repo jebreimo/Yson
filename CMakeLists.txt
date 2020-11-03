@@ -6,9 +6,24 @@
 ## License text is included with the source distribution.
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.7)
-project(Yson VERSION 1.0.4 LANGUAGES CXX)
+project(Yson VERSION 1.0.5 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
+
+# Set YSON_MASTER_PROJECT to ON if Argos is the root level project.
+if (NOT DEFINED YSON_MASTER_PROJECT)
+    if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+        set(YSON_MASTER_PROJECT ON)
+    else ()
+        set(YSON_MASTER_PROJECT OFF)
+    endif ()
+endif ()
+
+# Test option
+option(YSON_BUILD_TEST "Build tests" ${YSON_MASTER_PROJECT})
+
+# Install option
+option(YSON_INSTALL "Generate the install target" ${YSON_MASTER_PROJECT})
 
 add_subdirectory(external/Ystring)
 
@@ -152,7 +167,6 @@ set_target_properties(Yson
 
 add_library(Yson::Yson ALIAS Yson)
 
-
 if (UPDATE_SINGLE_SRC)
     find_package(Python3 COMPONENTS Interpreter REQUIRED)
     configure_file(
@@ -168,19 +182,17 @@ if (UPDATE_SINGLE_SRC)
     add_dependencies(UpdateSingleSrc Yson)
 endif ()
 
-
 ##
 ## Unit tests
 ##
 
-if (EXISTS "${CMAKE_SOURCE_DIR}/external/Ytest/CMakeLists.txt")
-    add_subdirectory(external/Ytest EXCLUDE_FROM_ALL)
-endif ()
-
-enable_testing()
-
-add_subdirectory(tests/YsonTest)
-
+if (YSON_BUILD_TEST)
+    if (EXISTS "${CMAKE_SOURCE_DIR}/external/Ytest/CMakeLists.txt")
+        add_subdirectory(external/Ytest EXCLUDE_FROM_ALL)
+    endif ()
+    enable_testing()
+    add_subdirectory(tests/YsonTest)
+endif()
 
 ##
 ## "Export" the current build tree and make it possible for other modules
@@ -191,33 +203,34 @@ export(TARGETS Yson
     NAMESPACE Yson::
     FILE YsonConfig.cmake)
 
-
 ##
 ## Installation
 ##
 
-include(GNUInstallDirs)
+if (YSON_INSTALL)
+    include(GNUInstallDirs)
 
-install(TARGETS Yson
-    EXPORT YsonConfig
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    )
+    install(TARGETS Yson
+        EXPORT YsonConfig
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        )
 
-install(EXPORT YsonConfig
-    FILE
-        YsonConfig.cmake
-    NAMESPACE
-        Yson::
-    DESTINATION
-        ${CMAKE_INSTALL_LIBDIR}/cmake/Yson
-    )
+    install(EXPORT YsonConfig
+        FILE
+            YsonConfig.cmake
+        NAMESPACE
+            Yson::
+        DESTINATION
+            ${CMAKE_INSTALL_LIBDIR}/cmake/Yson
+        )
 
-file(GLOB_RECURSE PUBLIC_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
-install(
-    FILES
-        ${PUBLIC_INCLUDES}
-        ${CMAKE_CURRENT_BINARY_DIR}/YsonVersion.hpp
-    DESTINATION
-        ${CMAKE_INSTALL_INCLUDEDIR}/Yson
-    )
+    file(GLOB_RECURSE PUBLIC_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
+    install(
+        FILES
+            ${PUBLIC_INCLUDES}
+            ${CMAKE_CURRENT_BINARY_DIR}/YsonVersion.hpp
+        DESTINATION
+            ${CMAKE_INSTALL_INCLUDEDIR}/Yson
+        )
+endif()
