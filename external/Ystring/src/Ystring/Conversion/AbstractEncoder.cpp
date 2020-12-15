@@ -89,7 +89,7 @@ namespace Ystring { namespace Conversion {
                                    const char32_t* srcEnd,
                                    std::string& dst)
     {
-        YSTRING_THROW(encodingName()
+        YSTRING_THROW(+ encodingName()
                       + "-encoder doesn't support 8-bit strings.");
     }
 
@@ -97,7 +97,7 @@ namespace Ystring { namespace Conversion {
                                    const char32_t* srcEnd,
                                    std::u16string& dst)
     {
-        YSTRING_THROW(encodingName()
+        YSTRING_THROW(+ encodingName()
                       + "-encoder doesn't support 16-bit strings.");
     }
 
@@ -105,7 +105,7 @@ namespace Ystring { namespace Conversion {
                                    const char32_t* srcEnd,
                                    std::u32string& dst)
     {
-        YSTRING_THROW(encodingName()
+        YSTRING_THROW(+ encodingName()
                       + "-encoder doesn't support 32-bit strings.");
     }
 
@@ -113,7 +113,7 @@ namespace Ystring { namespace Conversion {
                                    const char32_t* srcEnd,
                                    std::wstring& dst)
     {
-        YSTRING_THROW(encodingName()
+        YSTRING_THROW(+ encodingName()
                       + "-encoder doesn't support 32-bit strings.");
     }
 

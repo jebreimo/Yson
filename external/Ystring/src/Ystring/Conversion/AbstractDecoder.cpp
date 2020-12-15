@@ -158,7 +158,7 @@ namespace Ystring { namespace Conversion {
                                               char32_t*& dstBeg,
                                               char32_t* dstEnd) const
     {
-        YSTRING_THROW(encodingName()
+        YSTRING_THROW(+ encodingName()
                       + "-decoder doesn't support 8-bit strings.");
     }
 
@@ -167,7 +167,7 @@ namespace Ystring { namespace Conversion {
                                               char32_t*& dstBeg,
                                               char32_t* dstEnd) const
     {
-        YSTRING_THROW(encodingName()
+        YSTRING_THROW(+ encodingName()
                       + "-decoder doesn't support 16-bit strings.");
     }
 
@@ -176,28 +176,28 @@ namespace Ystring { namespace Conversion {
                                               char32_t*& dstBeg,
                                               char32_t* dstEnd) const
     {
-        YSTRING_THROW(encodingName()
+        YSTRING_THROW(+ encodingName()
                       + "-decoder doesn't support 32-bit strings.");
     }
 
     void AbstractDecoder::skipInvalidCharacter(
             const char*& srcBeg, const char* srcEnd) const
     {
-        YSTRING_THROW(encodingName()
+        YSTRING_THROW(+ encodingName()
                       + "-decoder doesn't support 8-bit strings.");
     }
 
     void AbstractDecoder::skipInvalidCharacter(
             const char16_t*& srcBeg, const char16_t* srcEnd) const
     {
-        YSTRING_THROW(encodingName()
+        YSTRING_THROW(+ encodingName()
                       + "-decoder doesn't support 16-bit strings.");
     }
 
     void AbstractDecoder::skipInvalidCharacter(
             const char32_t*& srcBeg, const char32_t* srcEnd) const
     {
-        YSTRING_THROW(encodingName()
+        YSTRING_THROW(+ encodingName()
                       + "-decoder doesn't support 32-bit strings.");
     }
 }}

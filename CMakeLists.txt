@@ -6,7 +6,7 @@
 ## License text is included with the source distribution.
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.7)
-project(Yson VERSION 1.0.5 LANGUAGES CXX)
+project(Yson VERSION 1.0.6 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -157,6 +157,7 @@ target_compile_definitions(Yson
     PRIVATE
         $<$<BOOL:${MSVC}>:_SCL_SECURE_NO_WARNINGS>
         $<$<BOOL:${MSVC}>:_CRT_SECURE_NO_WARNINGS>
+        $<$<CXX_COMPILER_ID:MSVC>:YSON_EXPORTS>
     )
 
 set_target_properties(Yson
@@ -233,4 +234,15 @@ if (YSON_INSTALL)
         DESTINATION
             ${CMAKE_INSTALL_INCLUDEDIR}/Yson
         )
+
+    include(CMakePackageConfigHelpers)
+
+    write_basic_package_version_file(YsonConfigVersion.cmake
+        COMPATIBILITY SameMajorVersion
+        )
+
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/YsonConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Yson
+        )
+
 endif()

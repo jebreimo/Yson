@@ -46,7 +46,6 @@ set(PRIVATE_HEADERS
 
 set(SOURCE_FILES
     src/Ystring/EncodingInfo.cpp
-    src/Ystring/YstringException.cpp
     src/Ystring/Conversion/AbstractDecoder.cpp
     src/Ystring/Conversion/AbstractEncoder.cpp
     src/Ystring/Conversion/Converter.cpp
@@ -65,6 +64,11 @@ target_compile_definitions(Yson_Ystring
     PRIVATE
         $<$<BOOL:${MSVC}>:_SCL_SECURE_NO_WARNINGS>
         Ystring=Yson_Ystring
+    )
+
+target_compile_options(Yson_Ystring
+    PRIVATE
+        $<$<CXX_COMPILER_ID:GNU>:-fPIC>
     )
 
 target_include_directories(Yson_Ystring BEFORE

@@ -12,6 +12,18 @@
 
 namespace Yson
 {
+    namespace
+    {
+        const char* unwrap(std::string_view::const_iterator it)
+        {
+          if constexpr (std::is_pointer_v<std::string_view::const_iterator>)
+            return it;
+#ifdef _WIN32
+          else
+            return it._Unwrapped();
+#endif
+        }
+    }
     Result nextStringToken(std::string_view string, bool isEndOfFile,
                            char quotes);
 
@@ -30,9 +42,9 @@ namespace Yson
         if (string.empty())
         {
             if (isEndOfFile)
-                return Result(JsonTokenType::END_OF_FILE, string.end(), false);
+                return Result(JsonTokenType::END_OF_FILE, unwrap(string.end()), false);
             else
-                return Result(JsonTokenType::INCOMPLETE_TOKEN, string.end(), true);
+                return Result(JsonTokenType::INCOMPLETE_TOKEN, unwrap(string.end()), true);
         }
 
         switch (string[0])
@@ -44,17 +56,17 @@ namespace Yson
         case '\n':
             return findEndOfNewline(string, isEndOfFile);
         case '[':
-            return Result(JsonTokenType::START_ARRAY, string.begin() + 1);
+            return Result(JsonTokenType::START_ARRAY, unwrap(string.begin() + 1));
         case ']':
-            return Result(JsonTokenType::END_ARRAY, string.begin() + 1);
+            return Result(JsonTokenType::END_ARRAY, unwrap(string.begin() + 1));
         case '{':
-            return Result(JsonTokenType::START_OBJECT, string.begin() + 1);
+            return Result(JsonTokenType::START_OBJECT, unwrap(string.begin() + 1));
         case '}':
-            return Result(JsonTokenType::END_OBJECT, string.begin() + 1);
+            return Result(JsonTokenType::END_OBJECT, unwrap(string.begin() + 1));
         case ':':
-            return Result(JsonTokenType::COLON, string.begin() + 1);
+            return Result(JsonTokenType::COLON, unwrap(string.begin() + 1));
         case ',':
-            return Result(JsonTokenType::COMMA, string.begin() + 1);
+            return Result(JsonTokenType::COMMA, unwrap(string.begin() + 1));
         case '"':
             return nextStringToken(string, isEndOfFile, '"');
         case '\'':
@@ -112,9 +124,9 @@ namespace Yson
             }
         }
         if (isEndOfFile)
-            return {JsonTokenType::INVALID_TOKEN, string.end()};
+            return {JsonTokenType::INVALID_TOKEN, unwrap(string.end())};
         else
-            return {tokenType, string.end(), true};
+            return {tokenType, unwrap(string.end()), true};
     }
 
     Result findEndOfBlockComment(std::string_view string,
@@ -124,12 +136,12 @@ namespace Yson
         for (auto it = string.begin(); it != string.end(); ++it)
         {
             if (*it == '/' && precededByStar)
-                return Result(JsonTokenType::BLOCK_COMMENT, ++it);
+                return Result(JsonTokenType::BLOCK_COMMENT, unwrap(++it));
             precededByStar = *it == '*';
         }
         if (isEndOfFile)
-            return Result(JsonTokenType::INVALID_TOKEN, string.end());
-        return Result(JsonTokenType::BLOCK_COMMENT, string.end(), true);
+            return Result(JsonTokenType::INVALID_TOKEN, unwrap(string.end()));
+        return Result(JsonTokenType::BLOCK_COMMENT, unwrap(string.end()), true);
     }
 
     Result findEndOfLineComment(std::string_view string,
@@ -138,9 +150,9 @@ namespace Yson
         for (auto it = string.begin(); it != string.end(); ++it)
         {
             if (*it == '\r' || *it == '\n')
-                return Result(JsonTokenType::COMMENT, it);
+                return Result(JsonTokenType::COMMENT, unwrap(it));
         }
-        return Result(JsonTokenType::COMMENT, string.end(), !isEndOfFile);
+        return Result(JsonTokenType::COMMENT, unwrap(string.end()), !isEndOfFile);
     }
 
     Result nextCommentToken(std::string_view string, bool isEndOfFile)
@@ -159,9 +171,9 @@ namespace Yson
         if (tokenType == JsonTokenType::INCOMPLETE_TOKEN)
         {
             if (!isEndOfFile)
-                return Result(JsonTokenType::COMMENT, string.end(), true);
+                return Result(JsonTokenType::COMMENT, unwrap(string.end()), true);
             else
-                return Result(JsonTokenType::INVALID_TOKEN, string.end(), false);
+                return Result(JsonTokenType::INVALID_TOKEN, unwrap(string.end()), false);
         }
 
         if (tokenType == JsonTokenType::COMMENT)
@@ -178,12 +190,12 @@ namespace Yson
         for (auto it = string.begin(); it != string.end(); ++it)
         {
             if (*it == '\n')
-                return Result(JsonTokenType::NEWLINE, ++it);
+                return Result(JsonTokenType::NEWLINE, unwrap(++it));
             else if (precededByCr)
-                return Result(JsonTokenType::NEWLINE, it);
+                return Result(JsonTokenType::NEWLINE, unwrap(it));
             precededByCr = true;
         }
-        return Result(JsonTokenType::NEWLINE, string.end(), !isEndOfFile);
+        return Result(JsonTokenType::NEWLINE, unwrap(string.end()), !isEndOfFile);
     }
 
     Result findEndOfValue(std::string_view string, bool isEndOfFile)
@@ -203,16 +215,16 @@ namespace Yson
             case ']':
             case '{':
             case '}':
-                return Result(JsonTokenType::VALUE, it);
+                return Result(JsonTokenType::VALUE, unwrap(it));
             case '/':
             case '*':
                 if (it != string.begin() && *(it - 1) == '/')
-                    return Result(JsonTokenType::VALUE, it - 1);
+                    return Result(JsonTokenType::VALUE, unwrap(it - 1));
             default:
                 break;
             }
         }
-        return Result(JsonTokenType::VALUE, string.end(), !isEndOfFile);
+        return Result(JsonTokenType::VALUE, unwrap(string.end()), !isEndOfFile);
     }
 
     Result findEndOfWhitespace(std::string_view string)
@@ -220,9 +232,9 @@ namespace Yson
         for (auto it = string.begin(); it != string.end(); ++it)
         {
             if (*it != ' ' && *it != '\t')
-                return Result(JsonTokenType::WHITESPACE, it);
+                return Result(JsonTokenType::WHITESPACE, unwrap(it));
         }
-        return Result(JsonTokenType::WHITESPACE, string.end());
+        return Result(JsonTokenType::WHITESPACE, unwrap(string.end()));
     }
 
     JsonTokenType determineCommentType(std::string_view string)

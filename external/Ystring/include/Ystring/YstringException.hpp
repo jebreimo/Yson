@@ -15,30 +15,33 @@
   * @brief Defines the exception thrown by Ystring functions.
   */
 
-#ifndef _NOEXCEPT
-    #if (defined(_MSC_VER)) && (_MSC_VER < 1910)
-        #define _NOEXCEPT
-    #else
-        #define _NOEXCEPT noexcept
-    #endif
-#endif
-
 namespace Ystring
 {
-    class YSTRING_API YstringException : public std::logic_error
+    class YstringException : public std::runtime_error
     {
     public:
-        YstringException();
-        explicit YstringException(const std::string& msg);
-        YstringException(const std::string& msg,
-                         const std::string& filename,
-                         int lineno,
-                         const std::string& funcname);
-        const char* what() const _NOEXCEPT override;
-    private:
-        std::string m_Message;
+        YstringException() noexcept
+            : std::runtime_error("Unspecified error.")
+        {}
+
+        /**
+         * @brief Passes @a message on to the base class.
+         */
+        explicit YstringException(const std::string& message) noexcept
+            : std::runtime_error(message)
+        {}
+
+        explicit YstringException(const char* message) noexcept
+            : std::runtime_error(message)
+        {}
     };
 }
 
+#define _YSTRING_THROW_3(file, line, msg) \
+    throw ::Ystring::YstringException(file ":" #line ": " msg)
+
+#define _YSTRING_THROW_2(file, line, msg) \
+    _YSTRING_THROW_3(file, line, msg)
+
 #define YSTRING_THROW(msg) \
-    throw YstringException((msg), __FILE__, __LINE__, __FUNCTION__)
+    _YSTRING_THROW_2(__FILE__, __LINE__, msg)

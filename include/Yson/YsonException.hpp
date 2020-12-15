@@ -21,22 +21,22 @@ namespace Yson
 
     /** @brief The exception class used by all functions in the Yson library.
       */
-    class YsonException : public std::logic_error
+    class YsonException : public std::runtime_error
     {
     public:
         YsonException()
-            : std::logic_error("Unspecified error.")
+            : std::runtime_error("Unspecified error.")
         {}
 
         explicit YsonException(const std::string& msg)
-            : std::logic_error(msg)
+            : std::runtime_error(msg)
         {}
 
         YsonException(const std::string& msg,
                       const std::string& debugFileName,
                       int debugLineNumber,
                       const std::string& debugFunctionName)
-            : std::logic_error(msg)
+            : std::runtime_error(msg)
         {
             if (!debugFunctionName.empty())
                 m_DebugLocation += debugFunctionName + "() in ";
