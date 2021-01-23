@@ -158,6 +158,8 @@ namespace Ystring
                      Endianness::UNKNOWN, 1, 1, 4),
         EncodingInfo(Encoding::LATIN_1, "iso-8859-1", "",
                      Endianness::UNKNOWN, 1, 1, 1),
+        EncodingInfo(Encoding::LATIN_5, "latin5", "",
+                     Endianness::UNKNOWN, 1, 1, 1),
         EncodingInfo(Encoding::LATIN_6, "latin6", "",
                      Endianness::UNKNOWN, 1, 1, 1),
         EncodingInfo(Encoding::LATIN_9, "latin9", "",
