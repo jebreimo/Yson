@@ -184,7 +184,7 @@ namespace
         std::stringstream ss;
         JsonWriter writer(ss);
         Y_THROWS(writer.value(std::numeric_limits<double>::infinity()),
-                 std::logic_error);
+                 std::runtime_error);
         writer.setNonFiniteFloatsEnabled(true);
         writer.value(std::numeric_limits<double>::infinity()).flush();
         Y_EQUAL(ss.str(), "Infinity");

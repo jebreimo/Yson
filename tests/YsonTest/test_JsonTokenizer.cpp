@@ -170,6 +170,35 @@ namespace
                                "'ABC \\\n\rDEF'"));
     }
 
+    void test_StreamAndBuffer()
+    {
+        std::stringstream ss;
+        std::string buffer("{}");
+        JsonTokenizer tokenizer(ss, buffer.data(), buffer.size());
+        Y_ASSERT(tokenizer.next());
+    }
+
+    void test_IncompleteUtf8()
+    {
+        std::stringstream ss;
+        ss.write(R"({"Key": )", 7);
+        JsonTokenizer tokenizer(ss);
+        Y_ASSERT(tokenizer.next());
+        Y_EQUAL(tokenizer.token(), "{");
+        Y_ASSERT(tokenizer.next());
+        Y_EQUAL(tokenizer.token(), "Key");
+        ss.clear();
+        ss.write("1, \"", 4);
+        ss.put('\xC0');
+        Y_ASSERT(tokenizer.next());
+        Y_EQUAL(tokenizer.token(), ":");
+        Y_ASSERT(tokenizer.next());
+        Y_EQUAL(tokenizer.token(), "1");
+        Y_ASSERT(tokenizer.next());
+        Y_EQUAL(tokenizer.token(), ",");
+        Y_ASSERT(!tokenizer.next());
+    }
+
     Y_TEST(test_Basics,
            test_StringTokens,
            test_SingleQuotedStringTokens,
@@ -178,5 +207,7 @@ namespace
            test_Value,
            test_ValueTokens,
            test_Whitespaces,
-           test_MultilineStrings);
+           test_MultilineStrings,
+           test_StreamAndBuffer,
+           test_IncompleteUtf8);
 }

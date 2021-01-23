@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <istream>
+#include <memory>
 #include <Ystring/Conversion.hpp>
 #include <Ystring/EncodingInfo.hpp>
 #include "Yson/Common/DefaultBufferSize.hpp"
@@ -31,8 +32,8 @@ namespace Yson
     {
         if (sourceEncoding != Encoding::UNKNOWN)
         {
-            m_Converter.reset(new Conversion::Converter(
-                    sourceEncoding, Ystring::Encoding::UTF_8));
+            m_Converter = std::make_unique<Conversion::Converter>(
+                    sourceEncoding, Ystring::Encoding::UTF_8);
         }
         m_Buffer.reserve(std::max(getDefaultBufferSize(), bufferSize));
         if (buffer && bufferSize)
@@ -51,7 +52,7 @@ namespace Yson
         if (readBytes < bytes)
             m_Buffer.resize(initialBufferSize + readBytes);
 
-        if (m_Stream->bad() || readBytes == 0)
+        if (m_Stream->bad() || m_Buffer.empty())
             return false;
 
         const char* bufferStart = m_Buffer.data();
@@ -63,8 +64,8 @@ namespace Yson
                     std::min<size_t>(bufferSize, 256));
             bufferStart = encoding.second;
             bufferSize -= bufferStart - m_Buffer.data();
-            m_Converter.reset(new Conversion::Converter(
-                    encoding.first, Ystring::Encoding::UTF_8));
+            m_Converter = std::make_unique<Conversion::Converter>(
+                    encoding.first, Ystring::Encoding::UTF_8);
         }
 
         auto convertedBytes = m_Converter->convert(
@@ -88,8 +89,8 @@ namespace Yson
         m_Stream = &stream;
         if (sourceEncoding != Encoding::UNKNOWN)
         {
-            m_Converter.reset(new Conversion::Converter(
-                    sourceEncoding, Ystring::Encoding::UTF_8));
+            m_Converter = std::make_unique<Conversion::Converter>(
+                    sourceEncoding, Ystring::Encoding::UTF_8);
         }
         else if (m_Converter)
         {

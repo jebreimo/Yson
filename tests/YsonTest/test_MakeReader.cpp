@@ -44,5 +44,13 @@ namespace
         Y_CALL(assertFails("Pluto"));
     }
 
-    Y_TEST(test_MakeReader);
+    void test_MakeReaderWithStream()
+    {
+        std::istringstream ss(R"({"a": 1})");
+        auto reader = makeReader(ss);
+        Y_ASSERT(reader->nextValue());
+    }
+
+    Y_TEST(test_MakeReader,
+           test_MakeReaderWithStream);
 }
