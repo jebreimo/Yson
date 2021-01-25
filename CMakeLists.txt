@@ -6,7 +6,7 @@
 ## License text is included with the source distribution.
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.7)
-project(Yson VERSION 1.0.7 LANGUAGES CXX)
+project(Yson VERSION 1.0.8 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -24,6 +24,8 @@ option(YSON_BUILD_TEST "Build tests" ${YSON_MASTER_PROJECT})
 
 # Install option
 option(YSON_INSTALL "Generate the install target" ${YSON_MASTER_PROJECT})
+
+include(GNUInstallDirs)
 
 add_subdirectory(external/Ystring)
 
@@ -145,7 +147,7 @@ target_compile_definitions(Yson
 
 target_include_directories(Yson BEFORE
     PUBLIC
-        $<INSTALL_INTERFACE:include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     PRIVATE
@@ -209,8 +211,6 @@ export(TARGETS Yson
 ##
 
 if (YSON_INSTALL)
-    include(GNUInstallDirs)
-
     install(TARGETS Yson
         EXPORT YsonConfig
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
