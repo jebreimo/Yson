@@ -10,14 +10,11 @@
 #include <algorithm>
 #include <istream>
 #include <memory>
-#include <Ystring/Conversion.hpp>
-#include <Ystring/EncodingInfo.hpp>
+#include <Yconvert/Converter.hpp>
 #include "Yson/Common/DefaultBufferSize.hpp"
 
 namespace Yson
 {
-    using namespace Ystring;
-
     TextStreamReader::TextStreamReader()
         : m_Stream()
     {
@@ -27,13 +24,13 @@ namespace Yson
     TextStreamReader::TextStreamReader(std::istream& stream,
                                        const char* buffer,
                                        size_t bufferSize,
-                                       Encoding_t sourceEncoding)
+                                       Yconvert::Encoding sourceEncoding)
         : m_Stream(&stream)
     {
-        if (sourceEncoding != Encoding::UNKNOWN)
+        if (sourceEncoding != Yconvert::Encoding::UNKNOWN)
         {
-            m_Converter = std::make_unique<Conversion::Converter>(
-                    sourceEncoding, Ystring::Encoding::UTF_8);
+            m_Converter = std::make_unique<Yconvert::Converter>(
+                    sourceEncoding, Yconvert::Encoding::UTF_8);
         }
         m_Buffer.reserve(std::max(getDefaultBufferSize(), bufferSize));
         if (buffer && bufferSize)
@@ -59,13 +56,13 @@ namespace Yson
         auto bufferSize = m_Buffer.size();
         if (!m_Converter)
         {
-            auto encoding = determineEncoding(
+            auto [encoding, offset] = Yconvert::determineEncoding(
                     m_Buffer.data(),
                     std::min<size_t>(bufferSize, 256));
-            bufferStart = encoding.second;
-            bufferSize -= bufferStart - m_Buffer.data();
-            m_Converter = std::make_unique<Conversion::Converter>(
-                    encoding.first, Ystring::Encoding::UTF_8);
+            bufferStart += offset;
+            bufferSize -= offset;
+            m_Converter = std::make_unique<Yconvert::Converter>(
+                    encoding, Yconvert::Encoding::UTF_8);
         }
 
         auto convertedBytes = m_Converter->convert(
@@ -84,13 +81,13 @@ namespace Yson
     }
 
     void TextStreamReader::init(std::istream& stream,
-                                Encoding_t sourceEncoding)
+                                Yconvert::Encoding sourceEncoding)
     {
         m_Stream = &stream;
-        if (sourceEncoding != Encoding::UNKNOWN)
+        if (sourceEncoding != Yconvert::Encoding::UNKNOWN)
         {
-            m_Converter = std::make_unique<Conversion::Converter>(
-                    sourceEncoding, Ystring::Encoding::UTF_8);
+            m_Converter = std::make_unique<Yconvert::Converter>(
+                    sourceEncoding, Yconvert::Encoding::UTF_8);
         }
         else if (m_Converter)
         {

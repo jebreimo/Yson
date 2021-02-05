@@ -9,7 +9,7 @@
 #include <cassert>
 #include <fstream>
 #include <iostream>
-#include <Ystring/Conversion.hpp>
+#include <Yconvert/Convert.hpp>
 #include "Yson/YsonException.hpp"
 #include "Yson/Common/Base64.hpp"
 #include "Yson/Common/GetUnicodeFileName.hpp"
@@ -253,10 +253,10 @@ namespace Yson
 
     UBJsonWriter& UBJsonWriter::value(const std::wstring& text)
     {
-        return value(Ystring::Conversion::convert<std::string>(
+        return value(Yconvert::convertTo<std::string>(
                 text,
-                Ystring::Encoding::UTF_16,
-                Ystring::Encoding::UTF_8));
+                Yconvert::Encoding::UTF_16_NATIVE,
+                Yconvert::Encoding::UTF_8));
     }
 
     UBJsonWriter& UBJsonWriter::binary(const void* data, size_t size)

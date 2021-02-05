@@ -12,7 +12,7 @@
 #include <fstream>
 #include <iostream>
 #include <stack>
-#include <Ystring/Conversion.hpp>
+#include <Yconvert/Convert.hpp>
 #include <Ystring/Escape/Escape.hpp>
 #include "Yson/Common/Base64.hpp"
 #include "Yson/Common/GetUnicodeFileName.hpp"
@@ -264,10 +264,10 @@ namespace Yson
 
     JsonWriter& JsonWriter::value(const std::wstring& text)
     {
-        return value(Ystring::Conversion::convert<std::string>(
+        return value(Yconvert::convertTo<std::string>(
                 text,
-                Ystring::Encoding::UTF_16,
-                Ystring::Encoding::UTF_8));
+                Yconvert::Encoding::UTF_16_NATIVE,
+                Yconvert::Encoding::UTF_8));
     }
 
     JsonWriter& JsonWriter::rawValue(const std::string& value)

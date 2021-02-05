@@ -13,7 +13,7 @@ namespace Yson
 {
     TextFileReader::TextFileReader(
             const std::string& fileName,
-            Ystring::Encoding_t sourceEncoding)
+            Yconvert::Encoding sourceEncoding)
         : m_FileStream(getUnicodeFileName(fileName), std::ios_base::binary)
     {
         if (!m_FileStream)

@@ -11,8 +11,6 @@
 #include <functional>
 #include <string>
 #include <vector>
-#include "Ystring/Encoding.hpp"
-#include "Ystring/PlatformDetails.hpp"
 #include "Ystring/YstringException.hpp"
 
 /** @file

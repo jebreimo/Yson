@@ -8,14 +8,14 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include <Ystring/Encoding.hpp>
+#include <Yconvert/Encoding.hpp>
 #include "TextReader.hpp"
 #include "Yson/YsonDefinitions.hpp"
 
-namespace Ystring { namespace Conversion
+namespace Yconvert
 {
     class Converter;
-}}
+}
 
 namespace Yson
 {
@@ -25,20 +25,20 @@ namespace Yson
         TextStreamReader(std::istream& stream,
                          const char* buffer = nullptr,
                          size_t bufferSize = 0,
-                         Ystring::Encoding_t sourceEncoding = Ystring::Encoding::UNKNOWN);
+                         Yconvert::Encoding sourceEncoding = Yconvert::Encoding::UNKNOWN);
 
-        ~TextStreamReader();
+        ~TextStreamReader() override;
 
         bool read(std::string& destination, size_t bytes) override;
 
     protected:
         TextStreamReader();
 
-        void init(std::istream& stream, Ystring::Encoding_t sourceEncoding);
+        void init(std::istream& stream, Yconvert::Encoding sourceEncoding);
 
     private:
         std::istream* m_Stream;
-        std::unique_ptr<Ystring::Conversion::Converter> m_Converter;
+        std::unique_ptr<Yconvert::Converter> m_Converter;
         std::vector<char> m_Buffer;
     };
 }

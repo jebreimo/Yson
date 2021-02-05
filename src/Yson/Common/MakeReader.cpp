@@ -7,11 +7,11 @@
 //****************************************************************************
 #include <algorithm>
 #include <fstream>
-#include "Ystring/EncodingInfo.hpp"
-#include "GetUnicodeFileName.hpp"
-#include "ThrowYsonException.hpp"
+#include "Yconvert/Encoding.hpp"
 #include "Yson/JsonReader.hpp"
 #include "Yson/UBJsonReader.hpp"
+#include "GetUnicodeFileName.hpp"
+#include "ThrowYsonException.hpp"
 
 namespace Yson
 {
@@ -38,15 +38,15 @@ namespace Yson
          */
         bool isByteOrderMark(const char* contents, size_t size)
         {
-            auto encInf = Yson_Ystring::determineEncodingFromByteOrderMark(
+            auto encInf = Yson_Yconvert::determineEncodingFromByteOrderMark(
                     contents, size);
             switch (encInf)
             {
-            case Yson_Ystring::Encoding::UTF_8:
-            case Yson_Ystring::Encoding::UTF_16_BE:
-            case Yson_Ystring::Encoding::UTF_16_LE:
-            case Yson_Ystring::Encoding::UTF_32_BE:
-            case Yson_Ystring::Encoding::UTF_32_LE:
+            case Yson_Yconvert::Encoding::UTF_8:
+            case Yson_Yconvert::Encoding::UTF_16_BE:
+            case Yson_Yconvert::Encoding::UTF_16_LE:
+            case Yson_Yconvert::Encoding::UTF_32_BE:
+            case Yson_Yconvert::Encoding::UTF_32_LE:
                 return true;
             default:
                 return false;

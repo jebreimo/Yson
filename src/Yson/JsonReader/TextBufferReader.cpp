@@ -8,8 +8,7 @@
 #include "TextBufferReader.hpp"
 
 #include <algorithm>
-#include <Ystring/Conversion.hpp>
-#include <Ystring/EncodingInfo.hpp>
+#include <Yconvert/Convert.hpp>
 
 namespace Yson
 {
@@ -19,17 +18,17 @@ namespace Yson
     }
 
     TextBufferReader::TextBufferReader(const char* buffer, size_t size,
-                                       Ystring::Encoding_t sourceEncoding)
+                                       Yconvert::Encoding sourceEncoding)
             : m_Buffer(buffer),
               m_Size(size),
               m_Offset()
     {
         while (m_Size != 0 && m_Buffer[m_Size - 1] == 0)
             --m_Size;
-        if (sourceEncoding != Ystring::Encoding::UNKNOWN)
+        if (sourceEncoding != Yconvert::Encoding::UNKNOWN)
         {
-            m_Converter.reset(new Ystring::Conversion::Converter(
-                    sourceEncoding, Ystring::Encoding::UTF_8));
+            m_Converter = std::make_unique<Yconvert::Converter>(
+                    sourceEncoding, Yconvert::Encoding::UTF_8);
         }
     }
 
@@ -40,16 +39,16 @@ namespace Yson
             return false;
         if (!m_Converter)
         {
-            auto encoding = Ystring::determineEncoding(
-                    m_Buffer,
-                    std::min<size_t>(m_Size, 256));
-            m_Offset = encoding.second - m_Buffer;
-            m_Converter.reset(new Ystring::Conversion::Converter(
-                    encoding.first,
-                    Ystring::Encoding::UTF_8));
+            auto encoding = Yconvert::determineEncoding(
+                m_Buffer,
+                std::min<size_t>(m_Size, 256));
+            m_Offset = encoding.second;
+            m_Converter = std::make_unique<Yconvert::Converter>(
+                encoding.first,
+                Yconvert::Encoding::UTF_8);
         }
 
-        if (m_Converter->sourceEncoding() == Ystring::Encoding::UTF_8)
+        if (m_Converter->sourceEncoding() == Yconvert::Encoding::UTF_8)
         {
             if (m_Offset + bytes != m_Size)
                 bytes = sizeWithoutIncompleteFinalCharacter(m_Buffer + m_Offset, bytes);

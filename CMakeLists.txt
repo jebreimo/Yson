@@ -27,6 +27,13 @@ option(YSON_INSTALL "Generate the install target" ${YSON_MASTER_PROJECT})
 
 include(GNUInstallDirs)
 
+set(YCONVERT_ISO_CODE_PAGES OFF)
+set(YCONVERT_DOS_CODE_PAGES OFF)
+set(YCONVERT_WIN_CODE_PAGES OFF)
+set(YCONVERT_MAC_CODE_PAGES OFF)
+
+add_subdirectory(external/Yconvert)
+
 add_subdirectory(external/Ystring)
 
 configure_file(include/Yson/YsonVersion.hpp.in YsonVersion.hpp @ONLY)
@@ -137,11 +144,13 @@ add_library(Yson
     src/Yson/UBJsonWriter/UBJsonWriter.cpp
     src/Yson/UBJsonWriter/UBJsonWriterUtilities.cpp
     src/Yson/UBJsonWriter/UBJsonWriterUtilities.hpp
+    $<TARGET_OBJECTS:Yson_Yconvert>
     $<TARGET_OBJECTS:Yson_Ystring>
     )
 
 target_compile_definitions(Yson
     PRIVATE
+        Yconvert=Yson_Yconvert
         Ystring=Yson_Ystring
     )
 
@@ -152,8 +161,14 @@ target_include_directories(Yson BEFORE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/Yconvert/include
         ${CMAKE_CURRENT_SOURCE_DIR}/external/Ystring/include
     )
+
+#target_link_libraries(Yson
+#    PRIVATE
+#        Yconvert::Yconvert
+#    )
 
 target_compile_definitions(Yson
     PRIVATE
