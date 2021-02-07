@@ -6,7 +6,7 @@
 ## License text is included with the source distribution.
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.7)
-project(Yson VERSION 1.0.9 LANGUAGES CXX)
+project(Yson VERSION 1.0.10 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
