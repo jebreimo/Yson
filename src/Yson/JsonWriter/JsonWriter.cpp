@@ -13,8 +13,8 @@
 #include <iostream>
 #include <stack>
 #include <Yconvert/Convert.hpp>
-#include <Ystring/Escape/Escape.hpp>
 #include "Yson/Common/Base64.hpp"
+#include "Yson/Common/Escape.hpp"
 #include "Yson/Common/GetUnicodeFileName.hpp"
 #include "Yson/Common/IsJavaScriptIdentifier.hpp"
 #include "Yson/Common/ThrowYsonException.hpp"
@@ -251,13 +251,13 @@ namespace Yson
 
     JsonWriter& JsonWriter::value(const std::string& text)
     {
-        if (!Ystring::hasUnescapedCharacters(text))
+        if (!hasUnescapedCharacters(text))
         {
             return writeString(text);
         }
         else
         {
-            return writeString(Ystring::escape(
+            return writeString(escape(
                     text, isEscapeNonAsciiCharactersEnabled()));
         }
     }

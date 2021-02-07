@@ -34,8 +34,6 @@ set(YCONVERT_MAC_CODE_PAGES OFF)
 
 add_subdirectory(external/Yconvert)
 
-add_subdirectory(external/Ystring)
-
 configure_file(src/Yson/Common/YsonVersion.hpp.in YsonVersion.hpp @ONLY)
 
 add_library(Yson
@@ -58,6 +56,8 @@ add_library(Yson
     src/Yson/Common/DefaultBufferSize.cpp
     src/Yson/Common/DefaultBufferSize.hpp
     src/Yson/Common/DetailedValueType.cpp
+    src/Yson/Common/Escape.cpp
+    src/Yson/Common/Escape.hpp
     src/Yson/Common/GetDetailedValueType.cpp
     src/Yson/Common/GetDetailedValueType.hpp
     src/Yson/Common/GetUnicodeFileName.cpp
@@ -145,13 +145,11 @@ add_library(Yson
     src/Yson/UBJsonWriter/UBJsonWriterUtilities.cpp
     src/Yson/UBJsonWriter/UBJsonWriterUtilities.hpp
     $<TARGET_OBJECTS:Yson_Yconvert>
-    $<TARGET_OBJECTS:Yson_Ystring>
     )
 
 target_compile_definitions(Yson
     PRIVATE
         Yconvert=Yson_Yconvert
-        Ystring=Yson_Ystring
     )
 
 target_include_directories(Yson BEFORE
@@ -162,7 +160,6 @@ target_include_directories(Yson BEFORE
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/external/Yconvert/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/Ystring/include
     )
 
 #target_link_libraries(Yson

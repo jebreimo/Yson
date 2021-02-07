@@ -7,17 +7,14 @@
 //****************************************************************************
 #pragma once
 
-#include <cstdint>
-#include <functional>
 #include <string>
-#include <vector>
-#include "Ystring/YstringException.hpp"
+#include <string_view>
 
 /** @file
   * @brief The function library for UTF-8 encoded strings.
   */
 
-namespace Ystring
+namespace Yson
 {
     /** @brief Returns a copy of @a str where control character etc. have
       *     been escaped.
@@ -25,24 +22,24 @@ namespace Ystring
       * When escaping with backslashes the function does not use octal codes,
       * not even \\0 for value 0 as these are too easy to misinterpret.
       */
-    YSTRING_API std::string escape(const std::string& str,
-                                   bool escapeNonAscii = false);
+    std::string escape(std::string_view str,
+                       bool escapeNonAscii = false);
 
     /** @brief Returns true if @a str has characters that will be unescaped
       *     if unescape is called with the same parameters.
       */
-    YSTRING_API bool hasEscapedCharacters(const std::string& str);
+    bool hasEscapedCharacters(std::string_view str);
 
     /** @brief Returns true if @a str has characters that will be escaped
       *     if escape is called with the same parameters.
       */
-    YSTRING_API bool hasUnescapedCharacters(const std::string& str,
-                                            bool escapeNonAscii = false);
+    bool hasUnescapedCharacters(std::string_view str,
+                                bool escapeNonAscii = false);
 
     /** @brief Returns a copy of @a str where all escape sequences have been
       *     translated to the characters they represent.
       * @throws YstringException if @a str contains an invalid
       *     escape sequence.
       */
-    YSTRING_API std::string unescape(const std::string& str);
+    std::string unescape(std::string_view str);
 }

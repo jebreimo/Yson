@@ -6,8 +6,8 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include <stack>
-#include <Ystring/Escape/Escape.hpp>
 #include "Yson/Common/Base64.hpp"
+#include "Yson/Common/Escape.hpp"
 #include "Yson/Common/GetDetailedValueType.hpp"
 #include "Yson/Common/GetValueType.hpp"
 #include "JsonArrayReader.hpp"
@@ -334,9 +334,9 @@ namespace Yson
             if (token.size() > 1)
             {
                 auto tokenString = m_Members->tokenizer.tokenString();
-                if (Ystring::hasEscapedCharacters(tokenString))
+                if (hasEscapedCharacters(tokenString))
                 {
-                    tokenString = Ystring::unescape(tokenString);
+                    tokenString = unescape(tokenString);
                     if (tokenString.size() == 1)
                     {
                         value = tokenString.front();
@@ -354,8 +354,8 @@ namespace Yson
         if (currentTokenIsValueOrString())
         {
             value = m_Members->tokenizer.tokenString();
-            if (Ystring::hasEscapedCharacters(value))
-                value = Ystring::unescape(value);
+            if (hasEscapedCharacters(value))
+                value = unescape(value);
             return true;
         }
         return false;
