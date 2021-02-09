@@ -184,8 +184,10 @@ namespace Yconvert
 
     Encoding encodingFromName(std::string name)
     {
-        std::transform(name.begin(), name.end(), name.begin(),
-                       [](auto c){return 'a' <= c && c <= 'z' ? c - 32 : c;});
+        std::transform(name.begin(), name.end(), name.begin(), [](auto c)
+        {
+            return 'a' <= c && c <= 'z' ? char(c - 32) : c;
+        });
         using std::begin;
         using std::end;
         auto it = std::find_if(begin(ENCODING_INFO), end(ENCODING_INFO),

@@ -7,6 +7,7 @@
 //****************************************************************************
 #pragma once
 #include "EncoderBase.hpp"
+#include <iterator>
 
 namespace Yconvert
 {

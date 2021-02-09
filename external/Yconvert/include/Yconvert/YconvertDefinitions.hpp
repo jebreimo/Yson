@@ -15,28 +15,30 @@
 
 /// @cond
 
-#ifdef _WIN32
-    // Disabling warnings about exposing std::string, std::vector and
-    // std::logic_error through the external DLL interface. The warnings are
-    // valid, but it would defeat much of the purpose of Yconvert to remove
-    // their cause (i.e. stop using std::string etc.).
-    // The issue is instead solved by having separate debug and release
-    // versions of the DLL and LIB files.
-    #pragma warning(disable: 4251 4275)
-    #ifdef YCONVERT_EXPORTS
-        #define YCONVERT_API __declspec(dllexport)
-    #else
-        #define YCONVERT_API __declspec(dllimport)
-        #ifndef YCONVERT_NO_AUTO_IMPORT
-            #ifdef _DEBUG
-                #pragma comment (lib, "Yconvert.debug.lib")
-            #else
-                #pragma comment (lib, "Yconvert.lib")
-            #endif
-        #endif
-    #endif
-#else
-    #define YCONVERT_API
+#ifndef YCONVERT_API
+  #ifdef _WIN32
+      // Disabling warnings about exposing std::string, std::vector and
+      // std::logic_error through the external DLL interface. The warnings are
+      // valid, but it would defeat much of the purpose of Yconvert to remove
+      // their cause (i.e. stop using std::string etc.).
+      // The issue is instead solved by having separate debug and release
+      // versions of the DLL and LIB files.
+      #pragma warning(disable: 4251 4275)
+      #ifdef YCONVERT_EXPORTS
+          #define YCONVERT_API __declspec(dllexport)
+      #else
+          #define YCONVERT_API __declspec(dllimport)
+          #ifndef YCONVERT_NO_AUTO_IMPORT
+              #ifdef _DEBUG
+                  #pragma comment (lib, "Yconvert.debug.lib")
+              #else
+                  #pragma comment (lib, "Yconvert.lib")
+              #endif
+          #endif
+      #endif
+  #else
+      #define YCONVERT_API
+  #endif
 #endif
 
 /// @endcond

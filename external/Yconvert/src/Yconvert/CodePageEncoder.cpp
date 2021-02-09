@@ -7,6 +7,8 @@
 //****************************************************************************
 #include "CodePageEncoder.hpp"
 
+#ifdef YCONVERT_ENABLE_CODE_PAGES
+
 #include <algorithm>
 #include <optional>
 #include "Yconvert/ConversionException.hpp"
@@ -133,3 +135,5 @@ namespace Yconvert
         return srcSize;
     }
 }
+
+#endif

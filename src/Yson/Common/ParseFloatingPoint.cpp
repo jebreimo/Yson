@@ -160,9 +160,9 @@ namespace Yson
             }
 
             if (exponent)
-                value *= pow(T(10), exponent);
+                value *= std::pow(T(10), T(exponent));
             if (fraction != 0)
-                value += fraction * pow(T(10), exponent - decimals);
+                value += fraction * std::pow(T(10), T(exponent - decimals));
 
             // Add the sign
             if (negative)

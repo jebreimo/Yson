@@ -6,6 +6,8 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "Escape.hpp"
+
+#include <iterator>
 #include "ThrowYsonException.hpp"
 
 namespace Yson
@@ -40,13 +42,13 @@ namespace Yson
             }
             else
             {
-                unsigned shift = (length - 1) * 6;
+                auto shift = unsigned((length - 1) * 6);
                 *it = (char)((0xFFu << (8 - length)) | (c >> shift));
                 ++it;
                 for (size_t i = 1; i < length; i++)
                 {
                     shift -= 6;
-                    *it = (char)(0x80u | ((c >> shift) & 0x3F));
+                    *it = (char)(0x80u | ((c >> shift) & 0x3Fu));
                     ++it;
                 }
             }

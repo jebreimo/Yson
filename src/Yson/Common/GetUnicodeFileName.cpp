@@ -2,11 +2,12 @@
 // Copyright © 2017, Trimble Inc.
 // Created 2017-07-31 by JEB
 //****************************************************************************
+#include <Yconvert/YconvertException.hpp>
 #include "GetUnicodeFileName.hpp"
 
 #if defined(_WIN32) || defined(_WIN64)
-#include "Ystring/Conversion.hpp"
-#include "Ystring/YstringException.hpp"
+#include "Yconvert/Convert.hpp"
+// #include "Ystring/YstringException.hpp"
 #include "ThrowYsonException.hpp"
 #endif
 
@@ -17,15 +18,15 @@ namespace Yson
     {
         try
         {
-            return Ystring::Conversion::convert<std::wstring>(
+            return Yconvert::convertTo<std::wstring>(
                     fileName,
-                    Ystring::Encoding::UTF_8,
-                    Ystring::Encoding::UTF_16,
-                    Ystring::Conversion::ErrorHandlingPolicy::THROW);
+                    Yconvert::Encoding::UTF_8,
+                    Yconvert::Encoding::UTF_16_NATIVE,
+                    Yconvert::ErrorPolicy::THROW);
         }
-        catch (Ystring::YstringException&)
+        catch (Yconvert::YconvertException& ex)
         {
-            YSON_THROW("File name must be encoded as UTF-8.");
+            YSON_THROW("File name must be encoded as UTF-8 (" + std::string(ex.what()) + ").");
         }
     }
 #else

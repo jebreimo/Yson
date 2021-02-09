@@ -11,6 +11,8 @@
 #include <vector>
 #include "CodePageDefinitions.hpp"
 
+#ifdef YCONVERT_ENABLE_CODE_PAGES
+
 namespace Yconvert
 {
     struct CodePointMapRange
@@ -40,3 +42,5 @@ namespace Yconvert
         std::vector<CodePointMapRange> m_Ranges;
     };
 }
+
+#endif

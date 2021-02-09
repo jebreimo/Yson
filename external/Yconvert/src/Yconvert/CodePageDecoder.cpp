@@ -7,6 +7,8 @@
 //****************************************************************************
 #include "CodePageDecoder.hpp"
 
+#ifdef YCONVERT_ENABLE_CODE_PAGES
+
 namespace Yconvert
 {
     CodePageDecoder::CodePageDecoder(Encoding encoding,
@@ -32,7 +34,7 @@ namespace Yconvert
         }
     }
 
-    size_t CodePageDecoder::skipCharacter(const void* src, size_t srcSize) const
+    size_t CodePageDecoder::skipCharacter(const void* /*src*/, size_t srcSize) const
     {
         return srcSize ? 1 : 0;
     }
@@ -47,3 +49,5 @@ namespace Yconvert
         return {count, count};
     }
 }
+
+#endif

@@ -10,6 +10,8 @@
 
 #include "CodePageDefinitions.hpp"
 
+#ifdef YCONVERT_ENABLE_CODE_PAGES
+
 namespace Yconvert
 {
     class CodePageDecoder : public DecoderBase
@@ -28,3 +30,5 @@ namespace Yconvert
         char32_t m_Chars[256];
     };
 }
+
+#endif

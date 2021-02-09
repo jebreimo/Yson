@@ -40,6 +40,8 @@ namespace Yconvert
             return decoder.decode(src, srcSize, buf.data(), n).first;
         }
 
+#ifdef YCONVERT_ENABLE_CODE_PAGES
+
         inline std::pair<const CodePageRange*, size_t>
         getCodePageRanges(Encoding encoding)
         {
@@ -65,6 +67,42 @@ namespace Yconvert
             return {nullptr, 0};
         }
 
+        std::unique_ptr<DecoderBase> makeCodePageDecoder(Encoding encoding)
+        {
+            auto [ranges, rangesSize] = getCodePageRanges(encoding);
+            if (ranges)
+            {
+                return std::unique_ptr<DecoderBase>(new CodePageDecoder(
+                    encoding, ranges, rangesSize));
+            }
+            return {};
+        }
+
+        std::unique_ptr<EncoderBase> makeCodePageEncoder(Encoding encoding)
+        {
+            auto [ranges, rangesSize] = getCodePageRanges(encoding);
+            if (ranges)
+            {
+                return std::unique_ptr<EncoderBase>(new CodePageEncoder(
+                    encoding, ranges, rangesSize));
+            }
+            return {};
+        }
+
+#else
+
+        std::unique_ptr<DecoderBase> makeCodePageDecoder(Encoding)
+        {
+            return {};
+        }
+
+        std::unique_ptr<EncoderBase> makeCodePageEncoder(Encoding)
+        {
+            return {};
+        }
+
+#endif
+
         std::unique_ptr<DecoderBase> makeDecoder(Encoding encoding)
         {
             switch (encoding)
@@ -80,12 +118,8 @@ namespace Yconvert
             case Encoding::UTF_32_LE:
                 return std::unique_ptr<DecoderBase>(new Utf32LEDecoder);
             default:
-                auto [ranges, rangesSize] = getCodePageRanges(encoding);
-                if (ranges)
-                {
-                    return std::unique_ptr<DecoderBase>(new CodePageDecoder(
-                        encoding, ranges, rangesSize));
-                }
+                if (auto decoder = makeCodePageDecoder(encoding))
+                    return decoder;
                 break;
             }
 
@@ -108,12 +142,8 @@ namespace Yconvert
             case Encoding::UTF_32_LE:
                 return std::unique_ptr<EncoderBase>(new Utf32LEEncoder);
             default:
-                auto [ranges, rangesSize] = getCodePageRanges(encoding);
-                if (ranges)
-                {
-                    return std::unique_ptr<EncoderBase>(new CodePageEncoder(
-                        encoding, ranges, rangesSize));
-                }
+                if (auto encoder = makeCodePageEncoder(encoding))
+                    return encoder;
                 break;
             }
 

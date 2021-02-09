@@ -5,7 +5,7 @@
 ## This file is distributed under the Simplified BSD License.
 ## License text is included with the source distribution.
 ##****************************************************************************
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.16)
 project(Yconvert VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -90,6 +90,8 @@ target_compile_definitions(Yson_Yconvert
         $<$<BOOL:${YCONVERT_WIN_CODE_PAGES}>:YCONVERT_ENABLE_WIN_CODE_PAGES>
     PRIVATE
         $<$<CXX_COMPILER_ID:MSVC>:NOMINMAX>
+        $<$<CXX_COMPILER_ID:MSVC>:YCONVERT_API=>
+        $<$<CXX_COMPILER_ID:MSVC>:YCONVERT_EXPORTS>
         Yconvert=Yson_Yconvert
     )
 
