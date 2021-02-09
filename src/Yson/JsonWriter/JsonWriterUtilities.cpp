@@ -9,7 +9,7 @@
 
 namespace Yson
 {
-    size_t findSplitPos(const std::string& s, size_t suggestedPos)
+    size_t findSplitPos(std::string_view s, size_t suggestedPos)
     {
         if (suggestedPos >= s.size() - 2)
             return s.size();

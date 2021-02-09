@@ -114,9 +114,9 @@ namespace Yson
         return members().key;
     }
 
-    UBJsonWriter& UBJsonWriter::key(const std::string& key)
+    UBJsonWriter& UBJsonWriter::key(std::string key)
     {
-        members().key = key;
+        members().key = move(key);
         return *this;
     }
 
@@ -239,7 +239,7 @@ namespace Yson
         return writeFloat(value);
     }
 
-    UBJsonWriter& UBJsonWriter::value(const std::string& text)
+    UBJsonWriter& UBJsonWriter::value(std::string_view text)
     {
         beginValue();
         auto& m = members();
@@ -251,7 +251,7 @@ namespace Yson
         return *this;
     }
 
-    UBJsonWriter& UBJsonWriter::value(const std::wstring& text)
+    UBJsonWriter& UBJsonWriter::value(std::wstring_view text)
     {
         return value(Yconvert::convertTo<std::string>(
                 text,

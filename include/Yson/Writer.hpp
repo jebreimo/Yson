@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <string>
+#include <string_view>
 #include "StructureParameters.hpp"
 
 namespace Yson
@@ -43,7 +44,7 @@ namespace Yson
          *      automatically escaped.
          * @return A reference to the instance.
          */
-        virtual Writer& key(const std::string& key) = 0;
+        virtual Writer& key(std::string key) = 0;
 
         virtual Writer& beginArray() = 0;
 
@@ -84,9 +85,9 @@ namespace Yson
 
         virtual Writer& value(double value) = 0;
 
-        virtual Writer& value(const std::string& value) = 0;
+        virtual Writer& value(std::string_view value) = 0;
 
-        virtual Writer& value(const std::wstring& value) = 0;
+        virtual Writer& value(std::wstring_view value) = 0;
 
         virtual Writer& binary(const void* data, size_t size) = 0;
 

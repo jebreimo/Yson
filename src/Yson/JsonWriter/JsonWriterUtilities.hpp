@@ -11,7 +11,7 @@
 
 namespace Yson
 {
-    size_t findSplitPos(const std::string& s, size_t suggestedPos);
+    size_t findSplitPos(std::string_view s, size_t suggestedPos);
 
     size_t getCurrentLineWidth(const std::vector<char>& buffer,
                                size_t maxLineWidth);

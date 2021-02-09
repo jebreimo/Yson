@@ -54,7 +54,7 @@ namespace Yson
 
         const std::string& key() const override;
 
-        JsonWriter& key(const std::string& key) override;
+        JsonWriter& key(std::string key) override;
 
         JsonWriter& beginArray() override;
 
@@ -98,17 +98,17 @@ namespace Yson
 
         JsonWriter& value(long double value);
 
-        JsonWriter& value(const std::string& text) override;
+        JsonWriter& value(std::wstring_view text) override;
 
-        JsonWriter& value(const std::wstring& text) override;
+        JsonWriter& value(std::string_view value) override;
 
         JsonWriter& binary(const void* data, size_t size) override;
 
         JsonWriter& base64(const void* data, size_t size) override;
 
-        JsonWriter& rawValue(const std::string& value);
+        JsonWriter& rawValue(std::string_view value);
 
-        JsonWriter& rawText(const std::string& value);
+        JsonWriter& rawText(std::string_view value);
 
         JsonWriter& indent();
 
@@ -173,13 +173,13 @@ namespace Yson
 
         Members& members() const;
 
-        void write(const std::string& s);
+        void write(std::string_view s);
 
         void write(const char* s, size_t size);
 
-        void writeMultiLine(const std::string& s);
+        void writeMultiLine(std::string_view s);
 
-        JsonWriter& writeString(const std::string& text);
+        JsonWriter& writeString(std::string_view text);
 
         JsonWriter(std::unique_ptr<std::ostream> streamPtr,
                    std::ostream* stream,

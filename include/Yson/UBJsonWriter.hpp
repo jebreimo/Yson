@@ -40,7 +40,7 @@ namespace Yson
 
         const std::string& key() const override;
 
-        UBJsonWriter& key(const std::string& key) override;
+        UBJsonWriter& key(std::string key) override;
 
         UBJsonWriter& beginArray() override;
 
@@ -81,9 +81,9 @@ namespace Yson
 
         UBJsonWriter& value(float value) override;
 
-        UBJsonWriter& value(const std::string& text) override;
+        UBJsonWriter& value(std::string_view text) override;
 
-        UBJsonWriter& value(const std::wstring& text) override;
+        UBJsonWriter& value(std::wstring_view text) override;
 
         UBJsonWriter& binary(const void* data, size_t size) override;
 

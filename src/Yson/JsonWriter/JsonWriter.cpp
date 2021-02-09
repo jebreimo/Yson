@@ -143,9 +143,9 @@ namespace Yson
         return members().key;
     }
 
-    JsonWriter& JsonWriter::key(const std::string& key)
+    JsonWriter& JsonWriter::key(std::string key)
     {
-        members().key = key;
+        members().key = move(key);
         return *this;
     }
 
@@ -249,28 +249,28 @@ namespace Yson
         return writeFloatValueImpl(value, "%.*Lg");
     }
 
-    JsonWriter& JsonWriter::value(const std::string& text)
+    JsonWriter& JsonWriter::value(std::string_view value)
     {
-        if (!hasUnescapedCharacters(text))
+        if (!hasUnescapedCharacters(value))
         {
-            return writeString(text);
+            return writeString(value);
         }
         else
         {
             return writeString(escape(
-                    text, isEscapeNonAsciiCharactersEnabled()));
+                value, isEscapeNonAsciiCharactersEnabled()));
         }
     }
 
-    JsonWriter& JsonWriter::value(const std::wstring& text)
+    JsonWriter& JsonWriter::value(std::wstring_view text)
     {
         return value(Yconvert::convertTo<std::string>(
-                text,
-                Yconvert::Encoding::UTF_16_NATIVE,
-                Yconvert::Encoding::UTF_8));
+            text,
+            Yconvert::Encoding::UTF_16_NATIVE,
+            Yconvert::Encoding::UTF_8));
     }
 
-    JsonWriter& JsonWriter::rawValue(const std::string& value)
+    JsonWriter& JsonWriter::rawValue(std::string_view value)
     {
         beginValue();
         write(value);
@@ -278,7 +278,7 @@ namespace Yson
         return *this;
     }
 
-    JsonWriter& JsonWriter::rawText(const std::string& value)
+    JsonWriter& JsonWriter::rawText(std::string_view value)
     {
         write(value);
         return *this;
@@ -512,7 +512,7 @@ namespace Yson
         return *this;
     }
 
-    void JsonWriter::write(const std::string& s)
+    void JsonWriter::write(std::string_view s)
     {
         write(s.data(), s.size());
     }
@@ -531,7 +531,7 @@ namespace Yson
         }
     }
 
-    void JsonWriter::writeMultiLine(const std::string& s)
+    void JsonWriter::writeMultiLine(std::string_view s)
     {
         auto maxWidth = size_t(m_Members->maximumLineWidth);
         if (s.size() <= maxWidth / 2)
@@ -562,7 +562,7 @@ namespace Yson
         }
     }
 
-    JsonWriter& JsonWriter::writeString(const std::string& text)
+    JsonWriter& JsonWriter::writeString(std::string_view text)
     {
         beginValue();
         auto& m = members();
