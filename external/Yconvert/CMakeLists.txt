@@ -50,8 +50,7 @@ add_library(Yson_Yconvert OBJECT
     include/Yconvert/Yconvert.hpp
     include/Yconvert/YconvertDefinitions.hpp
     include/Yconvert/YconvertException.hpp
-    src/Yconvert/CodePageDecoder.cpp
-    src/Yconvert/CodePageDecoder.hpp
+#    src/Yconvert/CodePageDecoder.hpp
     src/Yconvert/CodePageDefinitions.hpp
     src/Yconvert/Convert.cpp
     src/Yconvert/Converter.cpp
@@ -68,7 +67,7 @@ add_library(Yson_Yconvert OBJECT
     src/Yconvert/Utf16Encoder.hpp
     src/Yconvert/Utf32Encoder.hpp
     src/Yconvert/Utf32Decoder.hpp
-    src/Yconvert/CodePageEncoder.cpp
+#    src/Yconvert/CodePageEncoder.cpp
     src/Yconvert/CodePageEncoder.hpp
     src/Yconvert/YconvertThrow.hpp
     )

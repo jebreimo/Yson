@@ -268,9 +268,7 @@ namespace Yconvert
 
         if ((1u << len) - 1 == nonZeroPattern)
         {
-            if (nonAsciiPattern == 0)
-                return Encoding::ASCII;
-            if (isValidUtf8Char(str, len))
+            if (nonAsciiPattern == 0 || isValidUtf8Char(str, len))
                 return Encoding::UTF_8;
             return Encoding::UNKNOWN;
         }
