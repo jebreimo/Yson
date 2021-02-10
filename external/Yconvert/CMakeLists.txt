@@ -90,57 +90,7 @@ target_compile_definitions(Yson_Yconvert
         $<$<BOOL:${YCONVERT_WIN_CODE_PAGES}>:YCONVERT_ENABLE_WIN_CODE_PAGES>
     PRIVATE
         $<$<CXX_COMPILER_ID:MSVC>:NOMINMAX>
-        $<$<CXX_COMPILER_ID:MSVC>:YCONVERT_API=>
-        $<$<CXX_COMPILER_ID:MSVC>:YCONVERT_EXPORTS>
         Yconvert=Yson_Yconvert
     )
 
 yconvert_target_enable_all_warnings(Yson_Yconvert)
-
-#add_library(Yconvert::Yconvert ALIAS Yconvert)
-
-#if (YCONVERT_BUILD_TESTS)
-#    enable_testing()
-#    add_subdirectory(tests/YconvertTest)
-#endif()
-#
-#export(TARGETS Yconvert
-#    NAMESPACE Yconvert::
-#    FILE YconvertConfig.cmake)
-#
-#if (YCONVERT_INSTALL)
-#    install(TARGETS Yconvert
-#        EXPORT YconvertConfig
-#        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#        )
-#
-#    install(EXPORT YconvertConfig
-#        FILE
-#            YconvertConfig.cmake
-#        NAMESPACE
-#            Yconvert::
-#        DESTINATION
-#            ${CMAKE_INSTALL_LIBDIR}/cmake/Yconvert
-#        )
-#
-#    file(GLOB_RECURSE PUBLIC_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
-#    install(
-#        FILES
-#            ${PUBLIC_INCLUDES}
-#            ${CMAKE_CURRENT_BINARY_DIR}/YconvertVersion.hpp
-#        DESTINATION
-#            ${CMAKE_INSTALL_INCLUDEDIR}/Yconvert
-#    )
-#
-#    write_basic_package_version_file(YconvertConfigVersion.cmake
-#        COMPATIBILITY SameMajorVersion
-#        )
-#
-#    install(
-#        FILES
-#            ${CMAKE_CURRENT_BINARY_DIR}/YconvertConfigVersion.cmake
-#        DESTINATION
-#            ${CMAKE_INSTALL_LIBDIR}/cmake/Yconvert
-#        )
-#endif ()

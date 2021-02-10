@@ -27,14 +27,7 @@
       #ifdef YCONVERT_EXPORTS
           #define YCONVERT_API __declspec(dllexport)
       #else
-          #define YCONVERT_API __declspec(dllimport)
-          #ifndef YCONVERT_NO_AUTO_IMPORT
-              #ifdef _DEBUG
-                  #pragma comment (lib, "Yconvert.debug.lib")
-              #else
-                  #pragma comment (lib, "Yconvert.lib")
-              #endif
-          #endif
+          #define YCONVERT_API
       #endif
   #else
       #define YCONVERT_API
@@ -50,7 +43,7 @@ namespace Yconvert
 {
     constexpr char32_t REPLACEMENT_CHARACTER = 0xFFFDu;
 
-    /** @brief The maxmum value for unicode code points.
+    /** @brief The maximum value for unicode code points.
       */
     constexpr char32_t UNICODE_MAX = 0x10FFFF;
 
