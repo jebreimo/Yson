@@ -159,10 +159,10 @@ namespace Yson
                     exponent = -exponent;
             }
 
+            if (fraction)
+                value += fraction * std::pow(T(10), T(-decimals));
             if (exponent)
                 value *= std::pow(T(10), T(exponent));
-            if (fraction != 0)
-                value += fraction * std::pow(T(10), T(exponent - decimals));
 
             // Add the sign
             if (negative)
