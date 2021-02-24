@@ -183,7 +183,7 @@ namespace
         Y_CALL(assertReadFails<double>("1.1e_-1"));
         Y_CALL(assertReadFails<double>("1.1e-_1"));
         Y_CALL(assertReadFails<double>("1.1e-1_"));
-        Y_CALL(assertRead<double>("1.1e-1", 1.1e-1));
+        Y_CALL(assertRead<double>("1.1e-1", 1.1e-1, 1e-15));
         // TODO: test NaN, infinity and null
     }
 
