@@ -6,11 +6,11 @@
 ## License text is included with the source distribution.
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.16)
-project(Yson VERSION 1.1.2 LANGUAGES CXX)
+project(Yson VERSION 1.1.2.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# Set YSON_MASTER_PROJECT to ON if Argos is the root level project.
+# Set YSON_MASTER_PROJECT to ON if Yson is the root level project.
 if (NOT DEFINED YSON_MASTER_PROJECT)
     if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
         set(YSON_MASTER_PROJECT ON)
@@ -268,8 +268,10 @@ if (DEFINED LOCAL_SOURCE_PACKAGE_DIR OR DEFINED ENV{LOCAL_SOURCE_PACKAGE_DIR})
     if (NOT LOCAL_SOURCE_PACKAGE_DIR)
         set(LOCAL_SOURCE_PACKAGE_DIR $ENV{LOCAL_SOURCE_PACKAGE_DIR})
     endif ()
-    add_custom_target(${PROJECT_NAME}_BUILD_SRC_TARBALL
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND git archive -v --format=tar.gz --prefix=${PROJECT_NAME}/ HEAD > ${LOCAL_SOURCE_PACKAGE_DIR}/${PROJECT_NAME}-${PROJECT_VERSION}.tar.gz
-        )
+    if (YSON_MASTER_PROJECT)
+        add_custom_target(${PROJECT_NAME}_BUILD_SRC_TARBALL
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMAND git archive -v --format=tar.gz --prefix=${PROJECT_NAME}/ HEAD > ${LOCAL_SOURCE_PACKAGE_DIR}/${PROJECT_NAME}-${PROJECT_VERSION}.tar.gz
+            )
+    endif ()
 endif ()
