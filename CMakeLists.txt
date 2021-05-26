@@ -145,7 +145,7 @@ add_library(Yson
     src/Yson/UBJsonWriter/UBJsonWriterUtilities.cpp
     src/Yson/UBJsonWriter/UBJsonWriterUtilities.hpp
     $<TARGET_OBJECTS:Yson_Yconvert>
-    )
+    include/Yson/JsonItem.hpp)
 
 target_compile_definitions(Yson
     PRIVATE

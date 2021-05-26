@@ -10,6 +10,7 @@
 #include "Reader.hpp"
 #include <iosfwd>
 #include <memory>
+#include "JsonItem.hpp"
 
 namespace Yson
 {
