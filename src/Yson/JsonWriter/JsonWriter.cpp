@@ -63,7 +63,7 @@ namespace Yson
         std::stack<Context> contexts;
         std::string indentation;
         std::string key;
-        std::array<char, 256> sprintfBuffer;
+        std::vector<char> sprintfBuffer = std::vector<char>(32);
         std::vector<char> buffer;
         size_t maxBufferSize = MAX_BUFFER_SIZE;
         State state = AT_START_OF_VALUE_NO_COMMA;
@@ -797,8 +797,14 @@ namespace Yson
     {
         beginValue();
         auto& m = members();
-        auto size = sprintf(m.sprintfBuffer.data(), format, number);
-        write(m.sprintfBuffer.data(), size);
+        auto& buffer = m.sprintfBuffer;
+        auto size = snprintf(buffer.data(), buffer.size(), format, number);
+        if (size > buffer.size())
+        {
+            buffer.resize(size + 1);
+            size = snprintf(buffer.data(), buffer.size(), format, number);
+        }
+        write(buffer.data(), size);
         m.state = AT_END_OF_VALUE;
         return *this;
     }
@@ -810,12 +816,24 @@ namespace Yson
         {
             beginValue();
             auto& m = members();
-            auto size = sprintf(m.sprintfBuffer.data(),
+            auto& buffer = m.sprintfBuffer;
+            auto size = snprintf(buffer.data(),
+                                 buffer.size(),
+                                 format,
+                                 std::min(m.floatingPointPrecision,
+                                          std::numeric_limits<T>::digits10),
+                                 number);
+            if (size > buffer.size())
+            {
+                buffer.resize(size + 1);
+                size = snprintf(buffer.data(),
+                                buffer.size(),
                                 format,
                                 std::min(m.floatingPointPrecision,
                                          std::numeric_limits<T>::digits10),
                                 number);
-            write(m.sprintfBuffer.data(), size);
+            }
+            write(buffer.data(), size);
             m.state = AT_END_OF_VALUE;
         }
         else if (!languageExtension(NON_FINITE_FLOATS))
