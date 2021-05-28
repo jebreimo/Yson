@@ -5,19 +5,22 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
+#include "Yson/JsonReader.hpp"
+
 #include <stack>
+#include "Yson/JsonArray.hpp"
+#include "Yson/JsonObject.hpp"
 #include "Yson/Common/Base64.hpp"
 #include "Yson/Common/Escape.hpp"
 #include "Yson/Common/GetDetailedValueType.hpp"
 #include "Yson/Common/GetValueType.hpp"
+#include "Yson/Common/IsJavaScriptIdentifier.hpp"
+#include "Yson/Common/ParseFloatingPoint.hpp"
+#include "Yson/Common/ParseInteger.hpp"
 #include "JsonArrayReader.hpp"
 #include "JsonDocumentReader.hpp"
 #include "JsonObjectReader.hpp"
-#include "Yson/JsonReader.hpp"
 #include "ThrowJsonReaderException.hpp"
-#include "Yson/Common/ParseFloatingPoint.hpp"
-#include "Yson/Common/ParseInteger.hpp"
-#include "Yson/Common/IsJavaScriptIdentifier.hpp"
 
 namespace Yson
 {
@@ -231,7 +234,7 @@ namespace Yson
         assertStateIsKeyOrValue();
         if (currentTokenIsValue())
         {
-            return m_Members->tokenizer.tokenString() == "null";
+            return m_Members->tokenizer.tokenString() ==     "null";
         }
         return false;
     }
@@ -386,6 +389,96 @@ namespace Yson
     bool JsonReader::readBinary(std::vector<char>& value)
     {
         return readBase64(value);
+    }
+
+    JsonItem JsonReader::readArray()
+    {
+        std::vector<JsonItem> values;
+        const auto& tokenizer = m_Members->tokenizer;
+        enter();
+        while (true)
+        {
+            if (!nextValue())
+                break;
+
+            auto tType = tokenizer.tokenType();
+            if (tType == JsonTokenType::START_OBJECT)
+                values.push_back(readObject());
+            else if (tType == JsonTokenType::START_ARRAY)
+                values.push_back(readArray());
+            else
+                values.emplace_back(JsonValue(tokenizer.tokenString(), int(tType)));
+        }
+        leave();
+        return JsonItem(std::make_shared<JsonArray>(move(values)));
+    }
+
+    JsonItem JsonReader::readObject()
+    {
+        std::deque<std::string> keys;
+        std::unordered_map<std::string_view, JsonItem> values;
+        const auto& tokenizer = m_Members->tokenizer;
+        enter();
+        while (true)
+        {
+            if (!nextKey())
+                break;
+
+            auto entry = values.find(tokenizer.token());
+            std::string_view key;
+            if (entry != values.end())
+            {
+                key = entry->first;
+            }
+            else
+            {
+                keys.emplace_back(tokenizer.token());
+                key = keys.back();
+            }
+
+            if (!nextValue())
+            {
+                JSON_READER_THROW("Key without value: " + keys.back(),
+                                  tokenizer);
+            }
+
+            auto tType = tokenizer.tokenType();
+            if (tType == JsonTokenType::START_OBJECT)
+                values.insert_or_assign(key, readObject());
+            else if (tType == JsonTokenType::START_ARRAY)
+                values.insert_or_assign(key, readArray());
+            else
+                values.insert_or_assign(key, JsonItem(JsonValue(tokenizer.tokenString(), int(tType))));
+        }
+        leave();
+        return JsonItem(std::make_shared<JsonObject>(move(keys), move(values)));
+    }
+
+    JsonItem JsonReader::readCurrentItem()
+    {
+        switch (m_Members->currentState())
+        {
+        case JsonReaderState::INITIAL_STATE:
+        case JsonReaderState::AT_START:
+            if (!nextValue())
+                JSON_READER_THROW("Document is empty.", m_Members->tokenizer);
+            [[fallthrough]];
+        case JsonReaderState::AT_VALUE:
+        {
+            auto tType = m_Members->tokenizer.tokenType();
+            if (tType == JsonTokenType::START_OBJECT)
+                return readObject();
+            else if (tType == JsonTokenType::START_ARRAY)
+                return readArray();
+            else
+                return JsonItem(JsonValue(m_Members->tokenizer.tokenString(), int(tType)));
+        }
+        case JsonReaderState::AT_KEY:
+            return JsonItem(JsonValue(m_Members->tokenizer.tokenString(),
+                                      int(m_Members->tokenizer.tokenType())));
+        default:
+            JSON_READER_THROW("No key or value.", m_Members->tokenizer);
+        }
     }
 
     void JsonReader::assertStateIsKeyOrValue() const

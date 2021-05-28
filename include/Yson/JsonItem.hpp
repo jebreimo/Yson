@@ -6,51 +6,52 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
-#include <deque>
 #include <memory>
-#include <string>
-#include <string_view>
-#include <unordered_map>
 #include <variant>
-#include <vector>
-#include "ValueType.hpp"
+#include "JsonValue.hpp"
 
 namespace Yson
 {
-    class JsonValue
-    {
-    public:
-    private:
-        std::string m_Value;
-        ValueType m_Type;
-    };
-
     class JsonArray;
     class JsonObject;
 
     class JsonItem
     {
     public:
+        using InternalItem = std::variant<std::shared_ptr<JsonObject>,
+            std::shared_ptr<JsonArray>,
+            JsonValue>;
+
+        explicit JsonItem(InternalItem item);
+
         const JsonItem& operator[](std::string_view) const;
+
         const JsonItem& operator[](size_t) const;
 
+        [[nodiscard]]
+        bool isArray() const;
+
+        [[nodiscard]]
+        const JsonArray& array() const;
+
+        [[nodiscard]]
+        bool isObject() const;
+
+        [[nodiscard]]
+        const JsonObject& object() const;
+
+        [[nodiscard]]
+        bool isValue() const;
+
+        [[nodiscard]]
+        const JsonValue& value() const;
     private:
-        using Data = std::variant<std::shared_ptr<JsonObject>, std::shared_ptr<JsonArray>, JsonValue>;
-        Data m_Data;
+        InternalItem m_Item;
     };
 
-    class JsonObject
+    template <typename T>
+    T get(const JsonItem& item)
     {
-    public:
-    private:
-        std::deque<std::string> m_Keys;
-        std::unordered_map<std::string_view, JsonItem> m_Values;
-    };
-
-    class JsonArray
-    {
-    public:
-    private:
-        std::vector<JsonItem> m_Values;
-    };
+        return get<T>(item.value());
+    }
 }

@@ -17,12 +17,6 @@ namespace Yson
     class YsonReaderException : public YsonException
     {
     public:
-        YsonReaderException()
-            : YsonException("Unspecified error."),
-              m_LineNumber(0),
-              m_ColumnNumber(0)
-        {}
-
         explicit YsonReaderException(const std::string& msg,
                                      std::string fileName = std::string(),
                                      size_t lineNumber = 0,
@@ -50,6 +44,7 @@ namespace Yson
             m_DefaultMessage = makeDefaultMessage(msg);
         }
 
+        [[nodiscard]]
         const char* what() const _NOEXCEPT override
         {
             if (!m_DefaultMessage.empty())
@@ -57,21 +52,25 @@ namespace Yson
             return YsonException::what();
         }
 
+        [[nodiscard]]
         const std::string& fileName() const _NOEXCEPT
         {
             return m_FileName;
         }
 
+        [[nodiscard]]
         size_t lineNumber() const _NOEXCEPT
         {
             return m_LineNumber;
         }
 
+        [[nodiscard]]
         size_t columnNumber() const _NOEXCEPT
         {
             return m_ColumnNumber;
         }
     private:
+        [[nodiscard]]
         std::string makeDefaultMessage(const std::string& msg) const
         {
             std::string result;

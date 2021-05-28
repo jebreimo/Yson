@@ -29,7 +29,7 @@ namespace Yson
         case JsonReaderState::INITIAL_STATE:
             if (!tokenizer.next())
                 return {JsonReaderState::AT_END_OF_FILE, false};
-            //[[fallthrough]]
+            [[fallthrough]];
         case JsonReaderState::AT_START:
             if (isValueToken(tokenizer.tokenType()))
                 return {JsonReaderState::AT_VALUE, true};
@@ -66,11 +66,11 @@ namespace Yson
         case JsonReaderState::AT_VALUE:
         case JsonReaderState::AT_START:
             skipValue(tokenizer);
-            // [[fallthrough]]
+            [[fallthrough]];
         case JsonReaderState::AFTER_VALUE:
             if (!tokenizer.next())
                 return {JsonReaderState::AT_END_OF_FILE, false};
-            // [[fallthrough]]
+            [[fallthrough]];
         case JsonReaderState::AT_END:
             return {JsonReaderState::AT_START, true};
         default:

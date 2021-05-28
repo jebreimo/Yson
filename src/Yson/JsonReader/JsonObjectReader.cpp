@@ -59,13 +59,13 @@ namespace Yson
             return {JsonReaderState::AT_VALUE, true};
         case JsonReaderState::AT_VALUE:
             skipValue(tokenizer);
-            //[[fallthrough]]
+            [[fallthrough]];
         case JsonReaderState::AFTER_VALUE:
             if (!readComma(tokenizer, JsonTokenType::END_OBJECT))
                 return {JsonReaderState::AT_END, false};
             if (!readKey(tokenizer, JsonTokenType::END_OBJECT))
                 return {JsonReaderState::AT_END, false};
-            //[[fallthrough]]
+            [[fallthrough]];
         case JsonReaderState::AT_KEY:
             readColon(tokenizer);
             readStartOfValue(tokenizer);

@@ -80,11 +80,6 @@ namespace Yson
         return ValueType::INVALID;
     }
 
-    ValueType getValueType(const std::string& str)
-    {
-        return getValueType(std::string_view(str.data(), str.size()));
-    }
-
     namespace
     {
         template<typename Predicate>

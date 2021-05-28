@@ -49,15 +49,20 @@ namespace Yson
 
         void leave() override;
 
+        [[nodiscard]]
         ValueType valueType() const;
 
+        [[nodiscard]]
         ValueType valueType(bool analyzeStrings) const override;
 
+        [[nodiscard]]
         DetailedValueType detailedValueType() const;
 
+        [[nodiscard]]
         DetailedValueType detailedValueType(
                 bool analyzeStrings) const override;
 
+        [[nodiscard]]
         bool readNull() const override;
 
         bool read(bool& value) const override;
@@ -94,19 +99,33 @@ namespace Yson
 
         bool readBinary(void* buffer, size_t& size) override;
 
+        JsonItem readCurrentItem();
+
+        [[nodiscard]]
         std::string fileName() const override;
 
+        [[nodiscard]]
         size_t lineNumber() const override;
 
+        [[nodiscard]]
         size_t columnNumber() const override;
     private:
         void assertStateIsKeyOrValue() const;
 
+        [[nodiscard]]
         bool currentTokenIsValueOrString() const;
 
+        [[nodiscard]]
         bool currentTokenIsString() const;
 
+        [[nodiscard]]
         bool currentTokenIsValue() const;
+
+        [[nodiscard]]
+        JsonItem readObject();
+
+        [[nodiscard]]
+        JsonItem readArray();
 
         template <typename T>
         bool readInteger(T& value) const;

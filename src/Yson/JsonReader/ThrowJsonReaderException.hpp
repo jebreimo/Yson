@@ -16,27 +16,24 @@
   *     throws exceptions.
   */
 
-namespace Yson
-{
-    #define JSON_READER_THROW(msg, tokenizer) \
-        throw YsonReaderException((msg), \
-                                  __FILE__, __LINE__, __FUNCTION__, \
-                                  (tokenizer).fileName(), \
-                                  (tokenizer).lineNumber(), \
-                                  (tokenizer).columnNumber())
+#define JSON_READER_THROW(msg, tokenizer) \
+    throw YsonReaderException((msg), \
+                              __FILE__, __LINE__, __FUNCTION__, \
+                              (tokenizer).fileName(), \
+                              (tokenizer).lineNumber(), \
+                              (tokenizer).columnNumber())
 
-    #define JSON_READER_UNEXPECTED_TOKEN(tokenizer) \
-        throw YsonReaderException( \
-                "Unexpected token: '" + (tokenizer).tokenString() + "'.", \
-                __FILE__, __LINE__, __FUNCTION__, \
-                (tokenizer).fileName(), \
-                (tokenizer).lineNumber(), \
-                (tokenizer).columnNumber())
+#define JSON_READER_UNEXPECTED_TOKEN(tokenizer) \
+    throw YsonReaderException( \
+            "Unexpected token: '" + (tokenizer).tokenString() + "'.", \
+            __FILE__, __LINE__, __FUNCTION__, \
+            (tokenizer).fileName(), \
+            (tokenizer).lineNumber(), \
+            (tokenizer).columnNumber())
 
-    #define JSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer) \
-        throw YsonReaderException("Unexpected end of document.",\
-                                  __FILE__, __LINE__, __FUNCTION__, \
-                                  (tokenizer).fileName(), \
-                                  (tokenizer).lineNumber(), \
-                                  (tokenizer).columnNumber())
-}
+#define JSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer) \
+    throw YsonReaderException("Unexpected end of document.",\
+                              __FILE__, __LINE__, __FUNCTION__, \
+                              (tokenizer).fileName(), \
+                              (tokenizer).lineNumber(), \
+                              (tokenizer).columnNumber())

@@ -24,10 +24,6 @@ namespace Yson
     class YsonException : public std::runtime_error
     {
     public:
-        YsonException()
-            : std::runtime_error("Unspecified error.")
-        {}
-
         explicit YsonException(const std::string& msg)
             : std::runtime_error(msg)
         {}
@@ -44,11 +40,13 @@ namespace Yson
                                + std::to_string(debugLineNumber);
         }
 
+        [[nodiscard]]
         const std::string& debugLocation() const _NOEXCEPT
         {
             return m_DebugLocation;
         }
 
+        [[nodiscard]]
         std::string debugMessage() const
         {
             if (!m_DebugLocation.empty())
@@ -79,6 +77,7 @@ namespace Yson
                   m_FileName(fileName)
         {}
 
+        [[nodiscard]]
         const std::string& fileName() const
         {
             return m_FileName;
