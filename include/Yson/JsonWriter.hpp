@@ -24,7 +24,7 @@ namespace Yson
          *
          * @param formatting the automatic formatting that will be used.
          */
-        JsonWriter(JsonFormatting formatting = JsonFormatting::NONE);
+        explicit JsonWriter(JsonFormatting formatting = JsonFormatting::NONE);
 
         /**
          * @brief Creates a JSON writer that creates and writes to a file
@@ -35,14 +35,14 @@ namespace Yson
         explicit JsonWriter(const std::string& fileName,
                             JsonFormatting formatting = JsonFormatting::NONE);
 
-        JsonWriter(std::ostream& stream,
-                   JsonFormatting formatting = JsonFormatting::NONE);
+        explicit JsonWriter(std::ostream& stream,
+                            JsonFormatting formatting = JsonFormatting::NONE);
 
         JsonWriter(const JsonWriter&) = delete;
 
         JsonWriter(JsonWriter&& rhs) noexcept;
 
-        ~JsonWriter();
+        ~JsonWriter() override;
 
         JsonWriter& operator=(const JsonWriter&) = delete;
 
@@ -50,8 +50,10 @@ namespace Yson
 
         std::ostream* stream() override;
 
+        [[nodiscard]]
         std::pair<const void*, size_t> buffer() const override;
 
+        [[nodiscard]]
         const std::string& key() const override;
 
         JsonWriter& key(std::string key) override;
@@ -122,14 +124,17 @@ namespace Yson
 
         JsonWriter& writeSeparator(size_t count = 1);
 
+        [[nodiscard]]
         std::pair<char, unsigned> indentation() const;
 
         JsonWriter& setIndentation(char character, unsigned width);
 
+        [[nodiscard]]
         bool isFormattingEnabled() const;
 
         JsonWriter& setFormattingEnabled(bool value);
 
+        [[nodiscard]]
         int languageExtensions() const;
 
         JsonWriter& setLanguageExtensions(int value);
@@ -143,26 +148,32 @@ namespace Yson
           * functions will throw an exception if it encounters any of these
           * values.
           */
+        [[nodiscard]]
         bool isNonFiniteFloatsEnabled() const;
 
         JsonWriter& setNonFiniteFloatsEnabled(bool value);
 
+        [[nodiscard]]
         bool isUnquotedValueNamesEnabled() const;
 
         JsonWriter& setUnquotedValueNamesEnabled(bool value);
 
+        [[nodiscard]]
         bool isEscapeNonAsciiCharactersEnabled() const;
 
         JsonWriter& setEscapeNonAsciiCharactersEnabled(bool value);
 
+        [[nodiscard]]
         bool isMultilineStringsEnabled() const;
 
         JsonWriter& setMultilineStringsEnabled(bool value);
 
+        [[nodiscard]]
         int maximumLineWidth() const;
 
         JsonWriter& setMaximumLineWidth(int value);
 
+        [[nodiscard]]
         int floatingPointPrecision() const;
 
         JsonWriter& setFloatingPointPrecision(int value);
@@ -171,6 +182,7 @@ namespace Yson
     private:
         struct Members;
 
+        [[nodiscard]]
         Members& members() const;
 
         void write(std::string_view s);
@@ -187,8 +199,10 @@ namespace Yson
 
         void beginValue();
 
+        [[nodiscard]]
         JsonFormatting formatting() const;
 
+        [[nodiscard]]
         bool isInsideObject() const;
 
         JsonWriter& beginStructure(char startChar, char endChar,
@@ -212,6 +226,7 @@ namespace Yson
             ESCAPE_NON_ASCII_CHARACTERS = 8
         };
 
+        [[nodiscard]]
         bool languageExtension(LanguageExtensions ext) const;
 
         JsonWriter& setLanguageExtension(LanguageExtensions ext, bool value);

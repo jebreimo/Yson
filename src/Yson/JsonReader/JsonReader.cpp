@@ -8,8 +8,8 @@
 #include "Yson/JsonReader.hpp"
 
 #include <stack>
-#include "Yson/JsonArray.hpp"
-#include "Yson/JsonObject.hpp"
+#include "Yson/Array.hpp"
+#include "Yson/Object.hpp"
 #include "Yson/Common/Base64.hpp"
 #include "Yson/Common/Escape.hpp"
 #include "Yson/Common/GetDetailedValueType.hpp"
@@ -410,7 +410,7 @@ namespace Yson
                 values.emplace_back(JsonValue(tokenizer.tokenString(), int(tType)));
         }
         leave();
-        return JsonItem(std::make_shared<JsonArray>(move(values)));
+        return JsonItem(std::make_shared<Array>(move(values)));
     }
 
     JsonItem JsonReader::readObject()
@@ -451,7 +451,7 @@ namespace Yson
                 values.insert_or_assign(key, JsonItem(JsonValue(tokenizer.tokenString(), int(tType))));
         }
         leave();
-        return JsonItem(std::make_shared<JsonObject>(move(keys), move(values)));
+        return JsonItem(std::make_shared<Object>(move(keys), move(values)));
     }
 
     JsonItem JsonReader::readCurrentItem()

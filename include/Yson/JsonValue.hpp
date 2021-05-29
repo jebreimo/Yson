@@ -6,59 +6,57 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
-#include <string>
-#include <string_view>
-#include <vector>
-#include "ValueType.hpp"
-#include "YsonException.hpp"
+#include "Value.hpp"
 
 namespace Yson
 {
-    class JsonValue
+    class YSON_API JsonValue : public Value
     {
     public:
         JsonValue(std::string value, int tokenType);
 
         [[nodiscard]]
-        ValueType valueType(bool analyzeStrings = false) const;
+        ValueType valueType() const final;
 
         [[nodiscard]]
-        bool isNull() const;
+        ValueType valueType(bool analyzeStrings) const final;
 
-        bool get(bool& value) const;
+        [[nodiscard]]
+        bool isNull() const final;
 
-        bool get(int8_t& value) const;
+        bool get(bool& value) const final;
 
-        bool get(int16_t& value) const;
+        bool get(int8_t& value) const final;
 
-        bool get(int32_t& value) const;
+        bool get(int16_t& value) const final;
 
-        bool get(int64_t& value) const;
+        bool get(int32_t& value) const final;
 
-        bool get(uint8_t& value) const;
+        bool get(int64_t& value) const final;
 
-        bool get(uint16_t& value) const;
+        bool get(uint8_t& value) const final;
 
-        bool get(uint32_t& value) const;
+        bool get(uint16_t& value) const final;
 
-        bool get(uint64_t& value) const;
+        bool get(uint32_t& value) const final;
 
-        bool get(float& value) const;
+        bool get(uint64_t& value) const final;
 
-        bool get(double& value) const;
+        bool get(float& value) const final;
 
-        bool get(long double& value) const;
+        bool get(double& value) const final;
 
-        bool get(char& value) const;
+        bool get(long double& value) const final;
 
-        bool get(std::string& value) const;
+        bool get(char& value) const final;
 
-        bool getBase64(std::vector<char>& value) const;
+        bool get(std::string& value) const final;
 
-        bool getBinary(std::vector<char>& value) const;
+        bool getBase64(std::vector<char>& value) const final;
 
-        bool getBinary(void* buffer, size_t& size) const;
+        bool getBinary(std::vector<char>& value) const final;
 
+        bool getBinary(void* buffer, size_t& size) const final;
     private:
         std::string m_Value;
         int m_Type;

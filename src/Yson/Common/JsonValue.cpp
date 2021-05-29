@@ -20,6 +20,11 @@ namespace Yson
           m_Type(type)
     {}
 
+    ValueType JsonValue::valueType() const
+    {
+        return valueType(false);
+    }
+
     ValueType JsonValue::valueType(bool analyzeStrings) const
     {
         auto tokenType = JsonTokenType(m_Type);

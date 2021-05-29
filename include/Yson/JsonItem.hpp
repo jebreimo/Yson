@@ -12,17 +12,17 @@
 
 namespace Yson
 {
-    class JsonArray;
-    class JsonObject;
+    class Array;
+    class Object;
 
-    class JsonItem
+    class YSON_API JsonItem
     {
     public:
-        using InternalItem = std::variant<std::shared_ptr<JsonObject>,
-            std::shared_ptr<JsonArray>,
-            JsonValue>;
+        using ItemType = std::variant<std::shared_ptr<Object>,
+                                      std::shared_ptr<Array>,
+                                      JsonValue>;
 
-        explicit JsonItem(InternalItem item);
+        explicit JsonItem(ItemType item);
 
         const JsonItem& operator[](std::string_view) const;
 
@@ -32,21 +32,21 @@ namespace Yson
         bool isArray() const;
 
         [[nodiscard]]
-        const JsonArray& array() const;
+        const Array& array() const;
 
         [[nodiscard]]
         bool isObject() const;
 
         [[nodiscard]]
-        const JsonObject& object() const;
+        const Object& object() const;
 
         [[nodiscard]]
         bool isValue() const;
 
         [[nodiscard]]
-        const JsonValue& value() const;
+        const Value& value() const;
     private:
-        InternalItem m_Item;
+        ItemType m_Item;
     };
 
     template <typename T>

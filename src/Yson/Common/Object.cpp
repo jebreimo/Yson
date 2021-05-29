@@ -5,23 +5,23 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include "Yson/JsonObject.hpp"
+#include "Yson/Object.hpp"
 
 namespace Yson
 {
-    JsonObject::JsonObject(std::deque<std::string> keys,
+    Object::Object(std::deque<std::string> keys,
                            std::unordered_map<std::string_view, JsonItem> values)
         : m_Keys(move(keys)),
           m_Values(move(values))
     {}
 
-    const std::deque<std::string>& JsonObject::keys() const
+    const std::deque<std::string>& Object::keys() const
     {
         return m_Keys;
     }
 
     const std::unordered_map<std::string_view, JsonItem>&
-    JsonObject::values() const
+    Object::values() const
     {
         return m_Values;
     }

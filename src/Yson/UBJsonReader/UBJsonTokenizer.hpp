@@ -29,10 +29,13 @@ namespace Yson
 
         UBJsonTokenizer(const char* buffer, size_t bufferSize);
 
+        [[nodiscard]]
         size_t contentSize() const;
 
+        [[nodiscard]]
         UBJsonTokenType contentType() const;
 
+        [[nodiscard]]
         std::string fileName() const;
 
         bool next();
@@ -45,14 +48,19 @@ namespace Yson
 
         bool skip(UBJsonTokenType tokenType);
 
+        [[nodiscard]]
         size_t position() const;
 
+        [[nodiscard]]
         const void* tokenData() const;
 
+        [[nodiscard]]
         std::string_view token() const;
 
+        [[nodiscard]]
         size_t tokenSize() const;
 
+        [[nodiscard]]
         UBJsonTokenType tokenType() const;
 
         template <typename T>
@@ -71,9 +79,9 @@ namespace Yson
         void skipSizedToken();
 
         std::unique_ptr<BinaryReader> m_Reader;
-        UBJsonTokenType m_TokenType;
+        UBJsonTokenType m_TokenType = {};
         size_t m_ContentSize = 0;
-        UBJsonTokenType m_ContentType;
+        UBJsonTokenType m_ContentType = {};
         std::string m_FileName;
     };
 }
