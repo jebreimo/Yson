@@ -9,6 +9,7 @@
 #include <memory>
 #include <variant>
 #include "JsonValue.hpp"
+#include "UBJsonValue.hpp"
 
 namespace Yson
 {
@@ -20,7 +21,8 @@ namespace Yson
     public:
         using ItemType = std::variant<std::shared_ptr<Object>,
                                       std::shared_ptr<Array>,
-                                      JsonValue>;
+                                      JsonValue,
+                                      UBJsonValue>;
 
         explicit JsonItem(ItemType item);
 

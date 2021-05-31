@@ -99,7 +99,7 @@ namespace Yson
 
         bool readBinary(void* buffer, size_t& size) override;
 
-        JsonItem readCurrentItem();
+        JsonItem readCurrentItem() override;
 
         [[nodiscard]]
         std::string fileName() const override;
@@ -122,10 +122,10 @@ namespace Yson
         bool currentTokenIsValue() const;
 
         [[nodiscard]]
-        JsonItem readObject();
+        JsonItem readArray();
 
         [[nodiscard]]
-        JsonItem readArray();
+        JsonItem readObject();
 
         template <typename T>
         bool readInteger(T& value) const;

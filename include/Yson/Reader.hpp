@@ -11,6 +11,7 @@
 #include <vector>
 #include <string>
 #include "DetailedValueType.hpp"
+#include "JsonItem.hpp"
 #include "ValueType.hpp"
 #include "YsonReaderException.hpp"
 
@@ -93,6 +94,8 @@ namespace Yson
         virtual bool readBinary(std::vector<char>& value) = 0;
 
         virtual bool readBase64(std::vector<char>& value) const = 0;
+
+        virtual JsonItem readCurrentItem() = 0;
 
         virtual std::string fileName() const = 0;
 

@@ -8,6 +8,8 @@
 #include "Yson/UBJsonReader.hpp"
 
 #include <stack>
+#include "Yson/Array.hpp"
+#include "Yson/Object.hpp"
 #include "Yson/Common/Base64.hpp"
 #include "Yson/Common/GetDetailedValueType.hpp"
 #include "Yson/Common/GetValueType.hpp"
@@ -485,6 +487,37 @@ namespace Yson
             return false;
     }
 
+    JsonItem UBJsonReader::readCurrentItem()
+    {
+        auto& tokenizer = m_Members->tokenizer;
+        switch (currentScope().state.state)
+        {
+        case UBJsonReaderState::INITIAL_STATE:
+        case UBJsonReaderState::AT_START:
+            if (!nextValue())
+                UBJSON_READER_THROW("No key or value.", m_Members->tokenizer);
+            [[fallthrough]];
+        case UBJsonReaderState::AT_VALUE:
+            switch (tokenizer.tokenType())
+            {
+            case UBJsonTokenType::START_OBJECT_TOKEN:
+            case UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN:
+                return readObject();
+            case UBJsonTokenType::START_ARRAY_TOKEN:
+            case UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN:
+                return readArray();
+            default:
+                return JsonItem(UBJsonValue(std::string(tokenizer.token()),
+                                            tokenizer.tokenType()));
+            }
+        case UBJsonReaderState::AT_KEY:
+            return JsonItem(UBJsonValue(std::string(tokenizer.token()),
+                                        tokenizer.tokenType()));
+        default:
+            UBJSON_READER_THROW("No key or value.", m_Members->tokenizer);
+        }
+    }
+
     std::string UBJsonReader::fileName() const
     {
         return m_Members->tokenizer.fileName();
@@ -517,6 +550,86 @@ namespace Yson
         if (m_Members)
             return m_Members->scopes.back();
         YSON_THROW("Uninitialized UBJsonReader.");
+    }
+
+    JsonItem UBJsonReader::readArray()
+    {
+        std::vector<JsonItem> values;
+        const auto& tokenizer = m_Members->tokenizer;
+        enter();
+        while (true)
+        {
+            if (!nextValue())
+                break;
+
+            switch (tokenizer.tokenType())
+            {
+            case UBJsonTokenType::START_OBJECT_TOKEN:
+            case UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN:
+                values.push_back(readObject());
+                break;
+            case UBJsonTokenType::START_ARRAY_TOKEN:
+            case UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN:
+                values.push_back(readArray());
+                break;
+            default:
+                values.emplace_back(UBJsonValue(std::string(tokenizer.token()),
+                                                tokenizer.tokenType()));
+                break;
+            }
+        }
+        leave();
+        return JsonItem(std::make_shared<Array>(move(values)));
+    }
+
+    JsonItem UBJsonReader::readObject()
+    {
+        std::deque<std::string> keys;
+        std::unordered_map<std::string_view, JsonItem> values;
+        const auto& tokenizer = m_Members->tokenizer;
+        enter();
+        while (true)
+        {
+            if (!nextKey())
+                break;
+
+            auto entry = values.find(tokenizer.token());
+            std::string_view key;
+            if (entry != values.end())
+            {
+                key = entry->first;
+            }
+            else
+            {
+                keys.emplace_back(tokenizer.token());
+                key = keys.back();
+            }
+
+            if (!nextValue())
+            {
+                UBJSON_READER_THROW("Key without value: " + keys.back(),
+                                    tokenizer);
+            }
+
+            switch (tokenizer.tokenType())
+            {
+            case UBJsonTokenType::START_OBJECT_TOKEN:
+            case UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN:
+                values.insert_or_assign(key, readObject());
+                break;
+            case UBJsonTokenType::START_ARRAY_TOKEN:
+            case UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN:
+                values.insert_or_assign(key, readArray());
+                break;
+            default:
+                values.insert_or_assign(key,
+                                        JsonItem(UBJsonValue(std::string(tokenizer.token()),
+                                                    tokenizer.tokenType())));
+                break;
+            }
+        }
+        leave();
+        return JsonItem(std::make_shared<Object>(move(keys), move(values)));
     }
 
     template <typename T>

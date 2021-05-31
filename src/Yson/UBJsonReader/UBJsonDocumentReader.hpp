@@ -22,7 +22,5 @@ namespace Yson
 
         bool nextDocument(UBJsonTokenizer& tokenizer,
                           UBJsonReaderState& state) override;
-
-    public:
     };
 }

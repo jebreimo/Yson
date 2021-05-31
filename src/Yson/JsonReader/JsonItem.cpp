@@ -67,12 +67,15 @@ namespace Yson
 
     bool JsonItem::isValue() const
     {
-        return std::holds_alternative<JsonValue>(m_Item);
+        return std::holds_alternative<JsonValue>(m_Item)
+               || std::holds_alternative<UBJsonValue>(m_Item);
     }
 
     const Value& JsonItem::value() const
     {
         if (const auto* obj = std::get_if<JsonValue>(&m_Item))
+            return *obj;
+        if (const auto* obj = std::get_if<UBJsonValue>(&m_Item))
             return *obj;
         YSON_THROW("Item isn't a value.");
     }

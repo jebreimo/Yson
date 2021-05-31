@@ -10,10 +10,12 @@
 
 namespace Yson
 {
+    enum class JsonTokenType;
+
     class YSON_API JsonValue : public Value
     {
     public:
-        JsonValue(std::string value, int tokenType);
+        JsonValue(std::string value, JsonTokenType tokenType);
 
         [[nodiscard]]
         ValueType valueType() const final;
@@ -59,7 +61,7 @@ namespace Yson
         bool getBinary(void* buffer, size_t& size) const final;
     private:
         std::string m_Value;
-        int m_Type;
+        JsonTokenType m_Type;
     };
 
     template <typename T>

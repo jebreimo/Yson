@@ -7,6 +7,7 @@
 //****************************************************************************
 #pragma once
 #include <memory>
+#include "JsonItem.hpp"
 #include "Reader.hpp"
 
 namespace Yson
@@ -48,19 +49,26 @@ namespace Yson
 
         void leave() override;
 
+        [[nodiscard]]
         ValueType valueType() const;
 
+        [[nodiscard]]
         ValueType valueType(bool analyzeStrings) const override;
 
+        [[nodiscard]]
         DetailedValueType detailedValueType() const;
 
+        [[nodiscard]]
         DetailedValueType detailedValueType(
                 bool analyzeStrings) const override;
 
+        [[nodiscard]]
         bool isOptimizedArray() const;
 
+        [[nodiscard]]
         std::pair<size_t, DetailedValueType> optimizedArrayProperties() const;
 
+        [[nodiscard]]
         bool readNull() const override;
 
         bool read(bool& value) const override;
@@ -113,20 +121,33 @@ namespace Yson
 
         bool readBinary(void* buffer, size_t& size) override;
 
+        [[nodiscard]]
+        JsonItem readCurrentItem() override;
+
+        [[nodiscard]]
         std::string fileName() const override;
 
+        [[nodiscard]]
         size_t lineNumber() const override;
 
+        [[nodiscard]]
         size_t columnNumber() const override;
     private:
         struct Members;
         struct Scope;
 
-        UBJsonReader(Members* members);
+        explicit UBJsonReader(Members* members);
 
         void assertStateIsKeyOrValue() const;
 
+        [[nodiscard]]
         Scope& currentScope() const;
+
+        [[nodiscard]]
+        JsonItem readArray();
+
+        [[nodiscard]]
+        JsonItem readObject();
 
         template <typename T>
         bool readOptimizedArrayImpl(T* buffer, size_t& size,

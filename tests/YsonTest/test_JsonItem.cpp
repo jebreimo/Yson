@@ -6,6 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "Yson/JsonReader.hpp"
+#include "Yson/UBJsonReader.hpp"
 
 #include <sstream>
 #include "Ytest/Ytest.hpp"
@@ -34,6 +35,17 @@ namespace
         Y_ASSERT(get<int32_t>(item) == 1234);
     }
 
+    void test_ub_readItem_basics()
+    {
+        std::string doc("{i\x03KeySi\x0CHello world!"
+                        "i\x05" "Array[I\x10\x20U\xF0]}");
+        UBJsonReader reader(doc.data(), doc.size());
+        auto item = reader.readCurrentItem();
+        Y_ASSERT(item.isObject());
+        Y_ASSERT(get<std::string>(item["Key"]) == "Hello world!");
+    }
+
     Y_TEST(test_readItem_basics,
-           test_integerItem);
+           test_integerItem,
+           test_ub_readItem_basics);
 }

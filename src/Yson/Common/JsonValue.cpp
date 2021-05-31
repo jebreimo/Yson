@@ -15,7 +15,7 @@
 
 namespace Yson
 {
-    JsonValue::JsonValue(std::string value, int type)
+    JsonValue::JsonValue(std::string value, JsonTokenType type)
         : m_Value(move(value)),
           m_Type(type)
     {}
@@ -27,14 +27,13 @@ namespace Yson
 
     ValueType JsonValue::valueType(bool analyzeStrings) const
     {
-        auto tokenType = JsonTokenType(m_Type);
-        if (tokenType == JsonTokenType::VALUE
-            || (analyzeStrings && tokenType == JsonTokenType::STRING))
+        if (m_Type == JsonTokenType::VALUE
+            || (analyzeStrings && m_Type == JsonTokenType::STRING))
         {
             return getValueType(m_Value);
         }
 
-        if (tokenType == JsonTokenType::STRING)
+        if (m_Type == JsonTokenType::STRING)
             return ValueType::STRING;
 
         return ValueType::INVALID;
@@ -119,9 +118,9 @@ namespace Yson
 
     bool JsonValue::get(char& value) const
     {
-        if (JsonTokenType(m_Type) == JsonTokenType::VALUE)
+        if (m_Type == JsonTokenType::VALUE)
             return parse(m_Value, value, true);
-        if (JsonTokenType(m_Type) != JsonTokenType::STRING)
+        if (m_Type != JsonTokenType::STRING)
             return false;
         if (m_Value.size() == 1)
         {

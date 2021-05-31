@@ -69,7 +69,7 @@ namespace Yson
         if (!value.get(v))
         {
             throw YsonException("get called with incorrect type."
-                                " The value type is"
+                                " The value type is "
                                 + toString(value.valueType()) + ".",
                                 __FILE__, __LINE__, __FUNCTION__);
         }

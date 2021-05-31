@@ -70,14 +70,14 @@ namespace Yson
         case UBJsonReaderState::AT_START:
         case UBJsonReaderState::AT_VALUE:
             skipValue(tokenizer);
-            // [[fallthrough]]
+            [[fallthrough]];
         case UBJsonReaderState::AFTER_VALUE:
             if (!tokenizer.next())
             {
                 state.state = UBJsonReaderState::AT_END_OF_FILE;
                 return false;
             }
-            // [[fallthrough]]
+            [[fallthrough]];
         case UBJsonReaderState::AT_END:
             state.state = UBJsonReaderState::AT_START;
             return true;

@@ -407,7 +407,7 @@ namespace Yson
             else if (tType == JsonTokenType::START_ARRAY)
                 values.push_back(readArray());
             else
-                values.emplace_back(JsonValue(tokenizer.tokenString(), int(tType)));
+                values.emplace_back(JsonValue(tokenizer.tokenString(), tType));
         }
         leave();
         return JsonItem(std::make_shared<Array>(move(values)));
@@ -448,7 +448,7 @@ namespace Yson
             else if (tType == JsonTokenType::START_ARRAY)
                 values.insert_or_assign(key, readArray());
             else
-                values.insert_or_assign(key, JsonItem(JsonValue(tokenizer.tokenString(), int(tType))));
+                values.insert_or_assign(key, JsonItem(JsonValue(tokenizer.tokenString(), tType)));
         }
         leave();
         return JsonItem(std::make_shared<Object>(move(keys), move(values)));
@@ -456,28 +456,29 @@ namespace Yson
 
     JsonItem JsonReader::readCurrentItem()
     {
+        auto& tokenizer = m_Members->tokenizer;
         switch (m_Members->currentState())
         {
         case JsonReaderState::INITIAL_STATE:
         case JsonReaderState::AT_START:
             if (!nextValue())
-                JSON_READER_THROW("Document is empty.", m_Members->tokenizer);
+                JSON_READER_THROW("Document is empty.", tokenizer);
             [[fallthrough]];
         case JsonReaderState::AT_VALUE:
         {
-            auto tType = m_Members->tokenizer.tokenType();
+            auto tType = tokenizer.tokenType();
             if (tType == JsonTokenType::START_OBJECT)
                 return readObject();
             else if (tType == JsonTokenType::START_ARRAY)
                 return readArray();
             else
-                return JsonItem(JsonValue(m_Members->tokenizer.tokenString(), int(tType)));
+                return JsonItem(JsonValue(tokenizer.tokenString(), tType));
         }
         case JsonReaderState::AT_KEY:
-            return JsonItem(JsonValue(m_Members->tokenizer.tokenString(),
-                                      int(m_Members->tokenizer.tokenType())));
+            return JsonItem(JsonValue(tokenizer.tokenString(),
+                                      tokenizer.tokenType()));
         default:
-            JSON_READER_THROW("No key or value.", m_Members->tokenizer);
+            JSON_READER_THROW("No key or value.", tokenizer);
         }
     }
 
