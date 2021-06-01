@@ -5,7 +5,7 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include "Yson/JsonValue.hpp"
+#include "Yson/JsonValueItem.hpp"
 #include "Yson/Common/Base64.hpp"
 #include "Yson/Common/Escape.hpp"
 #include "Yson/Common/GetValueType.hpp"
@@ -15,17 +15,17 @@
 
 namespace Yson
 {
-    JsonValue::JsonValue(std::string value, JsonTokenType type)
+    JsonValueItem::JsonValueItem(std::string value, JsonTokenType type)
         : m_Value(move(value)),
           m_Type(type)
     {}
 
-    ValueType JsonValue::valueType() const
+    ValueType JsonValueItem::valueType() const
     {
         return valueType(false);
     }
 
-    ValueType JsonValue::valueType(bool analyzeStrings) const
+    ValueType JsonValueItem::valueType(bool analyzeStrings) const
     {
         if (m_Type == JsonTokenType::VALUE
             || (analyzeStrings && m_Type == JsonTokenType::STRING))
@@ -39,12 +39,12 @@ namespace Yson
         return ValueType::INVALID;
     }
 
-    bool JsonValue::isNull() const
+    bool JsonValueItem::isNull() const
     {
         return m_Value == "null";
     }
 
-    bool JsonValue::get(bool& value) const
+    bool JsonValueItem::get(bool& value) const
     {
         if (m_Value == "true" || m_Value == "1")
         {
@@ -61,62 +61,62 @@ namespace Yson
         return false;
     }
 
-    bool JsonValue::get(int8_t& value) const
+    bool JsonValueItem::get(int8_t& value) const
     {
         return parse(m_Value, value, true);
     }
 
-    bool JsonValue::get(int16_t& value) const
+    bool JsonValueItem::get(int16_t& value) const
     {
         return parse(m_Value, value, true);
     }
 
-    bool JsonValue::get(int32_t& value) const
+    bool JsonValueItem::get(int32_t& value) const
     {
         return parse(m_Value, value, true);
     }
 
-    bool JsonValue::get(int64_t& value) const
+    bool JsonValueItem::get(int64_t& value) const
     {
         return parse(m_Value, value, true);
     }
 
-    bool JsonValue::get(uint8_t& value) const
+    bool JsonValueItem::get(uint8_t& value) const
     {
         return parse(m_Value, value, true);
     }
 
-    bool JsonValue::get(uint16_t& value) const
+    bool JsonValueItem::get(uint16_t& value) const
     {
         return parse(m_Value, value, true);
     }
 
-    bool JsonValue::get(uint32_t& value) const
+    bool JsonValueItem::get(uint32_t& value) const
     {
         return parse(m_Value, value, true);
     }
 
-    bool JsonValue::get(uint64_t& value) const
+    bool JsonValueItem::get(uint64_t& value) const
     {
         return parse(m_Value, value, true);
     }
 
-    bool JsonValue::get(float& value) const
+    bool JsonValueItem::get(float& value) const
     {
         return parse(m_Value, value);
     }
 
-    bool JsonValue::get(double& value) const
+    bool JsonValueItem::get(double& value) const
     {
         return parse(m_Value, value);
     }
 
-    bool JsonValue::get(long double& value) const
+    bool JsonValueItem::get(long double& value) const
     {
         return parse(m_Value, value);
     }
 
-    bool JsonValue::get(char& value) const
+    bool JsonValueItem::get(char& value) const
     {
         if (m_Type == JsonTokenType::VALUE)
             return parse(m_Value, value, true);
@@ -139,7 +139,7 @@ namespace Yson
         return false;
     }
 
-    bool JsonValue::get(std::string& value) const
+    bool JsonValueItem::get(std::string& value) const
     {
         if (hasEscapedCharacters(m_Value))
             value = unescape(value);
@@ -148,17 +148,17 @@ namespace Yson
         return true;
     }
 
-    bool JsonValue::getBase64(std::vector<char>& value) const
+    bool JsonValueItem::getBase64(std::vector<char>& value) const
     {
         return fromBase64(m_Value, value);
     }
 
-    bool JsonValue::getBinary(std::vector<char>& value) const
+    bool JsonValueItem::getBinary(std::vector<char>& value) const
     {
         return fromBase64(m_Value, value);
     }
 
-    bool JsonValue::getBinary(void* buffer, size_t& size) const
+    bool JsonValueItem::getBinary(void* buffer, size_t& size) const
     {
         return fromBase64(m_Value, static_cast<char*>(buffer), size);
     }

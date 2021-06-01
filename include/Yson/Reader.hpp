@@ -10,8 +10,10 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include "ArrayItem.hpp"
 #include "DetailedValueType.hpp"
 #include "JsonItem.hpp"
+#include "ObjectItem.hpp"
 #include "ValueType.hpp"
 #include "YsonReaderException.hpp"
 

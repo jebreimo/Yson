@@ -9,10 +9,12 @@
 
 namespace Yson
 {
-    UBJsonReaderState makeState(const UBJsonTokenizer& tokenizer)
+    UBJsonReaderState makeState(const UBJsonTokenizer& tokenizer,
+                                unsigned options)
     {
         return UBJsonReaderState(UBJsonReaderState::AT_START,
                                  tokenizer.contentSize(),
-                                 tokenizer.contentType());
+                                 tokenizer.contentType(),
+                                 options);
     }
 }

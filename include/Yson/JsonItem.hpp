@@ -8,21 +8,21 @@
 #pragma once
 #include <memory>
 #include <variant>
-#include "JsonValue.hpp"
-#include "UBJsonValue.hpp"
+#include "JsonValueItem.hpp"
+#include "UBJsonValueItem.hpp"
 
 namespace Yson
 {
-    class Array;
-    class Object;
+    class ArrayItem;
+    class ObjectItem;
 
     class YSON_API JsonItem
     {
     public:
-        using ItemType = std::variant<std::shared_ptr<Object>,
-                                      std::shared_ptr<Array>,
-                                      JsonValue,
-                                      UBJsonValue>;
+        using ItemType = std::variant<std::shared_ptr<ObjectItem>,
+                                      std::shared_ptr<ArrayItem>,
+                                      JsonValueItem,
+                                      UBJsonValueItem>;
 
         explicit JsonItem(ItemType item);
 
@@ -34,19 +34,19 @@ namespace Yson
         bool isArray() const;
 
         [[nodiscard]]
-        const Array& array() const;
+        const ArrayItem& array() const;
 
         [[nodiscard]]
         bool isObject() const;
 
         [[nodiscard]]
-        const Object& object() const;
+        const ObjectItem& object() const;
 
         [[nodiscard]]
         bool isValue() const;
 
         [[nodiscard]]
-        const Value& value() const;
+        const ValueItem& value() const;
     private:
         ItemType m_Item;
     };

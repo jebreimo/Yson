@@ -6,19 +6,26 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
+#include <deque>
+#include <unordered_map>
 #include "JsonItem.hpp"
 
 namespace Yson
 {
-    class YSON_API Array
+    class YSON_API ObjectItem
     {
     public:
-        explicit Array(std::vector<JsonItem> values);
+        ObjectItem(std::deque<std::string> keys,
+                   std::unordered_map<std::string_view, JsonItem> values);
 
         [[nodiscard]]
-        const std::vector<JsonItem>& values() const;
+        const std::deque<std::string>& keys() const;
+
+        [[nodiscard]]
+        const std::unordered_map<std::string_view, JsonItem>& values() const;
 
     private:
-        std::vector<JsonItem> m_Values;
+        std::deque<std::string> m_Keys;
+        std::unordered_map<std::string_view, JsonItem> m_Values;
     };
 }

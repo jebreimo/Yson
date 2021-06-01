@@ -13,10 +13,10 @@
 
 namespace Yson
 {
-    class YSON_API Value
+    class YSON_API ValueItem
     {
     public:
-        virtual ~Value() = default;
+        virtual ~ValueItem() = default;
 
         [[nodiscard]]
         virtual ValueType valueType() const = 0;
@@ -63,7 +63,7 @@ namespace Yson
     };
 
     template <typename T>
-    T get(const Value& value)
+    T get(const ValueItem& value)
     {
         T v;
         if (!value.get(v))

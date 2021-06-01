@@ -6,16 +6,16 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
-#include "Value.hpp"
+#include "ValueItem.hpp"
 
 namespace Yson
 {
     enum class UBJsonTokenType : char;
 
-    class YSON_API UBJsonValue : public Value
+    class YSON_API UBJsonValueItem : public ValueItem
     {
     public:
-        UBJsonValue(std::string value, UBJsonTokenType type);
+        UBJsonValueItem(std::string value, UBJsonTokenType type);
 
         [[nodiscard]]
         ValueType valueType() const override;

@@ -6,16 +6,16 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
-#include "Value.hpp"
+#include "ValueItem.hpp"
 
 namespace Yson
 {
     enum class JsonTokenType;
 
-    class YSON_API JsonValue : public Value
+    class YSON_API JsonValueItem : public ValueItem
     {
     public:
-        JsonValue(std::string value, JsonTokenType tokenType);
+        JsonValueItem(std::string value, JsonTokenType tokenType);
 
         [[nodiscard]]
         ValueType valueType() const final;
@@ -65,7 +65,7 @@ namespace Yson
     };
 
     template <typename T>
-    T get(const JsonValue& value)
+    T get(const JsonValueItem& value)
     {
         T v;
         if (!value.get(v))

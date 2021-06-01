@@ -132,6 +132,10 @@ namespace Yson
 
         [[nodiscard]]
         size_t columnNumber() const override;
+
+        bool isExpandOptimizedByteArraysEnabled() const;
+
+        UBJsonReader& setExpandOptimizedByteArraysEnabled(bool value);
     private:
         struct Members;
         struct Scope;
@@ -144,10 +148,10 @@ namespace Yson
         Scope& currentScope() const;
 
         [[nodiscard]]
-        JsonItem readArray();
+        JsonItem readArray(bool expandOptmizedByteArrays);
 
         [[nodiscard]]
-        JsonItem readObject();
+        JsonItem readObject(bool expandOptmizedByteArrays);
 
         template <typename T>
         bool readOptimizedArrayImpl(T* buffer, size_t& size,

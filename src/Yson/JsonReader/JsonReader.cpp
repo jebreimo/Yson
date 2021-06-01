@@ -8,8 +8,8 @@
 #include "Yson/JsonReader.hpp"
 
 #include <stack>
-#include "Yson/Array.hpp"
-#include "Yson/Object.hpp"
+#include "Yson/ArrayItem.hpp"
+#include "Yson/ObjectItem.hpp"
 #include "Yson/Common/Base64.hpp"
 #include "Yson/Common/Escape.hpp"
 #include "Yson/Common/GetDetailedValueType.hpp"
@@ -407,10 +407,10 @@ namespace Yson
             else if (tType == JsonTokenType::START_ARRAY)
                 values.push_back(readArray());
             else
-                values.emplace_back(JsonValue(tokenizer.tokenString(), tType));
+                values.emplace_back(JsonValueItem(tokenizer.tokenString(), tType));
         }
         leave();
-        return JsonItem(std::make_shared<Array>(move(values)));
+        return JsonItem(std::make_shared<ArrayItem>(move(values)));
     }
 
     JsonItem JsonReader::readObject()
@@ -448,10 +448,10 @@ namespace Yson
             else if (tType == JsonTokenType::START_ARRAY)
                 values.insert_or_assign(key, readArray());
             else
-                values.insert_or_assign(key, JsonItem(JsonValue(tokenizer.tokenString(), tType)));
+                values.insert_or_assign(key, JsonItem(JsonValueItem(tokenizer.tokenString(), tType)));
         }
         leave();
-        return JsonItem(std::make_shared<Object>(move(keys), move(values)));
+        return JsonItem(std::make_shared<ObjectItem>(move(keys), move(values)));
     }
 
     JsonItem JsonReader::readCurrentItem()
@@ -472,10 +472,10 @@ namespace Yson
             else if (tType == JsonTokenType::START_ARRAY)
                 return readArray();
             else
-                return JsonItem(JsonValue(tokenizer.tokenString(), tType));
+                return JsonItem(JsonValueItem(tokenizer.tokenString(), tType));
         }
         case JsonReaderState::AT_KEY:
-            return JsonItem(JsonValue(tokenizer.tokenString(),
+            return JsonItem(JsonValueItem(tokenizer.tokenString(),
                                       tokenizer.tokenType()));
         default:
             JSON_READER_THROW("No key or value.", tokenizer);

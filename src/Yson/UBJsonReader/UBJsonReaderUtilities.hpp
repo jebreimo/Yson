@@ -94,5 +94,6 @@ namespace Yson
         }
     }
 
-    UBJsonReaderState makeState(const UBJsonTokenizer& tokenizer);
+    UBJsonReaderState makeState(const UBJsonTokenizer& tokenizer,
+                                unsigned options);
 }

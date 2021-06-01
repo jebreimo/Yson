@@ -6,8 +6,8 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "Yson/JsonItem.hpp"
-#include "Yson/Array.hpp"
-#include "Yson/Object.hpp"
+#include "Yson/ArrayItem.hpp"
+#include "Yson/ObjectItem.hpp"
 #include "Yson/Common/ThrowYsonException.hpp"
 
 namespace Yson
@@ -18,7 +18,7 @@ namespace Yson
 
     const JsonItem& JsonItem::operator[](size_t index) const
     {
-        if (const auto* obj = std::get_if<std::shared_ptr<Array>>(&m_Item))
+        if (const auto* obj = std::get_if<std::shared_ptr<ArrayItem>>(&m_Item))
         {
             const auto& values = (*obj)->values();
             if (index < values.size())
@@ -30,7 +30,7 @@ namespace Yson
 
     const JsonItem& JsonItem::operator[](std::string_view key) const
     {
-        if (const auto* obj = std::get_if<std::shared_ptr<Object>>(&m_Item))
+        if (const auto* obj = std::get_if<std::shared_ptr<ObjectItem>>(&m_Item))
         {
             const auto& values = (*obj)->values();
             auto it = values.find(key);
@@ -43,39 +43,39 @@ namespace Yson
 
     bool JsonItem::isArray() const
     {
-        return std::holds_alternative<std::shared_ptr<Array>>(m_Item);
+        return std::holds_alternative<std::shared_ptr<ArrayItem>>(m_Item);
     }
 
-    const Array& JsonItem::array() const
+    const ArrayItem& JsonItem::array() const
     {
-        if (const auto* obj = std::get_if<std::shared_ptr<Array>>(&m_Item))
+        if (const auto* obj = std::get_if<std::shared_ptr<ArrayItem>>(&m_Item))
             return **obj;
         YSON_THROW("Item isn't an array.");
     }
 
     bool JsonItem::isObject() const
     {
-        return std::holds_alternative<std::shared_ptr<Object>>(m_Item);
+        return std::holds_alternative<std::shared_ptr<ObjectItem>>(m_Item);
     }
 
-    const Object& JsonItem::object() const
+    const ObjectItem& JsonItem::object() const
     {
-        if (const auto* obj = std::get_if<std::shared_ptr<Object>>(&m_Item))
+        if (const auto* obj = std::get_if<std::shared_ptr<ObjectItem>>(&m_Item))
             return **obj;
         YSON_THROW("Item isn't an object.");
     }
 
     bool JsonItem::isValue() const
     {
-        return std::holds_alternative<JsonValue>(m_Item)
-               || std::holds_alternative<UBJsonValue>(m_Item);
+        return std::holds_alternative<JsonValueItem>(m_Item)
+               || std::holds_alternative<UBJsonValueItem>(m_Item);
     }
 
-    const Value& JsonItem::value() const
+    const ValueItem& JsonItem::value() const
     {
-        if (const auto* obj = std::get_if<JsonValue>(&m_Item))
+        if (const auto* obj = std::get_if<JsonValueItem>(&m_Item))
             return *obj;
-        if (const auto* obj = std::get_if<UBJsonValue>(&m_Item))
+        if (const auto* obj = std::get_if<UBJsonValueItem>(&m_Item))
             return *obj;
         YSON_THROW("Item isn't a value.");
     }

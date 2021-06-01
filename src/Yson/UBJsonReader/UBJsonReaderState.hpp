@@ -13,6 +13,11 @@
 
 namespace Yson
 {
+    enum UBJsonReaderOptions
+    {
+        EXPAND_OPTIMIZED_BYTE_ARRAYS = 1
+    };
+
     struct UBJsonReaderState
     {
         enum State
@@ -26,25 +31,29 @@ namespace Yson
             AT_END
         };
 
-        UBJsonReaderState()
-        {}
+        UBJsonReaderState() = default;
 
-        UBJsonReaderState(State state)
-                : state(state)
+        UBJsonReaderState(State state,
+                          unsigned options)
+                : state(state),
+                  options(options)
         {}
 
         UBJsonReaderState(State state,
                           size_t valueCount,
-                          UBJsonTokenType valueType)
+                          UBJsonTokenType valueType,
+                          unsigned options)
                 : valueCount(valueCount),
                   valueType(valueType),
-                  state(state)
+                  state(state),
+                  options(options)
         {}
 
         size_t valueCount = 0;
         size_t valueIndex = 0;
         UBJsonTokenType valueType = UBJsonTokenType::UNKNOWN_TOKEN;
         State state = INITIAL_STATE;
+        unsigned options = EXPAND_OPTIMIZED_BYTE_ARRAYS;
     };
 
     std::string toString(UBJsonReaderState::State state);

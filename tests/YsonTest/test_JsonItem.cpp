@@ -43,9 +43,33 @@ namespace
         auto item = reader.readCurrentItem();
         Y_ASSERT(item.isObject());
         Y_ASSERT(get<std::string>(item["Key"]) == "Hello world!");
+        Y_ASSERT(get<int>(item["Array"][1]) == 240);
+    }
+
+    void test_ub_binary_item()
+    {
+        const char doc[] = "[$i#i\4AB D";
+
+        UBJsonReader reader1(doc, sizeof(doc) - 1);
+        auto item1 = reader1.readCurrentItem();
+        Y_ASSERT(item1.isArray());
+        Y_ASSERT(item1.array().values().size() == 4);
+        Y_ASSERT(get<int>(item1[3]) == 'D');
+
+        UBJsonReader reader2(doc, sizeof(doc) - 1);
+        reader2.setExpandOptimizedByteArraysEnabled(false);
+        auto item2 = reader2.readCurrentItem();
+        Y_ASSERT(item2.isValue());
+        size_t size = 0;
+        Y_ASSERT(item2.value().getBinary(nullptr, size));
+        Y_ASSERT(size == 4);
+        std::string buffer(size, {});
+        Y_ASSERT(item2.value().getBinary(buffer.data(), size));
+        Y_ASSERT(buffer == "AB D");
     }
 
     Y_TEST(test_readItem_basics,
            test_integerItem,
-           test_ub_readItem_basics);
+           test_ub_readItem_basics,
+           test_ub_binary_item);
 }

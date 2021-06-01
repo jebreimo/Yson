@@ -5,7 +5,7 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include "Yson/UBJsonValue.hpp"
+#include "Yson/UBJsonValueItem.hpp"
 
 #include "Yson/Common/AssignInteger.hpp"
 #include "Yson/Common/Base64.hpp"
@@ -112,17 +112,17 @@ namespace Yson
         }
     }
 
-    UBJsonValue::UBJsonValue(std::string value, UBJsonTokenType type)
+    UBJsonValueItem::UBJsonValueItem(std::string value, UBJsonTokenType type)
         : m_Value(move(value)),
           m_Type(type)
     {}
 
-    ValueType UBJsonValue::valueType() const
+    ValueType UBJsonValueItem::valueType() const
     {
         return valueType(false);
     }
 
-    ValueType UBJsonValue::valueType(bool analyzeStrings) const
+    ValueType UBJsonValueItem::valueType(bool analyzeStrings) const
     {
         switch (m_Type)
         {
@@ -155,12 +155,12 @@ namespace Yson
         }
     }
 
-    bool UBJsonValue::isNull() const
+    bool UBJsonValueItem::isNull() const
     {
         return m_Type == UBJsonTokenType::NULL_TOKEN;
     }
 
-    bool UBJsonValue::get(bool& value) const
+    bool UBJsonValueItem::get(bool& value) const
     {
         switch (m_Type)
         {
@@ -175,67 +175,67 @@ namespace Yson
         }
     }
 
-    bool UBJsonValue::get(int8_t& value) const
+    bool UBJsonValueItem::get(int8_t& value) const
     {
         return setIntegerValue(value, m_Type, m_Value);
     }
 
-    bool UBJsonValue::get(int16_t& value) const
+    bool UBJsonValueItem::get(int16_t& value) const
     {
         return setIntegerValue(value, m_Type, m_Value);
     }
 
-    bool UBJsonValue::get(int32_t& value) const
+    bool UBJsonValueItem::get(int32_t& value) const
     {
         return setIntegerValue(value, m_Type, m_Value);
     }
 
-    bool UBJsonValue::get(int64_t& value) const
+    bool UBJsonValueItem::get(int64_t& value) const
     {
         return setIntegerValue(value, m_Type, m_Value);
     }
 
-    bool UBJsonValue::get(uint8_t& value) const
+    bool UBJsonValueItem::get(uint8_t& value) const
     {
         return setIntegerValue(value, m_Type, m_Value);
     }
 
-    bool UBJsonValue::get(uint16_t& value) const
+    bool UBJsonValueItem::get(uint16_t& value) const
     {
         return setIntegerValue(value, m_Type, m_Value);
     }
 
-    bool UBJsonValue::get(uint32_t& value) const
+    bool UBJsonValueItem::get(uint32_t& value) const
     {
         return setIntegerValue(value, m_Type, m_Value);
     }
 
-    bool UBJsonValue::get(uint64_t& value) const
+    bool UBJsonValueItem::get(uint64_t& value) const
     {
         return setIntegerValue(value, m_Type, m_Value);
     }
 
-    bool UBJsonValue::get(float& value) const
+    bool UBJsonValueItem::get(float& value) const
     {
         return setFloatingPointValue(value, m_Type, m_Value);
     }
 
-    bool UBJsonValue::get(double& value) const
+    bool UBJsonValueItem::get(double& value) const
     {
         return setFloatingPointValue(value, m_Type, m_Value);
     }
 
-    bool UBJsonValue::get(long double& value) const
+    bool UBJsonValueItem::get(long double& value) const
     {
         return setFloatingPointValue(value, m_Type, m_Value);
     }
 
-    bool UBJsonValue::get(char& value) const
+    bool UBJsonValueItem::get(char& value) const
     {
         return setIntegerValue(value, m_Type, m_Value);
     }
 
-    bool UBJsonValue::get(std::string& value) const
+    bool UBJsonValueItem::get(std::string& value) const
     {
         switch (m_Type)
         {
@@ -251,7 +251,7 @@ namespace Yson
         }
     }
 
-    bool UBJsonValue::getBase64(std::vector<char>& value) const
+    bool UBJsonValueItem::getBase64(std::vector<char>& value) const
     {
         if (m_Type == UBJsonTokenType::STRING_TOKEN)
             return fromBase64(m_Value, value);
@@ -259,7 +259,7 @@ namespace Yson
             return false;
     }
 
-    bool UBJsonValue::getBinary(std::vector<char>& value) const
+    bool UBJsonValueItem::getBinary(std::vector<char>& value) const
     {
         size_t size;
         if (getBinary(nullptr, size))
@@ -270,10 +270,26 @@ namespace Yson
         return false;
     }
 
-    bool UBJsonValue::getBinary(void* buffer, size_t& size) const
+    bool UBJsonValueItem::getBinary(void* buffer, size_t& size) const
     {
-        // TODO: implement this. Requires implementing proper support for
-        // optimized arrays.
-        return false;
+        if (m_Type != UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN
+            && m_Type != UBJsonTokenType::STRING_TOKEN)
+        {
+            YSON_THROW("Value is not suitable for getBinary value: "
+                       + toString(m_Type));
+        }
+
+        if (buffer == nullptr)
+        {
+            size = m_Value.size();
+            return true;
+        }
+
+        if (size < m_Value.size())
+            return false;
+
+        std::copy(m_Value.begin(), m_Value.end(), static_cast<char*>(buffer));
+        size = m_Value.size();
+        return true;
     }
 }

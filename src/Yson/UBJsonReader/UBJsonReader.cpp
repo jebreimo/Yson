@@ -8,8 +8,8 @@
 #include "Yson/UBJsonReader.hpp"
 
 #include <stack>
-#include "Yson/Array.hpp"
-#include "Yson/Object.hpp"
+#include "Yson/ArrayItem.hpp"
+#include "Yson/ObjectItem.hpp"
 #include "Yson/Common/Base64.hpp"
 #include "Yson/Common/GetDetailedValueType.hpp"
 #include "Yson/Common/GetValueType.hpp"
@@ -22,6 +22,26 @@
 
 namespace Yson
 {
+    namespace
+    {
+        template <typename T>
+        bool readOptimizedArrayToString(UBJsonReader& reader,
+                                        std::string& buffer)
+        {
+            size_t size = 0;
+            T* ptr = nullptr;
+            if (reader.readOptimizedArray(ptr, size))
+            {
+                buffer.resize(size);
+                ptr = reinterpret_cast<T*>(buffer.data());
+                if (reader.readOptimizedArray(ptr, size))
+                    return true;
+            }
+
+            return false;
+        }
+    }
+
     struct UBJsonReader::Scope
     {
         UBJsonScopeReader* reader = nullptr;
@@ -98,25 +118,26 @@ namespace Yson
     void UBJsonReader::enter()
     {
         auto state = currentScope().state.state;
+        auto options = currentScope().state.options;
         auto tokenType = m_Members->tokenizer.tokenType();
         if (state == UBJsonReaderState::AT_VALUE)
         {
             if (tokenType == UBJsonTokenType::START_OBJECT_TOKEN)
                 m_Members->scopes.push_back(
                         {&m_Members->objectReader,
-                         UBJsonReaderState(UBJsonReaderState::AT_START)});
+                         UBJsonReaderState(UBJsonReaderState::AT_START, options)});
             else if (tokenType == UBJsonTokenType::START_ARRAY_TOKEN)
                 m_Members->scopes.push_back(
                         {&m_Members->arrayReader,
-                         UBJsonReaderState(UBJsonReaderState::AT_START)});
+                         UBJsonReaderState(UBJsonReaderState::AT_START, options)});
             else if (tokenType == UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN)
                 m_Members->scopes.push_back(
                         {&m_Members->optimizedArrayReader,
-                         makeState(m_Members->tokenizer)});
+                         makeState(m_Members->tokenizer, options)});
             else if (tokenType == UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN)
                 m_Members->scopes.push_back(
                         {&m_Members->optimizedObjectReader,
-                         makeState(m_Members->tokenizer)});
+                         makeState(m_Members->tokenizer, options)});
             else
                 UBJSON_READER_THROW(
                         "There is no object or array to be entered.",
@@ -502,16 +523,16 @@ namespace Yson
             {
             case UBJsonTokenType::START_OBJECT_TOKEN:
             case UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN:
-                return readObject();
-            case UBJsonTokenType::START_ARRAY_TOKEN:
+                return readObject(isExpandOptimizedByteArraysEnabled());
             case UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN:
-                return readArray();
+            case UBJsonTokenType::START_ARRAY_TOKEN:
+                return readArray(isExpandOptimizedByteArraysEnabled());
             default:
-                return JsonItem(UBJsonValue(std::string(tokenizer.token()),
+                return JsonItem(UBJsonValueItem(std::string(tokenizer.token()),
                                             tokenizer.tokenType()));
             }
         case UBJsonReaderState::AT_KEY:
-            return JsonItem(UBJsonValue(std::string(tokenizer.token()),
+            return JsonItem(UBJsonValueItem(std::string(tokenizer.token()),
                                         tokenizer.tokenType()));
         default:
             UBJSON_READER_THROW("No key or value.", m_Members->tokenizer);
@@ -533,6 +554,22 @@ namespace Yson
         return m_Members->tokenizer.position();
     }
 
+    bool UBJsonReader::isExpandOptimizedByteArraysEnabled() const
+    {
+        return (currentScope().state.options
+                & UBJsonReaderOptions::EXPAND_OPTIMIZED_BYTE_ARRAYS) != 0;
+    }
+
+    UBJsonReader& UBJsonReader::setExpandOptimizedByteArraysEnabled(bool value)
+    {
+        auto& options = currentScope().state.options;
+        if (value)
+            options |= UBJsonReaderOptions::EXPAND_OPTIMIZED_BYTE_ARRAYS;
+        else
+            options &= ~UBJsonReaderOptions::EXPAND_OPTIMIZED_BYTE_ARRAYS;
+        return *this;
+    }
+
     void UBJsonReader::assertStateIsKeyOrValue() const
     {
         auto state = currentScope().state.state;
@@ -552,10 +589,34 @@ namespace Yson
         YSON_THROW("Uninitialized UBJsonReader.");
     }
 
-    JsonItem UBJsonReader::readArray()
+    JsonItem UBJsonReader::readArray(bool expandOptmizedByteArrays)
     {
         std::vector<JsonItem> values;
         const auto& tokenizer = m_Members->tokenizer;
+        const auto arrayType = tokenizer.tokenType();
+        if (arrayType == UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN
+            && !expandOptmizedByteArrays)
+        {
+            std::string str;
+            switch (tokenizer.contentType())
+            {
+            case UBJsonTokenType::CHAR_TOKEN:
+                if (readOptimizedArrayToString<char>(*this, str))
+                    return JsonItem(UBJsonValueItem(str, arrayType));
+                break;
+            case UBJsonTokenType::INT8_TOKEN:
+                if (readOptimizedArrayToString<int8_t>(*this, str))
+                    return JsonItem(UBJsonValueItem(str, arrayType));
+                break;
+            case UBJsonTokenType::UINT8_TOKEN:
+                if (readOptimizedArrayToString<uint8_t>(*this, str))
+                    return JsonItem(UBJsonValueItem(str, arrayType));
+                break;
+            default:
+                break;
+            }
+        }
+
         enter();
         while (true)
         {
@@ -566,23 +627,23 @@ namespace Yson
             {
             case UBJsonTokenType::START_OBJECT_TOKEN:
             case UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN:
-                values.push_back(readObject());
+                values.push_back(readObject(expandOptmizedByteArrays));
                 break;
             case UBJsonTokenType::START_ARRAY_TOKEN:
             case UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN:
-                values.push_back(readArray());
+                values.push_back(readArray(expandOptmizedByteArrays));
                 break;
             default:
-                values.emplace_back(UBJsonValue(std::string(tokenizer.token()),
+                values.emplace_back(UBJsonValueItem(std::string(tokenizer.token()),
                                                 tokenizer.tokenType()));
                 break;
             }
         }
         leave();
-        return JsonItem(std::make_shared<Array>(move(values)));
+        return JsonItem(std::make_shared<ArrayItem>(move(values)));
     }
 
-    JsonItem UBJsonReader::readObject()
+    JsonItem UBJsonReader::readObject(bool expandOptmizedByteArrays)
     {
         std::deque<std::string> keys;
         std::unordered_map<std::string_view, JsonItem> values;
@@ -615,21 +676,21 @@ namespace Yson
             {
             case UBJsonTokenType::START_OBJECT_TOKEN:
             case UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN:
-                values.insert_or_assign(key, readObject());
+                values.insert_or_assign(key, readObject(expandOptmizedByteArrays));
                 break;
             case UBJsonTokenType::START_ARRAY_TOKEN:
             case UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN:
-                values.insert_or_assign(key, readArray());
+                values.insert_or_assign(key, readArray(expandOptmizedByteArrays));
                 break;
             default:
                 values.insert_or_assign(key,
-                                        JsonItem(UBJsonValue(std::string(tokenizer.token()),
-                                                    tokenizer.tokenType())));
+                                        JsonItem(UBJsonValueItem(std::string(tokenizer.token()),
+                                                             tokenizer.tokenType())));
                 break;
             }
         }
         leave();
-        return JsonItem(std::make_shared<Object>(move(keys), move(values)));
+        return JsonItem(std::make_shared<ObjectItem>(move(keys), move(values)));
     }
 
     template <typename T>
@@ -643,17 +704,20 @@ namespace Yson
             UBJSON_READER_THROW("Current token is not an optimized array.",
                                 tokenizer);
         }
+
         if (tokenizer.tokenType()
             != UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN
             || tokenizer.contentType() != tokenType)
         {
             return false;
         }
+
         if (!buffer)
         {
             size = tokenizer.contentSize();
             return true;
         }
+
         if (size < tokenizer.contentSize())
             return false;
 
@@ -662,6 +726,7 @@ namespace Yson
             state.state = UBJsonReaderState::AFTER_VALUE;
             return true;
         }
+
         return false;
     }
 }
