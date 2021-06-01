@@ -6,7 +6,7 @@
 ## License text is included with the source distribution.
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.16)
-project(Yson VERSION 1.1.3 LANGUAGES CXX)
+project(Yson VERSION 1.2.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -38,18 +38,24 @@ configure_file(src/Yson/Common/YsonVersion.hpp.in YsonVersion.hpp @ONLY)
 
 add_library(Yson
     include/Yson/DetailedValueType.hpp
+    include/Yson/JsonItem.hpp
     include/Yson/JsonReader.hpp
+    include/Yson/JsonValueItem.hpp
     include/Yson/JsonWriter.hpp
+    include/Yson/ObjectItem.hpp
     include/Yson/Reader.hpp
     include/Yson/StructureParameters.hpp
     include/Yson/UBJsonReader.hpp
+    include/Yson/UBJsonValueItem.hpp
     include/Yson/UBJsonValueType.hpp
     include/Yson/UBJsonWriter.hpp
+    include/Yson/ValueItem.hpp
     include/Yson/ValueType.hpp
     include/Yson/Writer.hpp
     include/Yson/YsonDefinitions.hpp
     include/Yson/YsonException.hpp
     include/Yson/YsonReaderException.hpp
+    src/Yson/Common/ArrayItem.cpp
     src/Yson/Common/AssignInteger.hpp
     src/Yson/Common/Base64.cpp
     src/Yson/Common/Base64.hpp
@@ -66,7 +72,9 @@ add_library(Yson
     src/Yson/Common/GetValueType.hpp
     src/Yson/Common/IsJavaScriptIdentifier.cpp
     src/Yson/Common/IsJavaScriptIdentifier.hpp
+    src/Yson/Common/JsonItem.cpp
     src/Yson/Common/MakeReader.cpp
+    src/Yson/Common/ObjectItem.cpp
     src/Yson/Common/ParseFloatingPoint.cpp
     src/Yson/Common/ParseFloatingPoint.hpp
     src/Yson/Common/ParseInteger.cpp
@@ -97,6 +105,7 @@ add_library(Yson
     src/Yson/JsonReader/JsonTokenizerUtilities.cpp
     src/Yson/JsonReader/JsonTokenType.cpp
     src/Yson/JsonReader/JsonTokenType.hpp
+    src/Yson/JsonReader/JsonValueItem.cpp
     src/Yson/JsonReader/TextBufferReader.hpp
     src/Yson/JsonReader/TextBufferReader.cpp
     src/Yson/JsonReader/TextFileReader.hpp
@@ -139,13 +148,14 @@ add_library(Yson
     src/Yson/UBJsonReader/UBJsonTokenizerUtilities.hpp
     src/Yson/UBJsonReader/UBJsonTokenType.cpp
     src/Yson/UBJsonReader/UBJsonTokenType.hpp
+    src/Yson/UBJsonReader/UBJsonValueItem.cpp
     src/Yson/UBJsonWriter/AssignFloat.hpp
     src/Yson/UBJsonWriter/UBJsonValueTraits.hpp
     src/Yson/UBJsonWriter/UBJsonWriter.cpp
     src/Yson/UBJsonWriter/UBJsonWriterUtilities.cpp
     src/Yson/UBJsonWriter/UBJsonWriterUtilities.hpp
     $<TARGET_OBJECTS:Yson_Yconvert>
-    include/Yson/JsonItem.hpp src/Yson/Common/JsonItem.cpp include/Yson/JsonValueItem.hpp include/Yson/ObjectItem.hpp src/Yson/JsonReader/JsonValueItem.cpp src/Yson/Common/ObjectItem.cpp src/Yson/Common/ArrayItem.cpp include/Yson/ValueItem.hpp include/Yson/UBJsonValueItem.hpp src/Yson/UBJsonReader/UBJsonValueItem.cpp)
+    )
 
 target_compile_definitions(Yson
     PRIVATE
@@ -161,11 +171,6 @@ target_include_directories(Yson BEFORE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/external/Yconvert/include
     )
-
-#target_link_libraries(Yson
-#    PRIVATE
-#        Yconvert::Yconvert
-#    )
 
 target_compile_definitions(Yson
     PRIVATE

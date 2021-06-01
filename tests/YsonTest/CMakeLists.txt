@@ -21,6 +21,7 @@ add_executable(YsonTest
     test_Base64.cpp
     test_GetValueType.cpp
     test_IsJavaScriptIdentifier.cpp
+    test_JsonItem.cpp
     test_JsonReader.cpp
     test_JsonTokenizer.cpp
     test_JsonWriter.cpp
@@ -29,7 +30,7 @@ add_executable(YsonTest
     test_UBJsonReader.cpp
     test_UBJsonTokenizer.cpp
     test_UBJsonWriter.cpp
-    test_JsonItem.cpp)
+    )
 
 target_include_directories(YsonTest BEFORE
     PRIVATE
