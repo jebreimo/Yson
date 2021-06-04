@@ -5,14 +5,14 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include "JsonReaderState.hpp"
+#include "Yson/ReaderState.hpp"
 
 namespace Yson
 {
     #define CASE_TYPE(value) \
-        case JsonReaderState::value: return #value
+        case ReaderState::value: return #value
 
-    std::string toString(JsonReaderState state)
+    std::string toString(ReaderState state)
     {
         switch (state)
         {
@@ -23,8 +23,12 @@ namespace Yson
         CASE_TYPE(AT_VALUE);
         CASE_TYPE(AFTER_VALUE);
         CASE_TYPE(AT_END);
-        CASE_TYPE(FATAL_ERROR);
         }
         return "<unknown state: " + std::to_string(int(state)) + ">";
+    }
+
+    std::ostream& operator<<(std::ostream& stream, ReaderState state)
+    {
+        return stream << toString(state);
     }
 }

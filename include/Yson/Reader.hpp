@@ -14,6 +14,7 @@
 #include "DetailedValueType.hpp"
 #include "JsonItem.hpp"
 #include "ObjectItem.hpp"
+#include "ReaderState.hpp"
 #include "ValueType.hpp"
 #include "YsonReaderException.hpp"
 
@@ -58,11 +59,20 @@ namespace Yson
 
         virtual void leave() = 0;
 
-        virtual ValueType valueType(bool analyzeStrings = false) const = 0;
+        [[nodiscard]]
+        virtual ValueType valueType() const = 0;
 
+        [[nodiscard]]
+        virtual ValueType valueType(bool analyzeStrings) const = 0;
+
+        [[nodiscard]]
+        virtual DetailedValueType detailedValueType() const = 0;
+
+        [[nodiscard]]
         virtual DetailedValueType detailedValueType(
-                bool analyzeStrings = false) const = 0;
+                bool analyzeStrings) const = 0;
 
+        [[nodiscard]]
         virtual bool readNull() const = 0;
 
         virtual bool read(bool& value) const = 0;
@@ -99,11 +109,20 @@ namespace Yson
 
         virtual JsonItem readCurrentItem() = 0;
 
+        [[nodiscard]]
         virtual std::string fileName() const = 0;
 
+        [[nodiscard]]
         virtual size_t lineNumber() const = 0;
 
+        [[nodiscard]]
         virtual size_t columnNumber() const = 0;
+
+        [[nodiscard]]
+        virtual ReaderState state() const = 0;
+
+        [[nodiscard]]
+        virtual std::string scope() const = 0;
     };
 
     template <typename T>

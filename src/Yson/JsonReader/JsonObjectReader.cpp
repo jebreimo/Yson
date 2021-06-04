@@ -11,79 +11,84 @@
 
 namespace Yson
 {
-    std::pair<JsonReaderState, bool>
+    std::pair<ReaderState, bool>
     JsonObjectReader::nextKey(JsonTokenizer& tokenizer,
-                              JsonReaderState state)
+                              ReaderState state)
     {
         switch (state)
         {
-        case JsonReaderState::AT_START:
+        case ReaderState::AT_START:
             if (readKey(tokenizer, JsonTokenType::END_OBJECT))
-                return {JsonReaderState::AT_KEY, true};
+                return {ReaderState::AT_KEY, true};
             else
-                return {JsonReaderState::AT_END, false};
-        case JsonReaderState::AT_KEY:
+                return {ReaderState::AT_END, false};
+        case ReaderState::AT_KEY:
             readColon(tokenizer);
             if (!tokenizer.next())
                 JSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer);
             //[[fallthrough]]
-        case JsonReaderState::AT_VALUE:
+        case ReaderState::AT_VALUE:
             skipValue(tokenizer);
             //[[fallthrough]]
-        case JsonReaderState::AFTER_VALUE:
+        case ReaderState::AFTER_VALUE:
             if (!readComma(tokenizer, JsonTokenType::END_OBJECT))
-                return {JsonReaderState::AT_END, false};
+                return {ReaderState::AT_END, false};
             if (readKey(tokenizer, JsonTokenType::END_OBJECT))
-                return {JsonReaderState::AT_KEY, true};
+                return {ReaderState::AT_KEY, true};
             else
-                return {JsonReaderState::AT_END, false};
-        case JsonReaderState::AT_END:
-            return {JsonReaderState::AT_END, false};
+                return {ReaderState::AT_END, false};
+        case ReaderState::AT_END:
+            return {ReaderState::AT_END, false};
         default:
             JSON_READER_THROW("Invalid state: " + toString(state) + ".",
                               tokenizer);
         }
     }
 
-    std::pair<JsonReaderState, bool>
+    std::pair<ReaderState, bool>
     JsonObjectReader::nextValue(JsonTokenizer& tokenizer,
-                                JsonReaderState state)
+                                ReaderState state)
     {
         switch (state)
         {
-        case JsonReaderState::AT_START:
+        case ReaderState::AT_START:
             if (!readKey(tokenizer, JsonTokenType::END_OBJECT))
-                return {JsonReaderState::AT_END, false};
+                return {ReaderState::AT_END, false};
             readColon(tokenizer);
             readStartOfValue(tokenizer);
-            return {JsonReaderState::AT_VALUE, true};
-        case JsonReaderState::AT_VALUE:
+            return {ReaderState::AT_VALUE, true};
+        case ReaderState::AT_VALUE:
             skipValue(tokenizer);
             [[fallthrough]];
-        case JsonReaderState::AFTER_VALUE:
+        case ReaderState::AFTER_VALUE:
             if (!readComma(tokenizer, JsonTokenType::END_OBJECT))
-                return {JsonReaderState::AT_END, false};
+                return {ReaderState::AT_END, false};
             if (!readKey(tokenizer, JsonTokenType::END_OBJECT))
-                return {JsonReaderState::AT_END, false};
+                return {ReaderState::AT_END, false};
             [[fallthrough]];
-        case JsonReaderState::AT_KEY:
+        case ReaderState::AT_KEY:
             readColon(tokenizer);
             readStartOfValue(tokenizer);
-            return {JsonReaderState::AT_VALUE, true};
-        case JsonReaderState::AT_END:
-            return {JsonReaderState::AT_END, false};
+            return {ReaderState::AT_VALUE, true};
+        case ReaderState::AT_END:
+            return {ReaderState::AT_END, false};
         default:
             JSON_READER_THROW("Invalid state: " + toString(state) + ".",
                               tokenizer);
         }
     }
 
-    std::pair<JsonReaderState, bool>
+    std::pair<ReaderState, bool>
     JsonObjectReader::nextDocument(JsonTokenizer& tokenizer,
-                                   JsonReaderState state)
+                                   ReaderState state)
     {
         JSON_READER_THROW(
                 "Cannot call this function inside arrays or objects.",
                 tokenizer);
+    }
+
+    char JsonObjectReader::scopeType() const
+    {
+        return '{';
     }
 }

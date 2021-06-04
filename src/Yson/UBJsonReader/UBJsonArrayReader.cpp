@@ -23,17 +23,17 @@ namespace Yson
     {
         switch (state.state)
         {
-        case UBJsonReaderState::AT_VALUE:
+        case ReaderState::AT_VALUE:
             skipValue(tokenizer);
             //[[fallthrough]]
-        case UBJsonReaderState::AT_START:
-        case UBJsonReaderState::AFTER_VALUE:
+        case ReaderState::AT_START:
+        case ReaderState::AFTER_VALUE:
             if (readStartOfValue(tokenizer, UBJsonTokenType::END_ARRAY_TOKEN))
             {
-                state.state = UBJsonReaderState::AT_VALUE;
+                state.state = ReaderState::AT_VALUE;
                 return true;
             }
-            state.state = UBJsonReaderState::AT_END;
+            state.state = ReaderState::AT_END;
             //[[fallthrough]]
         default:
             return false;
@@ -46,5 +46,10 @@ namespace Yson
         UBJSON_READER_THROW(
                 "Cannot call this function inside arrays.",
                 tokenizer);
+    }
+
+    char UBJsonArrayReader::scopeType() const
+    {
+        return '[';
     }
 }

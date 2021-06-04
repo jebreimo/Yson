@@ -9,6 +9,7 @@
 
 #include <string>
 #include "Yson/DetailedValueType.hpp"
+#include "Yson/ReaderState.hpp"
 #include "UBJsonTokenType.hpp"
 
 namespace Yson
@@ -20,26 +21,15 @@ namespace Yson
 
     struct UBJsonReaderState
     {
-        enum State
-        {
-            INITIAL_STATE,
-            AT_END_OF_FILE,
-            AT_START,
-            AT_KEY,
-            AT_VALUE,
-            AFTER_VALUE,
-            AT_END
-        };
-
         UBJsonReaderState() = default;
 
-        UBJsonReaderState(State state,
+        UBJsonReaderState(ReaderState state,
                           unsigned options)
                 : state(state),
                   options(options)
         {}
 
-        UBJsonReaderState(State state,
+        UBJsonReaderState(ReaderState state,
                           size_t valueCount,
                           UBJsonTokenType valueType,
                           unsigned options)
@@ -52,9 +42,7 @@ namespace Yson
         size_t valueCount = 0;
         size_t valueIndex = 0;
         UBJsonTokenType valueType = UBJsonTokenType::UNKNOWN_TOKEN;
-        State state = INITIAL_STATE;
+        ReaderState state = ReaderState::INITIAL_STATE;
         unsigned options = EXPAND_OPTIMIZED_BYTE_ARRAYS;
     };
-
-    std::string toString(UBJsonReaderState::State state);
 }

@@ -7,7 +7,6 @@
 //****************************************************************************
 #include "Yson/JsonReader.hpp"
 
-#include <stack>
 #include "Yson/ArrayItem.hpp"
 #include "Yson/ObjectItem.hpp"
 #include "Yson/Common/Base64.hpp"
@@ -31,14 +30,14 @@ namespace Yson
         {}
 
         JsonTokenizer tokenizer;
-        std::stack<std::pair<JsonScopeReader*, JsonReaderState>> scopes;
+        std::vector<std::pair<JsonScopeReader*, ReaderState>> scopes;
         JsonArrayReader arrayReader;
         JsonDocumentReader documentReader;
         JsonObjectReader objectReader;
 
-        JsonReaderState& currentState()
+        ReaderState& currentState()
         {
-            return scopes.top().second;
+            return scopes.back().second;
         }
     };
 
@@ -51,15 +50,15 @@ namespace Yson
     JsonReader::JsonReader(const std::string& fileName)
             : m_Members(new Members(JsonTokenizer(fileName)))
     {
-        m_Members->scopes.push({&m_Members->documentReader,
-                                JsonReaderState::INITIAL_STATE});
+        m_Members->scopes.emplace_back(&m_Members->documentReader,
+                                       ReaderState::INITIAL_STATE);
     }
 
     JsonReader::JsonReader(const char* buffer, size_t bufferSize)
             : m_Members(new Members(JsonTokenizer(buffer, bufferSize)))
     {
-        m_Members->scopes.push({&m_Members->documentReader,
-                                JsonReaderState::INITIAL_STATE});
+        m_Members->scopes.emplace_back(&m_Members->documentReader,
+                                       ReaderState::INITIAL_STATE);
     }
 
     JsonReader::JsonReader(std::istream& stream,
@@ -67,8 +66,8 @@ namespace Yson
                            size_t bufferSize)
             : m_Members(new Members(JsonTokenizer(stream, buffer, bufferSize)))
     {
-        m_Members->scopes.push({&m_Members->documentReader,
-                                JsonReaderState::INITIAL_STATE});
+        m_Members->scopes.emplace_back(&m_Members->documentReader,
+                                       ReaderState::INITIAL_STATE);
     }
 
     JsonReader::~JsonReader() = default;
@@ -79,7 +78,7 @@ namespace Yson
 
     bool JsonReader::nextDocument()
     {
-        auto& scope = m_Members->scopes.top();
+        auto& scope = m_Members->scopes.back();
         auto result = scope.first->nextDocument(m_Members->tokenizer,
                                                 scope.second);
         scope.second = result.first;
@@ -88,7 +87,7 @@ namespace Yson
 
     bool JsonReader::nextKey()
     {
-        auto& scope = m_Members->scopes.top();
+        auto& scope = m_Members->scopes.back();
         auto result = scope.first->nextKey(m_Members->tokenizer,
                                            scope.second);
         scope.second = result.first;
@@ -97,7 +96,7 @@ namespace Yson
 
     bool JsonReader::nextValue()
     {
-        auto& scope = m_Members->scopes.top();
+        auto& scope = m_Members->scopes.back();
         auto result = scope.first->nextValue(m_Members->tokenizer,
                                              scope.second);
         scope.second = result.first;
@@ -107,9 +106,9 @@ namespace Yson
     void JsonReader::enter()
     {
         auto state = m_Members->currentState();
-        auto tokenType = m_Members->tokenizer.tokenType();
-        if (state == JsonReaderState::AT_VALUE)
+        if (state == ReaderState::AT_VALUE)
         {
+            auto tokenType = m_Members->tokenizer.tokenType();
             JsonScopeReader* nextReader;
             if (tokenType == JsonTokenType::START_OBJECT)
                 nextReader = &m_Members->objectReader;
@@ -119,7 +118,7 @@ namespace Yson
                 JSON_READER_THROW(
                         "There is no object or array to be entered.",
                         m_Members->tokenizer);
-            m_Members->scopes.push({nextReader, JsonReaderState::AT_START});
+            m_Members->scopes.emplace_back(nextReader, ReaderState::AT_START);
         }
         else
         {
@@ -136,9 +135,9 @@ namespace Yson
                     "Cannot call leave() when not inside an array or object",
                     m_Members->tokenizer);
         }
-        if (m_Members->currentState() != JsonReaderState::AT_END)
+        if (m_Members->currentState() != ReaderState::AT_END)
         {
-            auto& scope = m_Members->scopes.top();
+            auto& scope = m_Members->scopes.back();
             while (true)
             {
                 auto result = scope.first->nextValue(m_Members->tokenizer,
@@ -148,8 +147,8 @@ namespace Yson
                     break;
             }
         }
-        m_Members->scopes.pop();
-        m_Members->currentState() = JsonReaderState::AFTER_VALUE;
+        m_Members->scopes.pop_back();
+        m_Members->currentState() = ReaderState::AFTER_VALUE;
     }
 
     ValueType JsonReader::valueType() const
@@ -178,7 +177,7 @@ namespace Yson
             {
                 auto type = getValueType(m_Members->tokenizer.token());
                 if (type != ValueType::INVALID
-                    || m_Members->currentState() != JsonReaderState::AT_KEY
+                    || m_Members->currentState() != ReaderState::AT_KEY
                     || !isJavaScriptIdentifier(m_Members->tokenizer.token()))
                 {
                     return type;
@@ -217,7 +216,7 @@ namespace Yson
             {
                 auto type = getDetailedValueType(m_Members->tokenizer.token());
                 if (type != DetailedValueType::INVALID
-                    || m_Members->currentState() != JsonReaderState::AT_KEY
+                    || m_Members->currentState() != ReaderState::AT_KEY
                     || !isJavaScriptIdentifier(m_Members->tokenizer.token()))
                 {
                     return type;
@@ -375,7 +374,7 @@ namespace Yson
     bool JsonReader::readBinary(void* buffer, size_t& size)
     {
         auto state = m_Members->currentState();
-        if (state != JsonReaderState::AT_VALUE)
+        if (state != ReaderState::AT_VALUE)
         {
             JSON_READER_THROW("Current token is not a key or a value.",
                               m_Members->tokenizer);
@@ -459,12 +458,12 @@ namespace Yson
         auto& tokenizer = m_Members->tokenizer;
         switch (m_Members->currentState())
         {
-        case JsonReaderState::INITIAL_STATE:
-        case JsonReaderState::AT_START:
+        case ReaderState::INITIAL_STATE:
+        case ReaderState::AT_START:
             if (!nextValue())
                 JSON_READER_THROW("Document is empty.", tokenizer);
             [[fallthrough]];
-        case JsonReaderState::AT_VALUE:
+        case ReaderState::AT_VALUE:
         {
             auto tType = tokenizer.tokenType();
             if (tType == JsonTokenType::START_OBJECT)
@@ -474,7 +473,7 @@ namespace Yson
             else
                 return JsonItem(JsonValueItem(tokenizer.tokenString(), tType));
         }
-        case JsonReaderState::AT_KEY:
+        case ReaderState::AT_KEY:
             return JsonItem(JsonValueItem(tokenizer.tokenString(),
                                       tokenizer.tokenType()));
         default:
@@ -485,8 +484,8 @@ namespace Yson
     void JsonReader::assertStateIsKeyOrValue() const
     {
         auto state = m_Members->currentState();
-        if (state != JsonReaderState::AT_KEY
-            && state != JsonReaderState::AT_VALUE)
+        if (state != ReaderState::AT_KEY
+            && state != ReaderState::AT_VALUE)
         {
             JSON_READER_THROW("Current token is not a key or a value.",
                               m_Members->tokenizer);
@@ -542,5 +541,22 @@ namespace Yson
         if (currentTokenIsValue())
             return parse(m_Members->tokenizer.token(), value);
         return false;
+    }
+
+    ReaderState JsonReader::state() const
+    {
+        return m_Members->currentState();
+    }
+
+    std::string JsonReader::scope() const
+    {
+        std::string result;
+        for (auto& scope : m_Members->scopes)
+        {
+            if (auto c = scope.first->scopeType())
+                result.push_back(c);
+
+        }
+        return result;
     }
 }

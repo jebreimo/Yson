@@ -6,7 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
-#include "JsonReaderState.hpp"
+#include "Yson/ReaderState.hpp"
 #include "JsonTokenizer.hpp"
 
 namespace Yson
@@ -14,16 +14,18 @@ namespace Yson
     class JsonScopeReader
     {
     public:
-        virtual std::pair<JsonReaderState, bool> nextKey(
-                JsonTokenizer& tokenizer,
-                JsonReaderState state) = 0;
+        virtual char scopeType() const = 0;
 
-        virtual std::pair<JsonReaderState, bool> nextValue(
+        virtual std::pair<ReaderState, bool> nextKey(
                 JsonTokenizer& tokenizer,
-                JsonReaderState state) = 0;
+                ReaderState state) = 0;
 
-        virtual std::pair<JsonReaderState, bool> nextDocument(
+        virtual std::pair<ReaderState, bool> nextValue(
                 JsonTokenizer& tokenizer,
-                JsonReaderState state) = 0;
+                ReaderState state) = 0;
+
+        virtual std::pair<ReaderState, bool> nextDocument(
+                JsonTokenizer& tokenizer,
+                ReaderState state) = 0;
     };
 }

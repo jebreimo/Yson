@@ -14,16 +14,18 @@ namespace Yson
     class JsonDocumentReader : public JsonScopeReader
     {
     public:
-        std::pair<JsonReaderState, bool> nextKey(
+        std::pair<ReaderState, bool> nextKey(
                 JsonTokenizer& tokenizer,
-                JsonReaderState state) override;
+                ReaderState state) override;
 
-        std::pair<JsonReaderState, bool> nextValue(
+        std::pair<ReaderState, bool> nextValue(
                 JsonTokenizer& tokenizer,
-                JsonReaderState state) override;
+                ReaderState state) override;
 
-        std::pair<JsonReaderState, bool> nextDocument(
+        std::pair<ReaderState, bool> nextDocument(
                 JsonTokenizer& tokenizer,
-                JsonReaderState state) override;
+                ReaderState state) override;
+
+        char scopeType() const override;
     };
 }

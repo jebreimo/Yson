@@ -50,13 +50,13 @@ namespace Yson
         void leave() override;
 
         [[nodiscard]]
-        ValueType valueType() const;
+        ValueType valueType() const override;
 
         [[nodiscard]]
         ValueType valueType(bool analyzeStrings) const override;
 
         [[nodiscard]]
-        DetailedValueType detailedValueType() const;
+        DetailedValueType detailedValueType() const override;
 
         [[nodiscard]]
         DetailedValueType detailedValueType(
@@ -132,6 +132,10 @@ namespace Yson
 
         [[nodiscard]]
         size_t columnNumber() const override;
+
+        ReaderState state() const override;
+
+        std::string scope() const override;
 
         bool isExpandOptimizedByteArraysEnabled() const;
 

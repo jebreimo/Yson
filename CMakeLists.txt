@@ -6,7 +6,7 @@
 ## License text is included with the source distribution.
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.16)
-project(Yson VERSION 1.2.0 LANGUAGES CXX)
+project(Yson VERSION 1.3.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -44,6 +44,8 @@ add_library(Yson
     include/Yson/JsonWriter.hpp
     include/Yson/ObjectItem.hpp
     include/Yson/Reader.hpp
+    include/Yson/ReaderIterators.hpp
+    include/Yson/ReaderState.hpp
     include/Yson/StructureParameters.hpp
     include/Yson/UBJsonReader.hpp
     include/Yson/UBJsonValueItem.hpp
@@ -79,6 +81,8 @@ add_library(Yson
     src/Yson/Common/ParseFloatingPoint.hpp
     src/Yson/Common/ParseInteger.cpp
     src/Yson/Common/ParseInteger.hpp
+    src/Yson/Common/ReaderIterators.cpp
+    src/Yson/Common/ReaderState.cpp
     src/Yson/Common/SelectTypeIf.hpp
     src/Yson/Common/StringView.hpp
     src/Yson/Common/ThrowYsonException.hpp
@@ -94,8 +98,6 @@ add_library(Yson
     src/Yson/JsonReader/JsonObjectReader.hpp
     src/Yson/JsonReader/JsonReader.cpp
     src/Yson/JsonReader/ThrowJsonReaderException.hpp
-    src/Yson/JsonReader/JsonReaderState.cpp
-    src/Yson/JsonReader/JsonReaderState.hpp
     src/Yson/JsonReader/JsonScopeReader.hpp
     src/Yson/JsonReader/JsonScopeReaderUtilities.cpp
     src/Yson/JsonReader/JsonScopeReaderUtilities.hpp
@@ -136,7 +138,6 @@ add_library(Yson
     src/Yson/UBJsonReader/UBJsonOptimizedObjectReader.hpp
     src/Yson/UBJsonReader/UBJsonReader.cpp
     src/Yson/UBJsonReader/ThrowUBJsonReaderException.hpp
-    src/Yson/UBJsonReader/UBJsonReaderState.cpp
     src/Yson/UBJsonReader/UBJsonReaderState.hpp
     src/Yson/UBJsonReader/UBJsonReaderUtilities.cpp
     src/Yson/UBJsonReader/UBJsonReaderUtilities.hpp

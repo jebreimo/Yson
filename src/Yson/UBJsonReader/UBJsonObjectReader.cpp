@@ -16,23 +16,23 @@ namespace Yson
     {
         switch (state.state)
         {
-        case UBJsonReaderState::AT_KEY:
+        case ReaderState::AT_KEY:
             if (!tokenizer.next())
                 UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer);
             //[[fallthrough]]
-        case UBJsonReaderState::AT_VALUE:
+        case ReaderState::AT_VALUE:
             skipValue(tokenizer);
             //[[fallthrough]]
-        case UBJsonReaderState::AT_START:
-        case UBJsonReaderState::AFTER_VALUE:
+        case ReaderState::AT_START:
+        case ReaderState::AFTER_VALUE:
             if (readKey(tokenizer))
             {
-                state.state = UBJsonReaderState::AT_KEY;
+                state.state = ReaderState::AT_KEY;
                 return true;
             }
             else
             {
-                state.state = UBJsonReaderState::AT_END;
+                state.state = ReaderState::AT_END;
                 return false;
             }
         default:
@@ -45,21 +45,21 @@ namespace Yson
     {
         switch (state.state)
         {
-        case UBJsonReaderState::AT_VALUE:
+        case ReaderState::AT_VALUE:
             skipValue(tokenizer);
             //[[fallthrough]]
-        case UBJsonReaderState::AT_START:
-        case UBJsonReaderState::AFTER_VALUE:
+        case ReaderState::AT_START:
+        case ReaderState::AFTER_VALUE:
             if (!readKey(tokenizer))
             {
-                state.state = UBJsonReaderState::AT_END;
+                state.state = ReaderState::AT_END;
                 return false;
             }
             //[[fallthrough]]
-        case UBJsonReaderState::AT_KEY:
+        case ReaderState::AT_KEY:
             if (readStartOfValue(tokenizer))
             {
-                state.state = UBJsonReaderState::AT_VALUE;
+                state.state = ReaderState::AT_VALUE;
                 return true;
             }
             UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer);
@@ -74,5 +74,10 @@ namespace Yson
         UBJSON_READER_THROW(
                 "Cannot call this function inside objects.",
                 tokenizer);
+    }
+
+    char UBJsonObjectReader::scopeType() const
+    {
+        return '{';
     }
 }

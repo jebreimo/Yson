@@ -30,7 +30,7 @@ add_executable(YsonTest
     test_UBJsonReader.cpp
     test_UBJsonTokenizer.cpp
     test_UBJsonWriter.cpp
-    )
+    test_ReaderIterators.cpp)
 
 target_include_directories(YsonTest BEFORE
     PRIVATE

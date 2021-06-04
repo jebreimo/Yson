@@ -7,11 +7,12 @@
 //****************************************************************************
 #pragma once
 
+#include <iosfwd>
 #include <string>
 
 namespace Yson
 {
-    enum class JsonReaderState
+    enum class ReaderState
     {
         INITIAL_STATE,
         AT_END_OF_FILE,
@@ -19,9 +20,10 @@ namespace Yson
         AT_KEY,
         AT_VALUE,
         AFTER_VALUE,
-        AT_END,
-        FATAL_ERROR
+        AT_END
     };
 
-    std::string toString(JsonReaderState state);
+    std::string toString(ReaderState state);
+
+    std::ostream& operator<<(std::ostream& stream, ReaderState state);
 }

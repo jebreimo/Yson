@@ -19,8 +19,14 @@ namespace
         char text[] = R"({"key": 123, "key2": "value"})";
         JsonReader reader(text, sizeof(text));
 
+        Y_EQUAL(reader.state(), ReaderState::INITIAL_STATE);
+        Y_EQUAL(reader.scope(), "");
         Y_ASSERT(reader.nextValue());
+        Y_EQUAL(reader.state(), ReaderState::AT_VALUE);
+        Y_EQUAL(reader.scope(), "");
         reader.enter();
+        Y_EQUAL(reader.state(), ReaderState::AT_START);
+        Y_EQUAL(reader.scope(), "{");
         Y_ASSERT(reader.nextKey());
         Y_EQUAL(read<std::string>(reader), "key");
         Y_EQUAL(reader.valueType(true), ValueType::STRING);
@@ -34,8 +40,12 @@ namespace
         Y_ASSERT(!reader.nextKey());
         Y_ASSERT(!reader.nextKey());
         reader.leave();
+        Y_EQUAL(reader.state(), ReaderState::AFTER_VALUE);
+        Y_EQUAL(reader.scope(), "");
         Y_ASSERT(!reader.nextValue());
+        Y_EQUAL(reader.state(), ReaderState::AFTER_VALUE);
         Y_ASSERT(!reader.nextDocument());
+        Y_EQUAL(reader.state(), ReaderState::AT_END_OF_FILE);
     }
 
     void doReadBase64(const std::string& str,

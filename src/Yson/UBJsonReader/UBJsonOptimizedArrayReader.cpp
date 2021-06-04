@@ -21,7 +21,7 @@ namespace Yson
     bool UBJsonOptimizedArrayReader::nextValue(UBJsonTokenizer& tokenizer,
                                                UBJsonReaderState& state)
     {
-        if (state.state == UBJsonReaderState::AT_VALUE)
+        if (state.state == ReaderState::AT_VALUE)
             skipValue(tokenizer);
         if (state.valueIndex < state.valueCount)
         {
@@ -30,7 +30,7 @@ namespace Yson
             {
                 if (tokenizer.next(state.valueType))
                 {
-                    state.state = UBJsonReaderState::AT_VALUE;
+                    state.state = ReaderState::AT_VALUE;
                     return true;
                 }
                 UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer);
@@ -39,7 +39,7 @@ namespace Yson
             {
                 if (isValueToken(tokenizer.tokenType()))
                 {
-                    state.state = UBJsonReaderState::AT_VALUE;
+                    state.state = ReaderState::AT_VALUE;
                     return true;
                 }
                 UBJSON_READER_UNEXPECTED_TOKEN(tokenizer);
@@ -48,7 +48,7 @@ namespace Yson
         }
         else
         {
-            state.state = UBJsonReaderState::AT_END;
+            state.state = ReaderState::AT_END;
             return false;
         }
     }
@@ -58,5 +58,10 @@ namespace Yson
     {
         UBJSON_READER_THROW("Cannot call this function inside arrays.",
                             tokenizer);
+    }
+
+    char UBJsonOptimizedArrayReader::scopeType() const
+    {
+        return '[';
     }
 }

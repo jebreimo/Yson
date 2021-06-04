@@ -22,7 +22,6 @@ namespace Yson
         bool nextDocument(UBJsonTokenizer& tokenizer,
                           UBJsonReaderState& state) override;
 
-    public:
-    private:
+        char scopeType() const override;
     };
 }

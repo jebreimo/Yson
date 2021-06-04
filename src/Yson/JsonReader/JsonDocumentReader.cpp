@@ -12,70 +12,75 @@
 
 namespace Yson
 {
-    std::pair<JsonReaderState, bool> JsonDocumentReader::nextKey(
+    std::pair<ReaderState, bool> JsonDocumentReader::nextKey(
             JsonTokenizer& tokenizer,
-            JsonReaderState /*state*/)
+            ReaderState /*state*/)
     {
         JSON_READER_THROW("This function can only be called inside objects.",
                           tokenizer);
     }
 
-    std::pair<JsonReaderState, bool> JsonDocumentReader::nextValue(
+    std::pair<ReaderState, bool> JsonDocumentReader::nextValue(
             JsonTokenizer& tokenizer,
-            JsonReaderState state)
+            ReaderState state)
     {
         switch (state)
         {
-        case JsonReaderState::INITIAL_STATE:
+        case ReaderState::INITIAL_STATE:
             if (!tokenizer.next())
-                return {JsonReaderState::AT_END_OF_FILE, false};
+                return {ReaderState::AT_END_OF_FILE, false};
             [[fallthrough]];
-        case JsonReaderState::AT_START:
+        case ReaderState::AT_START:
             if (isValueToken(tokenizer.tokenType()))
-                return {JsonReaderState::AT_VALUE, true};
+                return {ReaderState::AT_VALUE, true};
             JSON_READER_THROW(
                     "Unexpected token '" + tokenizer.tokenString() + "'.",
                     tokenizer);
-        case JsonReaderState::AT_END:
-        case JsonReaderState::AT_END_OF_FILE:
-        case JsonReaderState::AFTER_VALUE:
+        case ReaderState::AT_END:
+        case ReaderState::AT_END_OF_FILE:
+        case ReaderState::AFTER_VALUE:
             return {state, false};
-        case JsonReaderState::AT_VALUE:
+        case ReaderState::AT_VALUE:
             skipValue(tokenizer);
             if (!tokenizer.next())
-                return {JsonReaderState::AT_END_OF_FILE, false};
-            return {JsonReaderState::AT_END, false};
+                return {ReaderState::AT_END_OF_FILE, false};
+            return {ReaderState::AT_END, false};
         default:
             JSON_READER_THROW("Invalid state: " + toString(state) + ".",
                               tokenizer);
         };
     }
 
-    std::pair<JsonReaderState, bool> JsonDocumentReader::nextDocument(
+    std::pair<ReaderState, bool> JsonDocumentReader::nextDocument(
             JsonTokenizer& tokenizer,
-            JsonReaderState state)
+            ReaderState state)
     {
         switch (state)
         {
-        case JsonReaderState::INITIAL_STATE:
+        case ReaderState::INITIAL_STATE:
             if (!tokenizer.next())
-                return {JsonReaderState::AT_END_OF_FILE, false};
-            return {JsonReaderState::AT_START, true};
-        case JsonReaderState::AT_END_OF_FILE:
-            return {JsonReaderState::AT_END_OF_FILE, false};
-        case JsonReaderState::AT_VALUE:
-        case JsonReaderState::AT_START:
+                return {ReaderState::AT_END_OF_FILE, false};
+            return {ReaderState::AT_START, true};
+        case ReaderState::AT_END_OF_FILE:
+            return {ReaderState::AT_END_OF_FILE, false};
+        case ReaderState::AT_VALUE:
+        case ReaderState::AT_START:
             skipValue(tokenizer);
             [[fallthrough]];
-        case JsonReaderState::AFTER_VALUE:
+        case ReaderState::AFTER_VALUE:
             if (!tokenizer.next())
-                return {JsonReaderState::AT_END_OF_FILE, false};
+                return {ReaderState::AT_END_OF_FILE, false};
             [[fallthrough]];
-        case JsonReaderState::AT_END:
-            return {JsonReaderState::AT_START, true};
+        case ReaderState::AT_END:
+            return {ReaderState::AT_START, true};
         default:
             JSON_READER_THROW("Invalid state: " + toString(state) + ".",
                               tokenizer);
-        };
+        }
+    }
+
+    char JsonDocumentReader::scopeType() const
+    {
+        return '\0';
     }
 }
