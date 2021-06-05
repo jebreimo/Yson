@@ -8,6 +8,7 @@
 #pragma once
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace Yson
 {
@@ -19,70 +20,32 @@ namespace Yson
         #endif
     #endif
 
-    /** @brief The exception class used by all functions in the Yson library.
+    /** @brief The base class for all exceptions thrown in the Yson library.
       */
     class YsonException : public std::runtime_error
     {
     public:
-        explicit YsonException(const std::string& msg)
-            : std::runtime_error(msg)
+        /**
+         * @brief Passes @a message on to the base class.
+         */
+        explicit YsonException(const std::string& message,
+                               const std::string& debugLocation) noexcept
+            : std::runtime_error(debugLocation + ": " + message),
+              message(message)
         {}
 
-        YsonException(const std::string& msg,
-                      const std::string& debugFileName,
-                      int debugLineNumber,
-                      const std::string& debugFunctionName)
-            : std::runtime_error(msg)
-        {
-            if (!debugFunctionName.empty())
-                m_DebugLocation += debugFunctionName + "() in ";
-            m_DebugLocation += debugFileName + ":"
-                               + std::to_string(debugLineNumber);
-        }
-
-        [[nodiscard]]
-        const std::string& debugLocation() const _NOEXCEPT
-        {
-            return m_DebugLocation;
-        }
-
-        [[nodiscard]]
-        std::string debugMessage() const
-        {
-            if (!m_DebugLocation.empty())
-                return what() + std::string(" [") + m_DebugLocation + "]";
-            else
-                return what();
-        }
-    private:
-        std::string m_DebugLocation;
-    };
-
-    class FileNotFound : public YsonException
-    {
-    public:
-        explicit FileNotFound(const std::string& fileName)
-            : YsonException("File not found: " + fileName),
-              m_FileName(fileName)
-        {}
-
-        FileNotFound(const std::string& fileName,
-                     const std::string& debugFileName,
-                     int debugLineNumber,
-                     const std::string& debugFunctionName)
-                : YsonException("File not found: " + fileName,
-                                debugFileName,
-                                debugLineNumber,
-                                debugFunctionName),
-                  m_FileName(fileName)
-        {}
-
-        [[nodiscard]]
-        const std::string& fileName() const
-        {
-            return m_FileName;
-        }
-    private:
-        std::string m_FileName;
+        std::string message;
     };
 }
+
+#define _YSON_DEBUG_LOCATION_3(file, line) \
+    file ":" #line
+
+#define _YSON_DEBUG_LOCATION_2(file, line) \
+    _YSON_DEBUG_LOCATION_3(file, line)
+
+#define YSON_DEBUG_LOCATION() \
+    _YSON_DEBUG_LOCATION_2(__FILE__, __LINE__)
+
+#define YSON_THROW(msg) \
+    throw ::Yson::YsonException(msg, YSON_DEBUG_LOCATION())

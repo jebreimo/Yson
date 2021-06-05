@@ -6,7 +6,6 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "Yson/ReaderIterators.hpp"
-#include "ThrowYsonException.hpp"
 
 namespace Yson
 {
@@ -43,6 +42,11 @@ namespace Yson
     const std::string& ObjectKeyIterator::operator*() const
     {
         return m_Key;
+    }
+
+    const std::string* ObjectKeyIterator::operator->() const
+    {
+        return &m_Key;
     }
 
     ObjectKeyIterator& ObjectKeyIterator::operator++()

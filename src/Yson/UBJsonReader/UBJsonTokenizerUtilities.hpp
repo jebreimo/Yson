@@ -7,7 +7,7 @@
 //****************************************************************************
 #pragma once
 #include <cstdint>
-#include "Yson/Common/ThrowYsonException.hpp"
+#include "Yson/YsonException.hpp"
 #include "FromBigEndian.hpp"
 #include "UBJsonTokenType.hpp"
 

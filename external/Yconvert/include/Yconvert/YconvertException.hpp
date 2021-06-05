@@ -22,10 +22,6 @@ namespace Yconvert
     class YconvertException : public std::runtime_error
     {
     public:
-        YconvertException() noexcept
-            : std::runtime_error("Unspecified error.")
-        {}
-
         /**
          * @brief Passes @a message on to the base class.
          */

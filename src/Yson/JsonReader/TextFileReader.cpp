@@ -6,7 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "TextFileReader.hpp"
-#include "Yson/Common/ThrowYsonException.hpp"
+#include "Yson/YsonException.hpp"
 #include "Yson/Common/GetUnicodeFileName.hpp"
 
 namespace Yson

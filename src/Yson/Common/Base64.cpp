@@ -6,7 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "Base64.hpp"
-#include "ThrowYsonException.hpp"
+#include "Yson/YsonException.hpp"
 
 namespace Yson
 {

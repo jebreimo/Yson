@@ -13,11 +13,11 @@
 #include <iostream>
 #include <stack>
 #include <Yconvert/Convert.hpp>
+#include "Yson/YsonException.hpp"
 #include "Yson/Common/Base64.hpp"
 #include "Yson/Common/Escape.hpp"
 #include "Yson/Common/GetUnicodeFileName.hpp"
 #include "Yson/Common/IsJavaScriptIdentifier.hpp"
-#include "Yson/Common/ThrowYsonException.hpp"
 #include "JsonWriterUtilities.hpp"
 
 namespace Yson

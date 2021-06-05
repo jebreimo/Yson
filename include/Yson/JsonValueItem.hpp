@@ -63,18 +63,4 @@ namespace Yson
         std::string m_Value;
         JsonTokenType m_Type;
     };
-
-    template <typename T>
-    T get(const JsonValueItem& value)
-    {
-        T v;
-        if (!value.get(v))
-        {
-            throw YsonException("get called with incorrect type."
-                                " The value type is"
-                                + toString(value.valueType()) + ".",
-                                __FILE__, __LINE__, __FUNCTION__);
-        }
-        return v;
-    }
 }

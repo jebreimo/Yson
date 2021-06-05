@@ -6,31 +6,24 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
-#include "Yson/Common/ThrowYsonException.hpp"
 #include "Yson/YsonReaderException.hpp"
 #include "UBJsonTokenizer.hpp"
 
 namespace Yson
 {
     #define UBJSON_READER_THROW(msg, tokenizer) \
-        throw YsonReaderException((msg), \
-                                  __FILE__, __LINE__, __FUNCTION__, \
-                                  (tokenizer).fileName(), \
-                                  0, \
-                                  (tokenizer).position())
+        throw ::Yson::YsonReaderException((msg), \
+                                          YSON_DEBUG_LOCATION(), \
+                                          (tokenizer).fileName(), \
+                                          0, \
+                                          (tokenizer).position())
 
     #define UBJSON_READER_UNEXPECTED_TOKEN(tokenizer) \
-        throw YsonReaderException( \
-                "Unexpected token: " + toString((tokenizer).tokenType()) + ".", \
-                __FILE__, __LINE__, __FUNCTION__, \
-                (tokenizer).fileName(), \
-                0, \
-                (tokenizer).position())
+        UBJSON_READER_THROW( \
+            "Unexpected token: " + toString((tokenizer).tokenType()) + ".", \
+            (tokenizer))
 
     #define UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer) \
-        throw YsonReaderException("Unexpected end of document.",\
-                                  __FILE__, __LINE__, __FUNCTION__, \
-                                  (tokenizer).fileName(), \
-                                  0, \
-                                  (tokenizer).position())
+        UBJSON_READER_THROW("Unexpected end of document.", \
+                            (tokenizer))
 }

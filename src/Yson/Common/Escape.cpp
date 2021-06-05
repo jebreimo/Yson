@@ -8,7 +8,7 @@
 #include "Escape.hpp"
 
 #include <iterator>
-#include "ThrowYsonException.hpp"
+#include "Yson/YsonException.hpp"
 
 namespace Yson
 {

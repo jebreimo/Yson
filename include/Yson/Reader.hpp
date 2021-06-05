@@ -133,7 +133,7 @@ namespace Yson
             return value;
         throw YsonReaderException("Can't read the current value. Its type is "
                                   + toString(reader.valueType()) + ".",
-                                  __FILE__, __LINE__, __FUNCTION__,
+                                  YSON_DEBUG_LOCATION(),
                                   reader.fileName(), reader.lineNumber(),
                                   reader.columnNumber());
     }

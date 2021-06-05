@@ -17,88 +17,48 @@ namespace Yson
     class YsonReaderException : public YsonException
     {
     public:
-        explicit YsonReaderException(const std::string& msg,
+        explicit YsonReaderException(const std::string& message,
+                                     const std::string& debugLocation,
                                      std::string fileName = std::string(),
-                                     size_t lineNumber = 0,
-                                     size_t columnNumber = 0)
-            : YsonException(msg),
-              m_FileName(move(fileName)),
-              m_LineNumber(lineNumber),
-              m_ColumnNumber(columnNumber)
-        {
-            m_DefaultMessage = makeDefaultMessage(msg);
-        }
+                                     size_t line = 0,
+                                     size_t column = 0)
+            : YsonException(makeLocationString(fileName, line, column)
+                            + message, debugLocation),
+              fileName(move(fileName)),
+              line(line),
+              column(column)
+        {}
 
-        YsonReaderException(const std::string& msg,
-                            const std::string& debugFileName,
-                            int debugLineNumber,
-                            const std::string& debugFunctionName,
-                            std::string fileName = "",
-                            size_t lineNumber = 0,
-                            size_t columnNumber = 0)
-            : YsonException(msg, debugFileName, debugLineNumber, debugFunctionName),
-              m_FileName(move(fileName)),
-              m_LineNumber(lineNumber),
-              m_ColumnNumber(columnNumber)
-        {
-            m_DefaultMessage = makeDefaultMessage(msg);
-        }
-
-        [[nodiscard]]
-        const char* what() const _NOEXCEPT override
-        {
-            if (!m_DefaultMessage.empty())
-                return m_DefaultMessage.c_str();
-            return YsonException::what();
-        }
-
-        [[nodiscard]]
-        const std::string& fileName() const _NOEXCEPT
-        {
-            return m_FileName;
-        }
-
-        [[nodiscard]]
-        size_t lineNumber() const _NOEXCEPT
-        {
-            return m_LineNumber;
-        }
-
-        [[nodiscard]]
-        size_t columnNumber() const _NOEXCEPT
-        {
-            return m_ColumnNumber;
-        }
+        std::string fileName;
+        size_t line;
+        size_t column;
     private:
         [[nodiscard]]
-        std::string makeDefaultMessage(const std::string& msg) const
+        static std::string makeLocationString(const std::string& fileName,
+                                              size_t line,
+                                              size_t column)
         {
             std::string result;
-            if (!m_FileName.empty())
-                result = "In " + m_FileName;
-            if (m_LineNumber || m_ColumnNumber)
+            if (!fileName.empty())
+                result = "In " + fileName;
+            if (line || column)
             {
                 if (!result.empty())
                     result += " at";
                 else
                     result = "At";
-                if (m_LineNumber)
-                    result += " line " + std::to_string(m_LineNumber);
-                if (m_ColumnNumber)
+                if (line)
+                    result += " line " + std::to_string(line);
+                if (column)
                 {
-                    if (m_LineNumber)
+                    if (line)
                         result += " and";
-                    result += " column " + std::to_string(m_ColumnNumber);
+                    result += " column " + std::to_string(column);
                 }
             }
             if (!result.empty())
-                result += ": " + msg;
+                result += ": ";
             return result;
         }
-
-        std::string m_DefaultMessage;
-        std::string m_FileName;
-        size_t m_LineNumber;
-        size_t m_ColumnNumber;
     };
 }

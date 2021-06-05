@@ -9,8 +9,8 @@
 
 #include <cassert>
 #include <tuple>
+#include "Yson/YsonException.hpp"
 #include "Yson/Common/DefaultBufferSize.hpp"
-#include "Yson/Common/ThrowYsonException.hpp"
 #include "JsonTokenizerUtilities.hpp"
 #include "TextBufferReader.hpp"
 #include "TextFileReader.hpp"

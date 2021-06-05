@@ -17,23 +17,16 @@
   */
 
 #define JSON_READER_THROW(msg, tokenizer) \
-    throw YsonReaderException((msg), \
-                              __FILE__, __LINE__, __FUNCTION__, \
-                              (tokenizer).fileName(), \
-                              (tokenizer).lineNumber(), \
-                              (tokenizer).columnNumber())
+    throw ::Yson::YsonReaderException((msg), \
+                                      YSON_DEBUG_LOCATION(), \
+                                      (tokenizer).fileName(), \
+                                      (tokenizer).lineNumber(), \
+                                      (tokenizer).columnNumber())
 
 #define JSON_READER_UNEXPECTED_TOKEN(tokenizer) \
-    throw YsonReaderException( \
+    JSON_READER_THROW( \
             "Unexpected token: '" + (tokenizer).tokenString() + "'.", \
-            __FILE__, __LINE__, __FUNCTION__, \
-            (tokenizer).fileName(), \
-            (tokenizer).lineNumber(), \
-            (tokenizer).columnNumber())
+            (tokenizer))
 
 #define JSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer) \
-    throw YsonReaderException("Unexpected end of document.",\
-                              __FILE__, __LINE__, __FUNCTION__, \
-                              (tokenizer).fileName(), \
-                              (tokenizer).lineNumber(), \
-                              (tokenizer).columnNumber())
+    JSON_READER_THROW("Unexpected end of document.", (tokenizer))

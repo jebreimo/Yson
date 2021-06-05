@@ -7,12 +7,12 @@
 //****************************************************************************
 #include "Yson/UBJsonValueItem.hpp"
 
+#include "Yson/YsonException.hpp"
 #include "Yson/Common/AssignInteger.hpp"
 #include "Yson/Common/Base64.hpp"
 #include "Yson/Common/GetValueType.hpp"
 #include "Yson/Common/ParseFloatingPoint.hpp"
 #include "Yson/Common/ParseInteger.hpp"
-#include "Yson/Common/ThrowYsonException.hpp"
 #include "FromBigEndian.hpp"
 #include "UBJsonTokenType.hpp"
 

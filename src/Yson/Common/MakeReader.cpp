@@ -10,8 +10,8 @@
 #include "Yconvert/Encoding.hpp"
 #include "Yson/JsonReader.hpp"
 #include "Yson/UBJsonReader.hpp"
+#include "Yson/YsonException.hpp"
 #include "GetUnicodeFileName.hpp"
-#include "ThrowYsonException.hpp"
 
 namespace Yson
 {
@@ -19,7 +19,7 @@ namespace Yson
     {
         enum class ContentType
         {
-            UNKOWN,
+            UNKNOWN,
             JSON,
             UBJSON
         };
@@ -64,7 +64,7 @@ namespace Yson
                 switch (contents[i])
                 {
                 case '{':
-                scopes.push_back('}');
+                    scopes.push_back('}');
                     allowComma = false;
                     break;
                 case '[':
@@ -74,11 +74,11 @@ namespace Yson
                 case '}':
                 case ']':
                     if (scopes.empty() || scopes.back() != contents[i])
-                        return ContentType::UNKOWN;
+                        return ContentType::UNKNOWN;
                     scopes.pop_back();
                     allowComma = !scopes.empty();
                 case ',':
-                    return allowComma ? ContentType::JSON : ContentType::UNKOWN;
+                    return allowComma ? ContentType::JSON : ContentType::UNKNOWN;
                 default:
                     if (std::find(std::begin(JSON_CHARACTERS),
                                   std::end(JSON_CHARACTERS),
@@ -88,17 +88,18 @@ namespace Yson
                                   std::end(UBJSON_CHARACTERS),
                                   contents[i]) != std::end(UBJSON_CHARACTERS))
                         return ContentType::UBJSON;
-                    return ContentType::UNKOWN;
+                    return ContentType::UNKNOWN;
                 }
             }
-            return ContentType::UNKOWN;
+            return ContentType::UNKNOWN;
         }
     }
 
     std::unique_ptr<Reader> makeReader(std::istream& stream)
     {
         std::vector<char> buffer(1024);
-        stream.read(buffer.data(), buffer.size());
+        stream.read(buffer.data(),
+                    static_cast<std::streamsize>(buffer.size()));
         buffer.resize(stream.gcount());
         auto contentType = identifyFile(buffer.data(), buffer.size());
         if (contentType == ContentType::JSON)
@@ -116,9 +117,9 @@ namespace Yson
         std::ifstream file(getUnicodeFileName(fileName),
                            std::ios_base::binary);
         if (!file)
-            THROW_FILE_NOT_FOUND(fileName);
+            YSON_THROW("File not found: " + fileName);
         std::vector<char> buffer(1024);
-        file.read(buffer.data(), buffer.size());
+        file.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
         buffer.resize(file.gcount());
         file.close();
         auto contentType = identifyFile(buffer.data(), buffer.size());

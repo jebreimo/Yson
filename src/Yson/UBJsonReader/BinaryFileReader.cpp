@@ -6,8 +6,8 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "BinaryFileReader.hpp"
+#include "Yson/YsonException.hpp"
 #include "Yson/Common/GetUnicodeFileName.hpp"
-#include "Yson/Common/ThrowYsonException.hpp"
 
 namespace Yson
 {

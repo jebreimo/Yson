@@ -10,9 +10,9 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include "Yson/YsonException.hpp"
 #include "Yson/UBJsonValueType.hpp"
 #include "Yson/Common/AssignInteger.hpp"
-#include "Yson/Common/ThrowYsonException.hpp"
 #include "AssignFloat.hpp"
 #include "UBJsonValueTraits.hpp"
 

@@ -8,7 +8,7 @@
 #include "Yson/JsonItem.hpp"
 #include "Yson/ArrayItem.hpp"
 #include "Yson/ObjectItem.hpp"
-#include "Yson/Common/ThrowYsonException.hpp"
+#include "Yson/YsonException.hpp"
 
 namespace Yson
 {

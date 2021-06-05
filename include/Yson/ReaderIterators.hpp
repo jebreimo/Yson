@@ -18,12 +18,21 @@ namespace Yson
     class ObjectKeyIterator
     {
     public:
+        using iterator_category = std::input_iterator_tag;
+        using value_type = std::string;
+        using difference_type = void;
+        using pointer = const std::string*;
+        using reference = const std::string&;
+
         ObjectKeyIterator();
 
         explicit ObjectKeyIterator(Reader& reader);
 
         [[nodiscard]]
         const std::string& operator*() const;
+
+        [[nodiscard]]
+        const std::string* operator->() const;
 
         ObjectKeyIterator& operator++();
 
@@ -153,8 +162,7 @@ namespace Yson
         {
             if (!m_Reader)
             {
-                throw YsonException("begin() can only be called once.",
-                                    __FILE__, __LINE__, __FUNCTION__);
+                YSON_THROW("begin() can only be called once.");
             }
 
             auto* reader = m_Reader;
