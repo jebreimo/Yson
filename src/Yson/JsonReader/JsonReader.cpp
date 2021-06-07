@@ -453,7 +453,7 @@ namespace Yson
         return JsonItem(std::make_shared<ObjectItem>(move(keys), move(values)));
     }
 
-    JsonItem JsonReader::readCurrentItem()
+    JsonItem JsonReader::readItem()
     {
         auto& tokenizer = m_Members->tokenizer;
         switch (m_Members->currentState())

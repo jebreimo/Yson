@@ -18,27 +18,37 @@ namespace Yson
 
     const JsonItem& JsonItem::operator[](size_t index) const
     {
-        if (const auto* obj = std::get_if<std::shared_ptr<ArrayItem>>(&m_Item))
-        {
-            const auto& values = (*obj)->values();
-            if (index < values.size())
-                return values[index];
-            YSON_THROW("Index is too great: " + std::to_string(index));
-        }
-        YSON_THROW("Item isn't an array.");
+        if (const auto* item = get(index))
+            return *item;
+        YSON_THROW("Index is too great: " + std::to_string(index));
     }
 
     const JsonItem& JsonItem::operator[](std::string_view key) const
+    {
+        if (const auto* item = get(key))
+            return *item;
+        YSON_THROW("No such key: " + std::string(key));
+    }
+
+    const JsonItem* JsonItem::get(std::string_view key) const
     {
         if (const auto* obj = std::get_if<std::shared_ptr<ObjectItem>>(&m_Item))
         {
             const auto& values = (*obj)->values();
             auto it = values.find(key);
-            if (it != values.end())
-                return it->second;
-            YSON_THROW("No such key: " + std::string(key));
+            return it != values.end() ? &it->second : nullptr;
         }
         YSON_THROW("Item isn't an object.");
+    }
+
+    const JsonItem* JsonItem::get(size_t index) const
+    {
+        if (const auto* obj = std::get_if<std::shared_ptr<ArrayItem>>(&m_Item))
+        {
+            const auto& values = (*obj)->values();
+            return index < values.size() ? &values[index] : nullptr;
+        }
+        YSON_THROW("Item isn't an array.");
     }
 
     bool JsonItem::isArray() const

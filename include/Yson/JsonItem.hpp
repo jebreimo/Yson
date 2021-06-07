@@ -26,9 +26,15 @@ namespace Yson
 
         explicit JsonItem(ItemType item);
 
-        const JsonItem& operator[](std::string_view) const;
+        const JsonItem& operator[](std::string_view key) const;
 
-        const JsonItem& operator[](size_t) const;
+        const JsonItem& operator[](size_t index) const;
+
+        [[nodiscard]]
+        const JsonItem* get(std::string_view key) const;
+
+        [[nodiscard]]
+        const JsonItem* get(size_t index) const;
 
         [[nodiscard]]
         bool isArray() const;
@@ -55,5 +61,11 @@ namespace Yson
     T get(const JsonItem& item)
     {
         return get<T>(item.value());
+    }
+
+    template <typename T>
+    T get(const JsonItem* item, const T& defaultValue)
+    {
+        return item ? get<T>(item->value()) : defaultValue;
     }
 }

@@ -508,7 +508,7 @@ namespace Yson
             return false;
     }
 
-    JsonItem UBJsonReader::readCurrentItem()
+    JsonItem UBJsonReader::readItem()
     {
         auto& tokenizer = m_Members->tokenizer;
         switch (currentScope().state.state)

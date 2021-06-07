@@ -107,7 +107,7 @@ namespace Yson
 
         virtual bool readBase64(std::vector<char>& value) const = 0;
 
-        virtual JsonItem readCurrentItem() = 0;
+        virtual JsonItem readItem() = 0;
 
         [[nodiscard]]
         virtual std::string fileName() const = 0;

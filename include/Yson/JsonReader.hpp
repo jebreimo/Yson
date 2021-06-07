@@ -99,7 +99,7 @@ namespace Yson
 
         bool readBinary(void* buffer, size_t& size) override;
 
-        JsonItem readCurrentItem() override;
+        JsonItem readItem() override;
 
         [[nodiscard]]
         std::string fileName() const override;
