@@ -9,6 +9,7 @@
 
 #include <iosfwd>
 #include <string>
+#include "YsonDefinitions.hpp"
 
 namespace Yson
 {
@@ -23,7 +24,7 @@ namespace Yson
         AT_END
     };
 
-    std::string toString(ReaderState state);
+    YSON_API std::string toString(ReaderState state);
 
-    std::ostream& operator<<(std::ostream& stream, ReaderState state);
+    YSON_API std::ostream& operator<<(std::ostream& stream, ReaderState state);
 }

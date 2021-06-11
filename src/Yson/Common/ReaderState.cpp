@@ -6,6 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "Yson/ReaderState.hpp"
+#include <ostream>
 
 namespace Yson
 {

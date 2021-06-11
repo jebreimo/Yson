@@ -12,10 +12,10 @@ namespace Yson
 {
     namespace detail
     {
-        bool initialize(Reader& reader);
+        YSON_API bool initialize(Reader& reader);
     }
 
-    class ObjectKeyIterator
+    class YSON_API ObjectKeyIterator
     {
     public:
         using iterator_category = std::input_iterator_tag;
@@ -44,10 +44,10 @@ namespace Yson
         bool m_AtEnd;
     };
 
-    bool operator!=(const ObjectKeyIterator& a,
-                    const ObjectKeyIterator& b);
+    YSON_API bool operator!=(const ObjectKeyIterator& a,
+                             const ObjectKeyIterator& b);
 
-    class ObjectKeyIteratorAdapter
+    class YSON_API ObjectKeyIteratorAdapter
     {
     public:
         explicit ObjectKeyIteratorAdapter(Reader& reader);
@@ -66,7 +66,7 @@ namespace Yson
         return ObjectKeyIteratorAdapter(reader);
     }
 
-    class ArrayIterator
+    class YSON_API ArrayIterator
     {
     public:
         explicit ArrayIterator(Reader& reader);
