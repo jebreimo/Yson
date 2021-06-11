@@ -13,11 +13,20 @@ namespace Yson
     class YSON_API ArrayItem
     {
     public:
+        using iterator = std::vector<JsonItem>::const_iterator;
+
         explicit ArrayItem(std::vector<JsonItem> values);
 
         [[nodiscard]]
         const std::vector<JsonItem>& values() const;
 
+        size_t empty() const;
+
+        size_t size() const;
+
+        iterator begin() const;
+
+        iterator end() const;
     private:
         std::vector<JsonItem> m_Values;
     };

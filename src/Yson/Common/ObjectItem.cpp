@@ -25,4 +25,24 @@ namespace Yson
     {
         return m_Values;
     }
+
+    size_t ObjectItem::empty() const
+    {
+        return m_Values.empty();
+    }
+
+    size_t ObjectItem::size() const
+    {
+        return m_Values.size();
+    }
+
+    ObjectItem::iterator ObjectItem::begin() const
+    {
+        return m_Values.begin();
+    }
+
+    ObjectItem::iterator ObjectItem::end() const
+    {
+        return m_Values.end();
+    }
 }

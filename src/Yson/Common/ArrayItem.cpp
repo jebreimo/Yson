@@ -17,4 +17,24 @@ namespace Yson
     {
         return m_Values;
     }
+
+    size_t ArrayItem::empty() const
+    {
+        return m_Values.empty();
+    }
+
+    size_t ArrayItem::size() const
+    {
+        return m_Values.size();
+    }
+
+    ArrayItem::iterator ArrayItem::begin() const
+    {
+        return m_Values.begin();
+    }
+
+    ArrayItem::iterator ArrayItem::end() const
+    {
+        return m_Values.end();
+    }
 }

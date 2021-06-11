@@ -15,6 +15,8 @@ namespace Yson
     class YSON_API ObjectItem
     {
     public:
+        using iterator = std::unordered_map<std::string_view, JsonItem>::const_iterator;
+
         ObjectItem(std::deque<std::string> keys,
                    std::unordered_map<std::string_view, JsonItem> values);
 
@@ -24,6 +26,13 @@ namespace Yson
         [[nodiscard]]
         const std::unordered_map<std::string_view, JsonItem>& values() const;
 
+        size_t empty() const;
+
+        size_t size() const;
+
+        iterator begin() const;
+
+        iterator end() const;
     private:
         std::deque<std::string> m_Keys;
         std::unordered_map<std::string_view, JsonItem> m_Values;

@@ -68,4 +68,9 @@ namespace Yson
     {
         return item ? get<T>(item->value()) : defaultValue;
     }
+
+    inline std::string get(const JsonItem* item, const std::string_view& defaultValue)
+    {
+        return item ? get<std::string>(item->value()) : std::string(defaultValue);
+    }
 }
