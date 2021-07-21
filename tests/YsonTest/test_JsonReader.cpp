@@ -28,15 +28,15 @@ namespace
         Y_EQUAL(reader.state(), ReaderState::AT_START);
         Y_EQUAL(reader.scope(), "{");
         Y_ASSERT(reader.nextKey());
-        Y_EQUAL(read<std::string>(reader), "key");
+        Y_EQUAL(get<std::string>(reader), "key");
         Y_EQUAL(reader.valueType(true), ValueType::STRING);
         Y_EQUAL(reader.detailedValueType(true), DetailedValueType::STRING);
         Y_ASSERT(reader.nextValue());
-        Y_EQUAL(read<std::string>(reader), "123");
+        Y_EQUAL(get<std::string>(reader), "123");
         Y_ASSERT(reader.nextKey());
-        Y_EQUAL(read<std::string>(reader), "key2");
+        Y_EQUAL(get<std::string>(reader), "key2");
         Y_ASSERT(reader.nextValue());
-        Y_EQUAL(read<std::string>(reader), "value");
+        Y_EQUAL(get<std::string>(reader), "value");
         Y_ASSERT(!reader.nextKey());
         Y_ASSERT(!reader.nextKey());
         reader.leave();
@@ -55,7 +55,7 @@ namespace
         Y_ASSERT(reader.nextValue());
         Y_EQUAL(reader.valueType(), ValueType::STRING);
         std::vector<char> value;
-        Y_ASSERT(reader.readBase64(value));
+        Y_ASSERT(reader.getBase64(value));
         Y_EQUAL_RANGES(value, std::vector<char>(expected));
     }
 
@@ -72,21 +72,21 @@ namespace
         Y_CALL(doReadBase64(R"("Bw==")", {7}));
     }
 
-    void test_readNull()
+    void test_isNull()
     {
         char text[] = R"(null)";
         JsonReader reader(text, sizeof(text));
         Y_ASSERT(reader.nextValue());
-        Y_ASSERT(reader.readNull());
+        Y_ASSERT(reader.isNull());
     }
 
     template <typename T>
-    void assertRead(const std::string& text, T expectedValue)
+    void assertGet(const std::string& text, T expectedValue)
     {
         JsonReader reader(text.data(), text.size());
         Y_ASSERT(reader.nextValue());
         T value;
-        Y_ASSERT(reader.read(value));
+        Y_ASSERT(reader.get(value));
         Y_EQUAL(value, expectedValue);
     }
 
@@ -96,17 +96,17 @@ namespace
         std::istringstream ss(doc);
         JsonReader reader(ss);
         Y_ASSERT(reader.nextValue());
-        Y_EQUAL(read<std::string>(reader), "AB\"\n\t/k\\g\xC4\xA3");
+        Y_EQUAL(get<std::string>(reader), "AB\"\n\t/k\\g\xC4\xA3");
         Y_ASSERT(!reader.nextValue());
     }
 
     template <typename T>
-    void assertRead(const std::string& text, T expectedValue, T epsilon)
+    void assertGet(const std::string& text, T expectedValue, T epsilon)
     {
         JsonReader reader(text.data(), text.size());
         Y_ASSERT(reader.nextValue());
         T value;
-        Y_ASSERT(reader.read(value));
+        Y_ASSERT(reader.get(value));
         Y_EQUIVALENT(value, expectedValue, epsilon);
     }
 
@@ -116,70 +116,70 @@ namespace
         JsonReader reader(text.data(), text.size());
         Y_ASSERT(reader.nextValue());
         bool value;
-        Y_ASSERT(!reader.read(value));
+        Y_ASSERT(!reader.get(value));
     }
 
-    void test_read_integer()
+    void test_get_integer()
     {
-        Y_CALL(assertRead("true", true));
-        Y_CALL(assertRead("false", false));
-        Y_CALL(assertRead("0", false));
-        Y_CALL(assertRead("1", true));
+        Y_CALL(assertGet("true", true));
+        Y_CALL(assertGet("false", false));
+        Y_CALL(assertGet("0", false));
+        Y_CALL(assertGet("1", true));
         Y_CALL(assertReadFails<bool>("falsd"));
         Y_CALL(assertReadFails<bool>("0.1"));
         Y_CALL(assertReadFails<bool>("2"));
         Y_CALL(assertReadFails<bool>("-1"));
 
-        Y_CALL(assertRead<char>("-128", -128));
-        Y_CALL(assertRead<char>("\"\\n\"", '\n'));
+        Y_CALL(assertGet<char>("-128", -128));
+        Y_CALL(assertGet<char>("\"\\n\"", '\n'));
 
         Y_CALL(assertReadFails<int8_t>("-129"));
-        Y_CALL(assertRead<int8_t>("01", 1));
-        Y_CALL(assertRead<int8_t>("067", 67));
-        Y_CALL(assertRead<int8_t>("000067", 67));
-        Y_CALL(assertRead<int8_t>("-128", -128));
-        Y_CALL(assertRead<int8_t>("1_00", 100));
-        Y_CALL(assertRead<int8_t>("127", 127));
+        Y_CALL(assertGet<int8_t>("01", 1));
+        Y_CALL(assertGet<int8_t>("067", 67));
+        Y_CALL(assertGet<int8_t>("000067", 67));
+        Y_CALL(assertGet<int8_t>("-128", -128));
+        Y_CALL(assertGet<int8_t>("1_00", 100));
+        Y_CALL(assertGet<int8_t>("127", 127));
         Y_CALL(assertReadFails<int8_t>("128"));
 
         Y_CALL(assertReadFails<uint8_t>("-1"));
-        Y_CALL(assertRead<uint8_t>("-0", 0));
-        Y_CALL(assertRead<uint8_t>("1_00", 100));
-        Y_CALL(assertRead<uint8_t>("255", 255));
+        Y_CALL(assertGet<uint8_t>("-0", 0));
+        Y_CALL(assertGet<uint8_t>("1_00", 100));
+        Y_CALL(assertGet<uint8_t>("255", 255));
         Y_CALL(assertReadFails<uint8_t>("256"));
 
         Y_CALL(assertReadFails<uint8_t>("-0b1"));
-        Y_CALL(assertRead<uint8_t>("-0b0000", 0));
-        Y_CALL(assertRead<uint8_t>("0b1", 1));
-        Y_CALL(assertRead<uint8_t>("0b0000_0001", 1));
-        Y_CALL(assertRead<uint8_t>("0b1111_1111", 255));
+        Y_CALL(assertGet<uint8_t>("-0b0000", 0));
+        Y_CALL(assertGet<uint8_t>("0b1", 1));
+        Y_CALL(assertGet<uint8_t>("0b0000_0001", 1));
+        Y_CALL(assertGet<uint8_t>("0b1111_1111", 255));
         Y_CALL(assertReadFails<uint8_t>("0b1_0000_0000"));
 
         Y_CALL(assertReadFails<int16_t>("-32769"));
-        Y_CALL(assertRead<int16_t>("-32768", -32768));
-        Y_CALL(assertRead<int16_t>("1_00", 100));
-        Y_CALL(assertRead<int16_t>("32767", 32767));
+        Y_CALL(assertGet<int16_t>("-32768", -32768));
+        Y_CALL(assertGet<int16_t>("1_00", 100));
+        Y_CALL(assertGet<int16_t>("32767", 32767));
         Y_CALL(assertReadFails<int16_t>("32768"));
 
         Y_CALL(assertReadFails<int64_t>("-0x8000_0000_0000_0001"));
-        Y_CALL(assertRead<int64_t>("-0x8000_0000_0000_0000",
-                                   -0x8000000000000000));
-        Y_CALL(assertRead<int64_t>("1_00", 100));
-        Y_CALL(assertRead<int64_t>("0x7FFF_FFFF_FFFF_FFFF",
-                                   0x7FFFFFFFFFFFFFFF));
+        Y_CALL(assertGet<int64_t>("-0x8000_0000_0000_0000",
+                                  -0x8000000000000000));
+        Y_CALL(assertGet<int64_t>("1_00", 100));
+        Y_CALL(assertGet<int64_t>("0x7FFF_FFFF_FFFF_FFFF",
+                                  0x7FFFFFFFFFFFFFFF));
         Y_CALL(assertReadFails<int64_t>("0x8000_0000_0000_0000"));
     }
 
-    void test_read_floating_point()
+    void test_get_floating_point()
     {
-        Y_CALL(assertRead<float>("100", 100.f));
-        Y_CALL(assertRead<double>("100.123", 100.123));
-        Y_CALL(assertRead<double>("-100.123", -100.123));
-        Y_CALL(assertRead<double>("-100.123e15", -100.123e15));
-        Y_CALL(assertRead<double>("-100.123e-15", -100.123e-15, 1e-25));
-        Y_CALL(assertRead<double>("-100_100_100.100_100e+1_2",
-                                  -100100100.100100e12));
-        Y_CALL(assertRead<float>("1e38", 1e38f));
+        Y_CALL(assertGet<float>("100", 100.f));
+        Y_CALL(assertGet<double>("100.123", 100.123));
+        Y_CALL(assertGet<double>("-100.123", -100.123));
+        Y_CALL(assertGet<double>("-100.123e15", -100.123e15));
+        Y_CALL(assertGet<double>("-100.123e-15", -100.123e-15, 1e-25));
+        Y_CALL(assertGet<double>("-100_100_100.100_100e+1_2",
+                                 -100100100.100100e12));
+        Y_CALL(assertGet<float>("1e38", 1e38f));
         Y_CALL(assertReadFails<float>("1e39"));
         Y_CALL(assertReadFails<double>("1e"));
         Y_CALL(assertReadFails<double>("1e+"));
@@ -193,7 +193,7 @@ namespace
         Y_CALL(assertReadFails<double>("1.1e_-1"));
         Y_CALL(assertReadFails<double>("1.1e-_1"));
         Y_CALL(assertReadFails<double>("1.1e-1_"));
-        Y_CALL(assertRead<double>("1.1e-1", 1.1e-1, 1e-15));
+        Y_CALL(assertGet<double>("1.1e-1", 1.1e-1, 1e-15));
         // TODO: test NaN, infinity and null
     }
 
@@ -225,36 +225,36 @@ namespace
         Y_EQUAL(reader.columnNumber(), 2);
     }
 
-    void test_read_string()
+    void test_get_string()
     {
-        Y_CALL(assertRead<std::string>(R"("100")", "100"));
-        Y_CALL(assertRead<std::string>("\"100\\n\"", "100\n"));
-        Y_CALL(assertRead<std::string>("\"100\\t200\\r\"", "100\t200\r"));
+        Y_CALL(assertGet<std::string>(R"("100")", "100"));
+        Y_CALL(assertGet<std::string>("\"100\\n\"", "100\n"));
+        Y_CALL(assertGet<std::string>("\"100\\t200\\r\"", "100\t200\r"));
     }
 
-    void test_read_single_quoted_string()
+    void test_get_single_quoted_string()
     {
-        Y_CALL(assertRead<std::string>("'100'", "100"));
-        Y_CALL(assertRead<std::string>("'100\\n'", "100\n"));
-        Y_CALL(assertRead<std::string>("'100\\t200\\r'", "100\t200\r"));
-        Y_CALL(assertRead<std::string>("'10\"0'", "10\"0"));
-        Y_CALL(assertRead<std::string>("'10\\'0'", "10'0"));
+        Y_CALL(assertGet<std::string>("'100'", "100"));
+        Y_CALL(assertGet<std::string>("'100\\n'", "100\n"));
+        Y_CALL(assertGet<std::string>("'100\\t200\\r'", "100\t200\r"));
+        Y_CALL(assertGet<std::string>("'10\"0'", "10\"0"));
+        Y_CALL(assertGet<std::string>("'10\\'0'", "10'0"));
     }
 
-    void test_read_surrogate_pair()
+    void test_get_surrogate_pair()
     {
-        Y_CALL(assertRead<std::string>("'\\uD83C\\uDFBC'", "\360\237\216\274"));
-        Y_CALL(assertRead<std::string>("'\\uD83C'", "\355\240\274"));
-        Y_CALL(assertRead<std::string>("'\\uD83CK'", "\355\240\274K"));
-        Y_CALL(assertRead<std::string>("'\\uD83C\\''", "\355\240\274'"));
+        Y_CALL(assertGet<std::string>("'\\uD83C\\uDFBC'", "\360\237\216\274"));
+        Y_CALL(assertGet<std::string>("'\\uD83C'", "\355\240\274"));
+        Y_CALL(assertGet<std::string>("'\\uD83CK'", "\355\240\274K"));
+        Y_CALL(assertGet<std::string>("'\\uD83C\\''", "\355\240\274'"));
     }
 
-    void test_read_multiline_string()
+    void test_get_multiline_string()
     {
-        Y_CALL(assertRead<std::string>("'Line 1.\\\n Line 1 continued.'",
-                                       "Line 1. Line 1 continued."));
-        Y_CALL(assertRead<std::string>("'Line 1.\\\r\n Line 1 continued.'",
-                                       "Line 1. Line 1 continued."));
+        Y_CALL(assertGet<std::string>("'Line 1.\\\n Line 1 continued.'",
+                                      "Line 1. Line 1 continued."));
+        Y_CALL(assertGet<std::string>("'Line 1.\\\r\n Line 1 continued.'",
+                                      "Line 1. Line 1 continued."));
     }
 
     void test_read_binary()
@@ -420,11 +420,11 @@ namespace
         Y_ASSERT(reader.nextValue());
         reader.enter();
         Y_ASSERT(reader.nextKey());
-        Y_EQUAL(read<std::string>(reader), "key");
+        Y_EQUAL(get<std::string>(reader), "key");
         Y_EQUAL(reader.valueType(true), ValueType::STRING);
         Y_EQUAL(reader.detailedValueType(true), DetailedValueType::STRING);
         Y_ASSERT(reader.nextValue());
-        Y_EQUAL(read<std::string>(reader), "123");
+        Y_EQUAL(get<std::string>(reader), "123");
     }
 
     void test_non_ASCII_characters()
@@ -441,13 +441,13 @@ namespace
         Y_ASSERT(reader.nextValue());
         Y_NO_THROW(reader.enter(), YsonException);
         Y_ASSERT(reader.nextValue());
-        Y_EQUAL(read<std::string>(reader), "null");
+        Y_EQUAL(get<std::string>(reader), "null");
         Y_ASSERT(reader.nextValue());
-        Y_EQUAL(read<std::string>(reader), "12.34");
+        Y_EQUAL(get<std::string>(reader), "12.34");
         Y_ASSERT(reader.nextValue());
-        Y_EQUAL(read<std::string>(reader), "fooz");
+        Y_EQUAL(get<std::string>(reader), "fooz");
         Y_ASSERT(reader.nextValue());
-        Y_EQUAL(read<std::string>(reader), "baz");
+        Y_EQUAL(get<std::string>(reader), "baz");
         Y_ASSERT(!reader.nextValue());
         Y_NO_THROW(reader.leave(), YsonException);
         Y_ASSERT(!reader.nextValue());
@@ -468,14 +468,14 @@ namespace
     }
 
     Y_TEST(test_Basics,
-           test_readNull,
+           test_isNull,
            test_read_base64,
-           test_read_floating_point,
-           test_read_integer,
-           test_read_string,
-           test_read_single_quoted_string,
-           test_read_surrogate_pair,
-           test_read_multiline_string,
+           test_get_floating_point,
+           test_get_integer,
+           test_get_string,
+           test_get_single_quoted_string,
+           test_get_surrogate_pair,
+           test_get_multiline_string,
            test_read_binary,
            test_array,
            test_document,

@@ -73,39 +73,39 @@ namespace Yson
                 bool analyzeStrings) const = 0;
 
         [[nodiscard]]
-        virtual bool readNull() const = 0;
+        virtual bool isNull() const = 0;
 
-        virtual bool read(bool& value) const = 0;
+        virtual bool get(bool& value) const = 0;
 
-        virtual bool read(int8_t& value) const = 0;
+        virtual bool get(int8_t& value) const = 0;
 
-        virtual bool read(int16_t& value) const = 0;
+        virtual bool get(int16_t& value) const = 0;
 
-        virtual bool read(int32_t& value) const = 0;
+        virtual bool get(int32_t& value) const = 0;
 
-        virtual bool read(int64_t& value) const = 0;
+        virtual bool get(int64_t& value) const = 0;
 
-        virtual bool read(uint8_t& value) const = 0;
+        virtual bool get(uint8_t& value) const = 0;
 
-        virtual bool read(uint16_t& value) const = 0;
+        virtual bool get(uint16_t& value) const = 0;
 
-        virtual bool read(uint32_t& value) const = 0;
+        virtual bool get(uint32_t& value) const = 0;
 
-        virtual bool read(uint64_t& value) const = 0;
+        virtual bool get(uint64_t& value) const = 0;
 
-        virtual bool read(float& value) const = 0;
+        virtual bool get(float& value) const = 0;
 
-        virtual bool read(double& value) const = 0;
+        virtual bool get(double& value) const = 0;
 
-        virtual bool read(char& value) const = 0;
+        virtual bool get(char& value) const = 0;
 
-        virtual bool read(std::string& value) const = 0;
+        virtual bool get(std::string& value) const = 0;
 
         virtual bool readBinary(void* buffer, size_t& size) = 0;
 
         virtual bool readBinary(std::vector<char>& value) = 0;
 
-        virtual bool readBase64(std::vector<char>& value) const = 0;
+        virtual bool getBase64(std::vector<char>& value) const = 0;
 
         virtual JsonItem readItem() = 0;
 
@@ -126,12 +126,12 @@ namespace Yson
     };
 
     template <typename T>
-    T read(const Reader& reader)
+    T get(const Reader& reader)
     {
         T value;
-        if (reader.read(value))
+        if (reader.get(value))
             return value;
-        throw YsonReaderException("Can't read the current value. Its type is "
+        throw YsonReaderException("Can't get the current value. Its type is "
                                   + toString(reader.valueType()) + ".",
                                   YSON_DEBUG_LOCATION(),
                                   reader.fileName(), reader.lineNumber(),

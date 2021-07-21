@@ -120,7 +120,7 @@ namespace Yson
             {
                 if (m_Reader->nextValue())
                 {
-                    m_Value = read<T>(*m_Reader);
+                    m_Value = get<T>(*m_Reader);
                 }
                 else
                 {

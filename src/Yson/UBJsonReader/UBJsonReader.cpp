@@ -323,13 +323,13 @@ namespace Yson
         }
     }
 
-    bool UBJsonReader::readNull() const
+    bool UBJsonReader::isNull() const
     {
         assertStateIsKeyOrValue();
         return m_Members->tokenizer.tokenType() == UBJsonTokenType::NULL_TOKEN;
     }
 
-    bool UBJsonReader::read(bool& value) const
+    bool UBJsonReader::get(bool& value) const
     {
         assertStateIsKeyOrValue();
         switch (m_Members->tokenizer.tokenType())
@@ -345,79 +345,79 @@ namespace Yson
         }
     }
 
-    bool UBJsonReader::read(int8_t& value) const
+    bool UBJsonReader::get(int8_t& value) const
     {
         assertStateIsKeyOrValue();
         return setIntegerValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(int16_t& value) const
+    bool UBJsonReader::get(int16_t& value) const
     {
         assertStateIsKeyOrValue();
         return setIntegerValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(int32_t& value) const
+    bool UBJsonReader::get(int32_t& value) const
     {
         assertStateIsKeyOrValue();
         return setIntegerValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(int64_t& value) const
+    bool UBJsonReader::get(int64_t& value) const
     {
         assertStateIsKeyOrValue();
         return setIntegerValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(uint8_t& value) const
+    bool UBJsonReader::get(uint8_t& value) const
     {
         assertStateIsKeyOrValue();
         return setIntegerValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(uint16_t& value) const
+    bool UBJsonReader::get(uint16_t& value) const
     {
         assertStateIsKeyOrValue();
         return setIntegerValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(uint32_t& value) const
+    bool UBJsonReader::get(uint32_t& value) const
     {
         assertStateIsKeyOrValue();
         return setIntegerValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(uint64_t& value) const
+    bool UBJsonReader::get(uint64_t& value) const
     {
         assertStateIsKeyOrValue();
         return setIntegerValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(float& value) const
+    bool UBJsonReader::get(float& value) const
     {
         assertStateIsKeyOrValue();
         return setFloatingPointValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(double& value) const
+    bool UBJsonReader::get(double& value) const
     {
         assertStateIsKeyOrValue();
         return setFloatingPointValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(long double& value) const
+    bool UBJsonReader::get(long double& value) const
     {
         assertStateIsKeyOrValue();
         return setFloatingPointValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(char& value) const
+    bool UBJsonReader::get(char& value) const
     {
         assertStateIsKeyOrValue();
         return setIntegerValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(std::string& value) const
+    bool UBJsonReader::get(std::string& value) const
     {
         assertStateIsKeyOrValue();
         switch (m_Members->tokenizer.tokenType())
@@ -499,7 +499,7 @@ namespace Yson
         return false;
     }
 
-    bool UBJsonReader::readBase64(std::vector<char>& value) const
+    bool UBJsonReader::getBase64(std::vector<char>& value) const
     {
         assertStateIsKeyOrValue();
         if (m_Members->tokenizer.tokenType() == UBJsonTokenType::STRING_TOKEN)

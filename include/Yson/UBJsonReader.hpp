@@ -69,35 +69,35 @@ namespace Yson
         std::pair<size_t, DetailedValueType> optimizedArrayProperties() const;
 
         [[nodiscard]]
-        bool readNull() const override;
+        bool isNull() const override;
 
-        bool read(bool& value) const override;
+        bool get(bool& value) const override;
 
-        bool read(int8_t& value) const override;
+        bool get(int8_t& value) const override;
 
-        bool read(int16_t& value) const override;
+        bool get(int16_t& value) const override;
 
-        bool read(int32_t& value) const override;
+        bool get(int32_t& value) const override;
 
-        bool read(int64_t& value) const override;
+        bool get(int64_t& value) const override;
 
-        bool read(uint8_t& value) const override;
+        bool get(uint8_t& value) const override;
 
-        bool read(uint16_t& value) const override;
+        bool get(uint16_t& value) const override;
 
-        bool read(uint32_t& value) const override;
+        bool get(uint32_t& value) const override;
 
-        bool read(uint64_t& value) const override;
+        bool get(uint64_t& value) const override;
 
-        bool read(std::string& value) const override;
+        bool get(std::string& value) const override;
 
-        bool read(char& value) const override;
+        bool get(char& value) const override;
 
-        bool read(float& value) const override;
+        bool get(float& value) const override;
 
-        bool read(double& value) const override;
+        bool get(double& value) const override;
 
-        bool read(long double& value) const;
+        bool get(long double& value) const;
 
         bool readOptimizedArray(int8_t* buffer, size_t& size);
 
@@ -115,7 +115,7 @@ namespace Yson
 
         bool readOptimizedArray(char* buffer, size_t& size);
 
-        bool readBase64(std::vector<char>& value) const override;
+        bool getBase64(std::vector<char>& value) const override;
 
         bool readBinary(std::vector<char>& value) override;
 
@@ -133,10 +133,13 @@ namespace Yson
         [[nodiscard]]
         size_t columnNumber() const override;
 
+        [[nodiscard]]
         ReaderState state() const override;
 
+        [[nodiscard]]
         std::string scope() const override;
 
+        [[nodiscard]]
         bool isExpandOptimizedByteArraysEnabled() const;
 
         UBJsonReader& setExpandOptimizedByteArraysEnabled(bool value);

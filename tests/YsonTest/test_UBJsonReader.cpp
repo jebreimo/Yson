@@ -26,15 +26,15 @@ namespace
         Y_ASSERT(reader.nextKey());
         Y_EQUAL(reader.valueType(), ValueType::STRING);
         Y_EQUAL(reader.detailedValueType(), DetailedValueType::STRING);
-        Y_EQUAL(read<std::string>(reader), "Key");
+        Y_EQUAL(get<std::string>(reader), "Key");
         Y_ASSERT(reader.nextValue());
         Y_EQUAL(reader.valueType(true), ValueType::STRING);
         Y_EQUAL(reader.detailedValueType(true), DetailedValueType::STRING);
-        Y_EQUAL(read<std::string>(reader), "Hello world!");
+        Y_EQUAL(get<std::string>(reader), "Hello world!");
         Y_ASSERT(reader.nextKey());
         Y_EQUAL(reader.valueType(true), ValueType::STRING);
         Y_EQUAL(reader.detailedValueType(true), DetailedValueType::STRING);
-        Y_EQUAL(read<std::string>(reader), "Array");
+        Y_EQUAL(get<std::string>(reader), "Array");
         Y_ASSERT(reader.nextValue());
         Y_EQUAL(reader.valueType(true), ValueType::ARRAY);
         Y_EQUAL(reader.detailedValueType(true), DetailedValueType::ARRAY);
@@ -42,11 +42,11 @@ namespace
         Y_ASSERT(reader.nextValue());
         Y_EQUAL(reader.valueType(true), ValueType::INTEGER);
         Y_EQUAL(reader.detailedValueType(true), DetailedValueType::UINT_15);
-        Y_EQUAL(read<int16_t>(reader), 0x1020);
+        Y_EQUAL(get<int16_t>(reader), 0x1020);
         Y_ASSERT(reader.nextValue());
         Y_EQUAL(reader.valueType(true), ValueType::INTEGER);
         Y_EQUAL(reader.detailedValueType(true), DetailedValueType::UINT_8);
-        Y_EQUAL(read<int64_t>(reader), 240);
+        Y_EQUAL(get<int64_t>(reader), 240);
         Y_ASSERT(!reader.nextValue());
         Y_ASSERT(!reader.nextValue());
         reader.leave();
@@ -76,7 +76,7 @@ namespace
     {
         UBJsonReader reader(doc, sizeof(doc) - 1);
         Y_ASSERT(reader.nextValue());
-        Y_EQUAL(read<T>(reader), expectedValue);
+        Y_EQUAL(get<T>(reader), expectedValue);
     }
 
     template <typename T>
@@ -84,7 +84,7 @@ namespace
     {
         UBJsonReader reader(doc.data(), doc.size());
         Y_ASSERT(reader.nextValue());
-        Y_EQUAL(read<T>(reader), expectedValue);
+        Y_EQUAL(get<T>(reader), expectedValue);
     }
 
     template <typename T>
@@ -93,7 +93,7 @@ namespace
         UBJsonReader reader(doc.data(), doc.size());
         Y_ASSERT(reader.nextValue());
         T value;
-        Y_ASSERT(!reader.read(value));
+        Y_ASSERT(!reader.get(value));
     }
 
     void test_Read()
@@ -286,7 +286,7 @@ namespace
             ss.seekg(0);
             UBJsonReader reader(ss);
             reader.nextValue();
-            Y_EQUAL(Yson::read<std::string>(reader), buffer.first);
+            Y_EQUAL(Yson::get<std::string>(reader), buffer.first);
         }
         catch(...)
         {

@@ -33,6 +33,7 @@ namespace Yson
         if (str.empty())
             return ValueType::INVALID;
         auto assumedType = ValueType::UNKNOWN;
+
         size_t i = 0;
         if (str[i] == '-' || str[i] == '+')
         {
@@ -40,6 +41,7 @@ namespace Yson
                 return ValueType::INVALID;
             assumedType = ValueType::INTEGER;
         }
+
         if (str[i] == '0')
         {
             if (++i == str.size())
@@ -60,7 +62,9 @@ namespace Yson
             }
         }
         else if (getDigit(str[i]) <= 9)
+        {
             return getNumberValueType(str.substr(i));
+        }
 
         if (str.substr(i) == "Infinity")
             return ValueType::FLOAT;

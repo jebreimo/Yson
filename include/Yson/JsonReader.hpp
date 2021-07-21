@@ -63,37 +63,37 @@ namespace Yson
                 bool analyzeStrings) const override;
 
         [[nodiscard]]
-        bool readNull() const override;
+        bool isNull() const override;
 
-        bool read(bool& value) const override;
+        bool get(bool& value) const override;
 
-        bool read(int8_t& value) const override;
+        bool get(int8_t& value) const override;
 
-        bool read(int16_t& value) const override;
+        bool get(int16_t& value) const override;
 
-        bool read(int32_t& value) const override;
+        bool get(int32_t& value) const override;
 
-        bool read(int64_t& value) const override;
+        bool get(int64_t& value) const override;
 
-        bool read(uint8_t& value) const override;
+        bool get(uint8_t& value) const override;
 
-        bool read(uint16_t& value) const override;
+        bool get(uint16_t& value) const override;
 
-        bool read(uint32_t& value) const override;
+        bool get(uint32_t& value) const override;
 
-        bool read(uint64_t& value) const override;
+        bool get(uint64_t& value) const override;
 
-        bool read(float& value) const override;
+        bool get(float& value) const override;
 
-        bool read(double& value) const override;
+        bool get(double& value) const override;
 
-        bool read(long double& value) const;
+        bool get(long double& value) const;
 
-        bool read(char& value) const override;
+        bool get(char& value) const override;
 
-        bool read(std::string& value) const override;
+        bool get(std::string& value) const override;
 
-        bool readBase64(std::vector<char>& value) const override;
+        bool getBase64(std::vector<char>& value) const override;
 
         bool readBinary(std::vector<char>& value) override;
 
@@ -134,10 +134,10 @@ namespace Yson
         JsonItem readObject();
 
         template <typename T>
-        bool readInteger(T& value) const;
+        bool getInteger(T& value) const;
 
         template <typename T>
-        bool readFloatingPoint(T& value) const;
+        bool getFloatingPoint(T& value) const;
 
         struct Members;
         std::unique_ptr<Members> m_Members;

@@ -228,17 +228,17 @@ namespace Yson
         }
     }
 
-    bool JsonReader::readNull() const
+    bool JsonReader::isNull() const
     {
         assertStateIsKeyOrValue();
         if (currentTokenIsValue())
         {
-            return m_Members->tokenizer.tokenString() ==     "null";
+            return m_Members->tokenizer.tokenString() == "null";
         }
         return false;
     }
 
-    bool JsonReader::read(bool& value) const
+    bool JsonReader::get(bool& value) const
     {
         assertStateIsKeyOrValue();
         if (currentTokenIsValue())
@@ -255,7 +255,7 @@ namespace Yson
                 return true;
             }
             uint8_t uValue;
-            if (readInteger(uValue) && uValue <= 1)
+            if (getInteger(uValue) && uValue <= 1)
             {
                 value = uValue == 1;
                 return true;
@@ -264,62 +264,62 @@ namespace Yson
         return false;
     }
 
-    bool JsonReader::read(int8_t& value) const
+    bool JsonReader::get(int8_t& value) const
     {
-        return readInteger(value);
+        return getInteger(value);
     }
 
-    bool JsonReader::read(int16_t& value) const
+    bool JsonReader::get(int16_t& value) const
     {
-        return readInteger(value);
+        return getInteger(value);
     }
 
-    bool JsonReader::read(int32_t& value) const
+    bool JsonReader::get(int32_t& value) const
     {
-        return readInteger(value);
+        return getInteger(value);
     }
 
-    bool JsonReader::read(int64_t& value) const
+    bool JsonReader::get(int64_t& value) const
     {
-        return readInteger(value);
+        return getInteger(value);
     }
 
-    bool JsonReader::read(uint8_t& value) const
+    bool JsonReader::get(uint8_t& value) const
     {
-        return readInteger(value);
+        return getInteger(value);
     }
 
-    bool JsonReader::read(uint16_t& value) const
+    bool JsonReader::get(uint16_t& value) const
     {
-        return readInteger(value);
+        return getInteger(value);
     }
 
-    bool JsonReader::read(uint32_t& value) const
+    bool JsonReader::get(uint32_t& value) const
     {
-        return readInteger(value);
+        return getInteger(value);
     }
 
-    bool JsonReader::read(uint64_t& value) const
+    bool JsonReader::get(uint64_t& value) const
     {
-        return readInteger(value);
+        return getInteger(value);
     }
 
-    bool JsonReader::read(float& value) const
+    bool JsonReader::get(float& value) const
     {
-        return readFloatingPoint(value);
+        return getFloatingPoint(value);
     }
 
-    bool JsonReader::read(double& value) const
+    bool JsonReader::get(double& value) const
     {
-        return readFloatingPoint(value);
+        return getFloatingPoint(value);
     }
 
-    bool JsonReader::read(long double& value) const
+    bool JsonReader::get(long double& value) const
     {
-        return readFloatingPoint(value);
+        return getFloatingPoint(value);
     }
 
-    bool JsonReader::read(char& value) const
+    bool JsonReader::get(char& value) const
     {
         assertStateIsKeyOrValue();
         auto tokenType = m_Members->tokenizer.tokenType();
@@ -350,7 +350,7 @@ namespace Yson
         return false;
     }
 
-    bool JsonReader::read(std::string& value) const
+    bool JsonReader::get(std::string& value) const
     {
         assertStateIsKeyOrValue();
         if (currentTokenIsValueOrString())
@@ -363,7 +363,7 @@ namespace Yson
         return false;
     }
 
-    bool JsonReader::readBase64(std::vector<char>& value) const
+    bool JsonReader::getBase64(std::vector<char>& value) const
     {
         assertStateIsKeyOrValue();
         if (currentTokenIsString())
@@ -387,7 +387,7 @@ namespace Yson
 
     bool JsonReader::readBinary(std::vector<char>& value)
     {
-        return readBase64(value);
+        return getBase64(value);
     }
 
     JsonItem JsonReader::readArray()
@@ -526,7 +526,7 @@ namespace Yson
     }
 
     template <typename T>
-    bool JsonReader::readInteger(T& value) const
+    bool JsonReader::getInteger(T& value) const
     {
         assertStateIsKeyOrValue();
         if (currentTokenIsValue())
@@ -535,7 +535,7 @@ namespace Yson
     }
 
     template <typename T>
-    bool JsonReader::readFloatingPoint(T& value) const
+    bool JsonReader::getFloatingPoint(T& value) const
     {
         assertStateIsKeyOrValue();
         if (currentTokenIsValue())

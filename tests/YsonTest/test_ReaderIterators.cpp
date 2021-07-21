@@ -21,9 +21,9 @@ namespace
         {
             Y_EQUAL(key, keys1.at(i++));
             if (key == "foo")
-                Y_EQUAL(Yson::read<std::string>(*reader), "bar");
+                Y_EQUAL(Yson::get<std::string>(*reader), "bar");
             if (key == "val")
-                Y_EQUAL(Yson::read<int32_t>(*reader), 123);
+                Y_EQUAL(Yson::get<int32_t>(*reader), 123);
             else if (key == "zap")
             {
                 std::vector<std::string> keys2 = {"a", "b"};
@@ -47,11 +47,11 @@ namespace
         {
             if (i == 0)
             {
-                Y_EQUAL(Yson::read<std::string>(*reader), "ab");
+                Y_EQUAL(Yson::get<std::string>(*reader), "ab");
             }
             else if (i == 1)
             {
-                Y_EQUAL(Yson::read<int>(*reader), 12);
+                Y_EQUAL(Yson::get<int>(*reader), 12);
             }
             else if (i == 2)
             {
@@ -59,9 +59,9 @@ namespace
                 for (Yson::ArrayIterator it2(*reader); it2.next();)
                 {
                     if (j == 0)
-                        Y_EQUAL(Yson::read<double>(*reader), 1.1);
+                        Y_EQUAL(Yson::get<double>(*reader), 1.1);
                     else if (j == 1)
-                        Y_EQUAL(Yson::read<bool>(*reader), true);
+                        Y_EQUAL(Yson::get<bool>(*reader), true);
                     ++j;
                 }
                 Y_EQUAL(j, 2);

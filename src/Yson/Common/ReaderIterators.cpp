@@ -55,7 +55,7 @@ namespace Yson
         {
             if (m_Reader->nextKey())
             {
-                m_Reader->read(m_Key);
+                m_Reader->get(m_Key);
                 m_Reader->nextValue();
             }
             else
@@ -100,7 +100,7 @@ namespace Yson
     }
 
     ArrayIterator::ArrayIterator(Reader& reader)
-        : m_Reader (& reader),
+        : m_Reader(&reader),
           m_State(0)
     {}
 
