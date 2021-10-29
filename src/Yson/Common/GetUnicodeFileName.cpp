@@ -1,14 +1,16 @@
 ﻿//****************************************************************************
-// Copyright © 2017, Trimble Inc.
-// Created 2017-07-31 by JEB
+// Copyright © 2017 Jan Erik Breimo. All rights reserved.
+// Created by Jan Erik Breimo on 2017-07-31.
+//
+// This file is distributed under the Simplified BSD License.
+// License text is included with the source distribution.
 //****************************************************************************
 #include <Yconvert/YconvertException.hpp>
 #include "GetUnicodeFileName.hpp"
 
 #if defined(_WIN32) || defined(_WIN64)
 #include "Yconvert/Convert.hpp"
-// #include "Ystring/YstringException.hpp"
-#include "ThrowYsonException.hpp"
+#include "Yson/YsonException.hpp"
 #endif
 
 namespace Yson
