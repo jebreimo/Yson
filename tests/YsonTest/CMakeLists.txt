@@ -20,7 +20,7 @@ add_executable(YsonTest
     test_GetValueType.cpp
     test_Base64.cpp
     test_GetValueType.cpp
-    test_IsJavaScriptIdentifier.cpp
+    $<$<NOT:$<AND:$<BOOL:${BUILD_SHARED_LIBS}>,$<CXX_COMPILER_ID:MSVC>>>:test_IsJavaScriptIdentifier.cpp>
     test_JsonItem.cpp
     test_JsonReader.cpp
     test_JsonTokenizer.cpp
