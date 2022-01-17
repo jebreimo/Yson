@@ -29,7 +29,7 @@ namespace Yconvert
                 --it;
                 auto offset = c - it->codePoint;
                 if (offset <= it->length)
-                    return it->index + offset;
+                    return char(it->index + offset);
             }
             return {};
         }

@@ -266,7 +266,7 @@ namespace Yson
     {
         return value(Yconvert::convertTo<std::string>(
             text,
-            Yconvert::Encoding::UTF_16_NATIVE,
+            Yconvert::Encoding::WSTRING_NATIVE,
             Yconvert::Encoding::UTF_8));
     }
 

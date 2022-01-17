@@ -24,6 +24,7 @@ namespace Yconvert
         ASCII,
         UTF_16_NATIVE = IsLittleEndian ? UTF_16_LE : UTF_16_BE,
         UTF_32_NATIVE = IsLittleEndian ? UTF_32_LE : UTF_32_BE,
+        WSTRING_NATIVE = sizeof(wchar_t) == 2 ? UTF_16_NATIVE : UTF_32_NATIVE,
     #ifdef YCONVERT_ENABLE_ISO_CODE_PAGES
         ISO_8859_1 = 128,
         ISO_8859_2,

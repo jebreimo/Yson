@@ -263,6 +263,16 @@ namespace
         Y_EQUAL(ss.str(), "\"ABC\\\"\\uD801\\uDC37\\\"DEF\"");
     }
 
+    void test_LongWstring()
+    {
+        using namespace std::string_literals;
+        std::stringstream ss;
+        JsonWriter writer(ss);
+        std::wstring ws = L"Property(Name = D.01_Prosess_1, Value = 74.4191, Utlegging av matjord (A-sjikt))Property(Name = D.02_Prosess_2, Value = 74.4191, Utlegging av matjord (B-sjikt))Property(Name = A.01_Objektnavn, Value = )Property(Name = E.01_Overflatebehandling, Value = Matjorda skal legges ut løst med ujevn overflate på ruglete/løs/ujevn undergrunnsmasse. Matjorda skal ikke komprimeres.)Property(Name = E.02_Sjikt_01, Value = Matjord, A-sjikt, t= avhengig av avtak, min. 50 cm)Property(Name = E.03_Sjikt_02, Value = Matjord, B-sjikt, t= avhengig av avtak, ca 20-40 cm)Property(Name = E.04_Sjikt_03, Value = Usoldet jord fra linja, til traubunn/fjell)Property(Name = A.02_Objektkode_tekst, Value = Matjord)Property(Name = A.03_Objektkode_nummer, Value = 744190)Property(Name = A.04_Beskrivelse, Value = Mellomlagret matjord tilbakeført fra ranker på samme eiendom.)Property(Name = B.01_Parsell, Value = )Property(Name = B.02_Område, Value = )Property(Name = C.01_MMI, Value = )Property(Name = D.03_Prosess_3, Value = 25.223, Usoldet jord fra linja)Property(Name = F.01_Merknad, Value = Omfatter også nødvendig utsortering av stubber, røtter, kvist og stein/klumper med tykkelse 50-100mm. All tilbakeføring skal skje med beltegående maskin.)Property(Name = G.01_Vertikalnivå, Value = 1)";
+        writer.value(ws).flush();
+        Y_EQUAL(ss.str(), u8"\"Property(Name = D.01_Prosess_1, Value = 74.4191, Utlegging av matjord (A-sjikt))Property(Name = D.02_Prosess_2, Value = 74.4191, Utlegging av matjord (B-sjikt))Property(Name = A.01_Objektnavn, Value = )Property(Name = E.01_Overflatebehandling, Value = Matjorda skal legges ut løst med ujevn overflate på ruglete/løs/ujevn undergrunnsmasse. Matjorda skal ikke komprimeres.)Property(Name = E.02_Sjikt_01, Value = Matjord, A-sjikt, t= avhengig av avtak, min. 50 cm)Property(Name = E.03_Sjikt_02, Value = Matjord, B-sjikt, t= avhengig av avtak, ca 20-40 cm)Property(Name = E.04_Sjikt_03, Value = Usoldet jord fra linja, til traubunn/fjell)Property(Name = A.02_Objektkode_tekst, Value = Matjord)Property(Name = A.03_Objektkode_nummer, Value = 744190)Property(Name = A.04_Beskrivelse, Value = Mellomlagret matjord tilbakeført fra ranker på samme eiendom.)Property(Name = B.01_Parsell, Value = )Property(Name = B.02_Område, Value = )Property(Name = C.01_MMI, Value = )Property(Name = D.03_Prosess_3, Value = 25.223, Usoldet jord fra linja)Property(Name = F.01_Merknad, Value = Omfatter også nødvendig utsortering av stubber, røtter, kvist og stein/klumper med tykkelse 50-100mm. All tilbakeføring skal skje med beltegående maskin.)Property(Name = G.01_Vertikalnivå, Value = 1)\"");
+    }
+
     Y_TEST(test_Basics,
            test_EscapedString,
            test_ManualFormatting,
@@ -277,5 +287,6 @@ namespace
            test_SpecialValues,
            test_MultiLineStrings,
            test_MultiLineStringsWithEscape,
-           test_EscapeNonAsciiCharacters);
+           test_EscapeNonAsciiCharacters,
+           test_LongWstring);
 }

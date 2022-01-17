@@ -361,7 +361,7 @@ namespace Yconvert
         auto srcSize0 = srcSize;
         auto dstSize0 = dstSize;
         auto csrc = static_cast<const char*>(src);
-        auto cdst = static_cast<const char*>(dst);
+        auto cdst = static_cast<char*>(dst);
         size_t numCodePoints = 0;
         try
         {
@@ -369,7 +369,7 @@ namespace Yconvert
             {
                 auto[m, n] = m_Decoder->decode(csrc, srcSize,
                                                m_Buffer.data(), m_Buffer.size());
-                auto [p, q] = m_Encoder->encode(m_Buffer.data(), n, dst, dstSize);
+                auto [p, q] = m_Encoder->encode(m_Buffer.data(), n, cdst, dstSize);
                 if (n != p)
                 {
                     srcSize -= findNthCodePoint(*m_Decoder, csrc, srcSize,

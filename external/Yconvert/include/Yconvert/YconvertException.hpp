@@ -22,15 +22,6 @@ namespace Yconvert
     class YconvertException : public std::runtime_error
     {
     public:
-        /**
-         * @brief Passes @a message on to the base class.
-         */
-        explicit YconvertException(const std::string& message) noexcept
-            : std::runtime_error(message)
-        {}
-
-        explicit YconvertException(const char* message) noexcept
-            : std::runtime_error(message)
-        {}
+        using std::runtime_error::runtime_error;
     };
 }

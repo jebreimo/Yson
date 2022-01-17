@@ -22,7 +22,7 @@ void testDetermineEncoding(const char* s, size_t len,
 
 TEST_CASE("Determine encoding from first character")
 {
-    testDetermineEncoding("(abc)", 5, Encoding::ASCII);
+    testDetermineEncoding("(abc)", 5, Encoding::UTF_8);
     testDetermineEncoding(u8"Å", 2, Encoding::UTF_8);
     testDetermineEncoding("\0(\xAA\xAA", 4, Encoding::UTF_16_BE);
     testDetermineEncoding("\xAA\0", 2, Encoding::UTF_16_LE);

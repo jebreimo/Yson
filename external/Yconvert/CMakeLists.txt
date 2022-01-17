@@ -6,7 +6,7 @@
 ## License text is included with the source distribution.
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.16)
-project(Yconvert VERSION 0.1.0)
+project(Yconvert VERSION 0.1.3)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -50,6 +50,7 @@ add_library(Yson_Yconvert OBJECT
     include/Yconvert/Yconvert.hpp
     include/Yconvert/YconvertDefinitions.hpp
     include/Yconvert/YconvertException.hpp
+#   src/Yconvert/CodePageDecoder.cpp
 #    src/Yconvert/CodePageDecoder.hpp
     src/Yconvert/CodePageDefinitions.hpp
     src/Yconvert/Convert.cpp
@@ -68,7 +69,7 @@ add_library(Yson_Yconvert OBJECT
     src/Yconvert/Utf32Encoder.hpp
     src/Yconvert/Utf32Decoder.hpp
 #    src/Yconvert/CodePageEncoder.cpp
-    src/Yconvert/CodePageEncoder.hpp
+#   src/Yconvert/CodePageEncoder.hpp
     src/Yconvert/YconvertThrow.hpp
     )
 
