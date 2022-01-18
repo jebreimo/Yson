@@ -73,6 +73,7 @@ namespace Yson
         bool formattingEnabled = true;
         char indentationCharacter = ' ';
         int maximumLineWidth = 120;
+        std::unique_ptr<Yconvert::Converter> wstringConverter;
     };
 
     JsonWriter::JsonWriter(JsonFormatting formatting)
@@ -264,10 +265,16 @@ namespace Yson
 
     JsonWriter& JsonWriter::value(std::wstring_view text)
     {
-        return value(Yconvert::convertTo<std::string>(
-            text,
-            Yconvert::Encoding::WSTRING_NATIVE,
-            Yconvert::Encoding::UTF_8));
+        auto& converter = members().wstringConverter;
+        if (!converter)
+        {
+            converter = std::make_unique<Yconvert::Converter>(
+                Yconvert::Encoding::WSTRING_NATIVE,
+                Yconvert::Encoding::UTF_8);
+            converter->setErrorHandlingPolicy(Yconvert::ErrorPolicy::REPLACE);
+        }
+
+        return value(Yconvert::convertTo<std::string>(text, *converter));
     }
 
     JsonWriter& JsonWriter::rawValue(std::string_view value)

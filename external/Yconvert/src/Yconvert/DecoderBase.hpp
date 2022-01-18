@@ -40,6 +40,6 @@ namespace Yconvert
                  char32_t* dst, size_t dstSize) const = 0;
     private:
         Encoding m_Encoding;
-        ErrorPolicy m_ErrorHandlingPolicy;
+        ErrorPolicy m_ErrorHandlingPolicy = ErrorPolicy::THROW;
     };
 }

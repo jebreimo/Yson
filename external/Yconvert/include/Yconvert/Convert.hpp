@@ -19,6 +19,18 @@
 namespace Yconvert
 {
     /**
+     * @brief Converts the string @a source with @a converter
+     *  and writes the result to @a destination.
+     *
+     * @returns The number of bytes read from source and the number of bytes
+     *  written to destination.
+     */
+    std::pair<size_t, size_t>
+    convertString(const void* source, size_t sourceSize,
+                  void* destination, size_t destinationSize,
+                  Converter& converter);
+
+    /**
      * @brief Converts the string @a source from @a sourceEncoding
      *  to @a destinationEncoding and writes the result to @a destination.
      *
@@ -30,7 +42,28 @@ namespace Yconvert
                   Encoding sourceEncoding,
                   void* destination, size_t destinationSize,
                   Encoding destinationEncoding,
-                  ErrorPolicy errorPolicy);
+                  ErrorPolicy errorPolicy = ErrorPolicy::REPLACE);
+
+    /**
+     * @brief Converts the string @a source with @a converter and writes
+     *  the result to @a destination.
+     *
+     * @returns The number of values read from source and the number of
+     *  bytes written to destination.
+     */
+    template <typename CharT>
+    std::pair<size_t, size_t>
+    convertString(std::basic_string_view<CharT> source,
+                  void* destination, size_t destinationSize,
+                  Converter& converter)
+    {
+        using SrcString = std::basic_string_view<CharT>;
+        auto srcSize = source.size() * sizeof(typename SrcString::value_type);
+        auto n = converter.convert(source.data(), srcSize,
+                                   destination, destinationSize);
+        return {n.first / sizeof(typename SrcString::value_type),
+                n.second};
+    }
 
     /**
      * @brief Converts the string @a source from @a sourceEncoding
@@ -45,16 +78,25 @@ namespace Yconvert
                   Encoding sourceEncoding,
                   void* destination, size_t destinationSize,
                   Encoding destinationEncoding,
-                  ErrorPolicy errorPolicy)
+                  ErrorPolicy errorPolicy = ErrorPolicy::REPLACE)
     {
         Converter converter(sourceEncoding, destinationEncoding);
         converter.setErrorHandlingPolicy(errorPolicy);
+        return convertString(source, destination, destinationSize, converter);
+    }
+
+    /**
+     * @brief Converts the string @a source with @a converter and writes
+     *  the result to @a destination.
+     */
+    template <typename CharT>
+    void convertString(std::basic_string_view<CharT> source,
+                       std::string& destination,
+                       Converter& converter)
+    {
         using SrcString = std::basic_string_view<CharT>;
         auto srcSize = source.size() * sizeof(typename SrcString::value_type);
-        auto n = converter.convert(source.data(), srcSize,
-                                   destination, destinationSize);
-        return {n.first / sizeof(typename SrcString::value_type),
-                n.second};
+        converter.convert(source.data(), srcSize, destination);
     }
 
     /**
@@ -70,9 +112,23 @@ namespace Yconvert
     {
         Converter converter(sourceEncoding, destinationEncoding);
         converter.setErrorHandlingPolicy(errorPolicy);
-        using SrcString = std::basic_string_view<CharT>;
-        auto srcSize = source.size() * sizeof(typename SrcString::value_type);
-        converter.convert(source.data(), srcSize, destination);
+        convertString(source, destination, converter);
+    }
+
+    /**
+     * @brief Converts the string @a source with @a converter and writes
+     *  the result to @a destination.
+     */
+    template <typename Char1T, typename Char2T>
+    void convertString(std::basic_string_view<Char1T> source,
+                       std::basic_string<Char2T>& destination,
+                       Converter& converter)
+    {
+        auto srcSize = source.size() * sizeof(Char1T);
+        auto dstSize = converter.getEncodedSize(source.data(), srcSize);
+        destination.resize(dstSize / sizeof(Char2T));
+        converter.convert(source.data(), srcSize,
+                          destination.data(), dstSize);
     }
 
     /**
@@ -88,16 +144,44 @@ namespace Yconvert
     {
         Converter converter(sourceEncoding, destinationEncoding);
         converter.setErrorHandlingPolicy(errorPolicy);
-        auto srcSize = source.size() * sizeof(Char1T);
-        auto dstSize = converter.getEncodedSize(source.data(), srcSize);
-        destination.resize(dstSize / sizeof(Char2T));
-        converter.convert(source.data(), srcSize,
-                          destination.data(), dstSize);
+        convertString(source, destination, converter);
+    }
+
+    /**
+     * @brief Converts the string @a source with @a converter
+     *  and returns the result.
+     *
+     * The first template parameter is the result's string type and must be
+     * specified explicitly.
+     */
+    template <typename StringT, typename CharT>
+    StringT convertTo(std::basic_string_view<CharT> source,
+                      Converter& converter)
+    {
+        StringT result;
+        convertString<CharT, typename StringT::value_type>(source, result,
+                                                           converter);
+        return result;
+    }
+
+    /**
+     * @brief Converts the string @a source with @a converter
+     *  and returns the result.
+     *
+     * The first template parameter is the result's string type and must be
+     * specified explicitly.
+     */
+    template <typename StringT, typename CharT>
+    StringT convertTo(const std::basic_string<CharT>& source,
+                      Converter& converter)
+    {
+        return convertTo<StringT>(std::basic_string_view<CharT>(source),
+                                  converter);
     }
 
     /**
      * @brief Converts the string @a source from @a sourceEncoding
-     *  to @a destinationEncoding and returns the result to @a destination.
+     *  to @a destinationEncoding and returns the result.
      *
      * The first template parameter is the result's string type and must be
      * specified explicitly.
@@ -114,6 +198,13 @@ namespace Yconvert
         return result;
     }
 
+    /**
+     * @brief Converts the string @a source from @a sourceEncoding
+     *  to @a destinationEncoding and returns the result.
+     *
+     * The first template parameter is the result's string type and must be
+     * specified explicitly.
+     */
     template <typename StringT, typename CharT>
     StringT convertTo(const std::basic_string<CharT>& source,
                       Encoding sourceEncoding,

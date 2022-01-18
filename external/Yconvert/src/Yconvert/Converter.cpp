@@ -178,8 +178,7 @@ namespace Yconvert
     Converter::Converter(Encoding srcEncoding, Encoding dstEncoding)
         : m_Decoder(makeDecoder(srcEncoding)),
           m_Encoder(makeEncoder(dstEncoding)),
-          m_ConversionType(getConversionType(srcEncoding, dstEncoding)),
-          m_Buffer(DEFAULT_BUFFER_SIZE)
+          m_ConversionType(getConversionType(srcEncoding, dstEncoding))
     {}
 
     Converter::Converter(Converter&&) noexcept = default;
@@ -190,7 +189,7 @@ namespace Yconvert
 
     size_t Converter::bufferSize() const
     {
-        return m_Buffer.size();
+        return m_Buffer.empty() ? DEFAULT_BUFFER_SIZE : m_Buffer.size();
     }
 
     void Converter::setBufferSize(size_t value)
@@ -233,6 +232,10 @@ namespace Yconvert
     {
         if (m_ConversionType != ConversionType::CONVERT)
             return srcSize;
+
+        if (m_Buffer.empty())
+            m_Buffer.resize(DEFAULT_BUFFER_SIZE);
+
         const auto& dec = getEncodingInfo(m_Decoder->encoding());
         const auto& enc = getEncodingInfo(m_Encoder->encoding());
         if (dec.maxUnits == 1 && enc.maxUnits == 1)
@@ -335,6 +338,9 @@ namespace Yconvert
     size_t Converter::doConvert(const void* src, size_t srcSize,
                                 std::string& dst)
     {
+        if (m_Buffer.empty())
+            m_Buffer.resize(DEFAULT_BUFFER_SIZE);
+
         auto originalSize = srcSize;
         auto csrc = static_cast<const char*>(src);
         while (srcSize != 0)
@@ -358,6 +364,9 @@ namespace Yconvert
     Converter::doConvert(const void* src, size_t srcSize,
                          void* dst, size_t dstSize)
     {
+        if (m_Buffer.empty())
+            m_Buffer.resize(DEFAULT_BUFFER_SIZE);
+
         auto srcSize0 = srcSize;
         auto dstSize0 = dstSize;
         auto csrc = static_cast<const char*>(src);
