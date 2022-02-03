@@ -10,9 +10,9 @@
 namespace Yconvert
 {
     std::pair<size_t, size_t>
-    Yconvert::convertString(const void *source, size_t sourceSize,
-                            void *destination, size_t destinationSize,
-                            Converter &converter)
+    convertString(const void* source, size_t sourceSize,
+                  void* destination, size_t destinationSize,
+                  Converter &converter)
     {
         return converter.convert(source, sourceSize,
                                  destination, destinationSize);
