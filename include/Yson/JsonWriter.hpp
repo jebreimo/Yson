@@ -24,7 +24,7 @@ namespace Yson
          *
          * @param formatting the automatic formatting that will be used.
          */
-        explicit JsonWriter(JsonFormatting formatting = JsonFormatting::NONE);
+        explicit JsonWriter(JsonFormatting formatting = JsonFormatting::FORMAT);
 
         /**
          * @brief Creates a JSON writer that creates and writes to a file
@@ -33,10 +33,10 @@ namespace Yson
          * @param formatting the automatic formatting that will be used.
          */
         explicit JsonWriter(const std::string& fileName,
-                            JsonFormatting formatting = JsonFormatting::NONE);
+                            JsonFormatting formatting = JsonFormatting::FORMAT);
 
         explicit JsonWriter(std::ostream& stream,
-                            JsonFormatting formatting = JsonFormatting::NONE);
+                            JsonFormatting formatting = JsonFormatting::FORMAT);
 
         JsonWriter(const JsonWriter&) = delete;
 
@@ -100,7 +100,7 @@ namespace Yson
 
         JsonWriter& value(long double value);
 
-        JsonWriter& value(std::wstring_view text) override;
+        JsonWriter& value(std::wstring_view value) override;
 
         JsonWriter& value(std::string_view value) override;
 

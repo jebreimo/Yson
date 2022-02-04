@@ -263,7 +263,7 @@ namespace Yson
         }
     }
 
-    JsonWriter& JsonWriter::value(std::wstring_view text)
+    JsonWriter& JsonWriter::value(std::wstring_view value)
     {
         auto& converter = members().wstringConverter;
         if (!converter)
@@ -274,7 +274,8 @@ namespace Yson
             converter->setErrorHandlingPolicy(Yconvert::ErrorPolicy::REPLACE);
         }
 
-        return value(Yconvert::convertTo<std::string>(text, *converter));
+        return JsonWriter::value(Yconvert::convertTo<std::string>(
+            value, *converter));
     }
 
     JsonWriter& JsonWriter::rawValue(std::string_view value)

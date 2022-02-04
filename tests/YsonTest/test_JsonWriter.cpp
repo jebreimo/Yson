@@ -18,7 +18,7 @@ namespace
     void test_Basics()
     {
         std::ostringstream stream;
-        JsonWriter writer(stream);
+        JsonWriter writer(stream, JsonFormatting::NONE);
         writer.key("Key");
         Y_EQUAL(writer.key(), "Key");
         writer.beginArray().value(12345678)
@@ -193,7 +193,7 @@ namespace
     void test_UnquotedValueNames()
     {
         std::stringstream ss;
-        JsonWriter writer(ss);
+        JsonWriter writer(ss, JsonFormatting::NONE);
         writer.setUnquotedValueNamesEnabled(true);
         writer.beginObject()
               .key("Key1").value(0)
@@ -224,7 +224,7 @@ namespace
     void test_SpecialValues()
     {
         std::stringstream ss;
-        JsonWriter writer(ss);
+        JsonWriter writer(ss, JsonFormatting::NONE);
         writer.beginArray();
         writer.boolean(true).boolean(false).null();
         writer.endArray().flush();
