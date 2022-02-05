@@ -65,21 +65,25 @@ namespace Yson
 
         virtual Writer& value(char value) = 0;
 
-        virtual Writer& value(int8_t value) = 0;
+        virtual Writer& value(signed char value) = 0;
 
-        virtual Writer& value(int16_t value) = 0;
+        virtual Writer& value(short value) = 0;
 
-        virtual Writer& value(int32_t value) = 0;
+        virtual Writer& value(int value) = 0;
 
-        virtual Writer& value(int64_t value) = 0;
+        virtual Writer& value(long value) = 0;
 
-        virtual Writer& value(uint8_t value) = 0;
+        virtual Writer& value(long long value) = 0;
 
-        virtual Writer& value(uint16_t value) = 0;
+        virtual Writer& value(unsigned char value) = 0;
 
-        virtual Writer& value(uint32_t value) = 0;
+        virtual Writer& value(unsigned short value) = 0;
 
-        virtual Writer& value(uint64_t value) = 0;
+        virtual Writer& value(unsigned value) = 0;
+
+        virtual Writer& value(unsigned long value) = 0;
+
+        virtual Writer& value(unsigned long long value) = 0;
 
         virtual Writer& value(float value) = 0;
 

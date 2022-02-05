@@ -59,21 +59,25 @@ namespace Yson
 
         UBJsonWriter& boolean(bool value) override;
 
-        UBJsonWriter& value(int8_t value) override;
+        UBJsonWriter& value(signed char value) override;
 
-        UBJsonWriter& value(int16_t value) override;
+        UBJsonWriter& value(short value) override;
 
-        UBJsonWriter& value(int32_t value) override;
+        UBJsonWriter& value(int value) override;
 
-        UBJsonWriter& value(int64_t value) override;
+        UBJsonWriter& value(long value) override;
 
-        UBJsonWriter& value(uint8_t value) override;
+        UBJsonWriter& value(long long value) override;
 
-        UBJsonWriter& value(uint16_t value) override;
+        UBJsonWriter& value(unsigned char value) override;
 
-        UBJsonWriter& value(uint32_t value) override;
+        UBJsonWriter& value(unsigned short value) override;
 
-        UBJsonWriter& value(uint64_t value) override;
+        UBJsonWriter& value(unsigned value) override;
+
+        UBJsonWriter& value(unsigned long value) override;
+
+        UBJsonWriter& value(unsigned long long value) override;
 
         UBJsonWriter& value(char value) override;
 

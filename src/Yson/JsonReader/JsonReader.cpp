@@ -264,42 +264,52 @@ namespace Yson
         return false;
     }
 
-    bool JsonReader::read(int8_t& value) const
+    bool JsonReader::read(signed char& value) const
     {
         return readInteger(value);
     }
 
-    bool JsonReader::read(int16_t& value) const
+    bool JsonReader::read(short& value) const
     {
         return readInteger(value);
     }
 
-    bool JsonReader::read(int32_t& value) const
+    bool JsonReader::read(int& value) const
     {
         return readInteger(value);
     }
 
-    bool JsonReader::read(int64_t& value) const
+    bool JsonReader::read(long& value) const
     {
         return readInteger(value);
     }
 
-    bool JsonReader::read(uint8_t& value) const
+    bool JsonReader::read(long long& value) const
     {
         return readInteger(value);
     }
 
-    bool JsonReader::read(uint16_t& value) const
+    bool JsonReader::read(unsigned char& value) const
     {
         return readInteger(value);
     }
 
-    bool JsonReader::read(uint32_t& value) const
+    bool JsonReader::read(unsigned short& value) const
     {
         return readInteger(value);
     }
 
-    bool JsonReader::read(uint64_t& value) const
+    bool JsonReader::read(unsigned int& value) const
+    {
+        return readInteger(value);
+    }
+
+    bool JsonReader::read(unsigned long& value) const
+    {
+        return readInteger(value);
+    }
+
+    bool JsonReader::read(unsigned long long& value) const
     {
         return readInteger(value);
     }

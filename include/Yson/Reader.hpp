@@ -77,21 +77,25 @@ namespace Yson
 
         virtual bool read(bool& value) const = 0;
 
-        virtual bool read(int8_t& value) const = 0;
+        virtual bool read(signed char& value) const = 0;
 
-        virtual bool read(int16_t& value) const = 0;
+        virtual bool read(short& value) const = 0;
 
-        virtual bool read(int32_t& value) const = 0;
+        virtual bool read(int& value) const = 0;
 
-        virtual bool read(int64_t& value) const = 0;
+        virtual bool read(long& value) const = 0;
 
-        virtual bool read(uint8_t& value) const = 0;
+        virtual bool read(long long& value) const = 0;
 
-        virtual bool read(uint16_t& value) const = 0;
+        virtual bool read(unsigned char& value) const = 0;
 
-        virtual bool read(uint32_t& value) const = 0;
+        virtual bool read(unsigned short& value) const = 0;
 
-        virtual bool read(uint64_t& value) const = 0;
+        virtual bool read(unsigned int& value) const = 0;
+
+        virtual bool read(unsigned long& value) const = 0;
+
+        virtual bool read(unsigned long long& value) const = 0;
 
         virtual bool read(float& value) const = 0;
 

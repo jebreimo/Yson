@@ -345,49 +345,61 @@ namespace Yson
         }
     }
 
-    bool UBJsonReader::read(int8_t& value) const
+    bool UBJsonReader::read(signed char& value) const
     {
         assertStateIsKeyOrValue();
         return setIntegerValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(int16_t& value) const
+    bool UBJsonReader::read(short& value) const
     {
         assertStateIsKeyOrValue();
         return setIntegerValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(int32_t& value) const
+    bool UBJsonReader::read(int& value) const
     {
         assertStateIsKeyOrValue();
         return setIntegerValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(int64_t& value) const
+    bool UBJsonReader::read(long& value) const
     {
         assertStateIsKeyOrValue();
         return setIntegerValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(uint8_t& value) const
+    bool UBJsonReader::read(long long& value) const
     {
         assertStateIsKeyOrValue();
         return setIntegerValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(uint16_t& value) const
+    bool UBJsonReader::read(unsigned char& value) const
     {
         assertStateIsKeyOrValue();
         return setIntegerValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(uint32_t& value) const
+    bool UBJsonReader::read(unsigned short& value) const
     {
         assertStateIsKeyOrValue();
         return setIntegerValue(value, m_Members->tokenizer);
     }
 
-    bool UBJsonReader::read(uint64_t& value) const
+    bool UBJsonReader::read(unsigned int& value) const
+    {
+        assertStateIsKeyOrValue();
+        return setIntegerValue(value, m_Members->tokenizer);
+    }
+
+    bool UBJsonReader::read(unsigned long& value) const
+    {
+        assertStateIsKeyOrValue();
+        return setIntegerValue(value, m_Members->tokenizer);
+    }
+
+    bool UBJsonReader::read(unsigned long long& value) const
     {
         assertStateIsKeyOrValue();
         return setIntegerValue(value, m_Members->tokenizer);

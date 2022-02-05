@@ -159,6 +159,16 @@ namespace
     {
         Y_CALL(doTestInteger(32, "32"));
         Y_CALL(doTestInteger(char(20), "20"));
+        Y_CALL(doTestInteger(static_cast<unsigned char>(20), "20"));
+        Y_CALL(doTestInteger(static_cast<signed char>(20), "20"));
+        Y_CALL(doTestInteger(static_cast<short>(20), "20"));
+        Y_CALL(doTestInteger(static_cast<unsigned short>(20), "20"));
+        Y_CALL(doTestInteger(static_cast<int>(20), "20"));
+        Y_CALL(doTestInteger(static_cast<unsigned int>(20), "20"));
+        Y_CALL(doTestInteger(static_cast<long>(20), "20"));
+        Y_CALL(doTestInteger(static_cast<unsigned long>(20), "20"));
+        Y_CALL(doTestInteger(static_cast<long long>(20), "20"));
+        Y_CALL(doTestInteger(static_cast<unsigned long long>(20), "20"));
     }
 
     template <typename T>

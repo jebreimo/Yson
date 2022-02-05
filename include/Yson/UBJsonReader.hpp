@@ -73,21 +73,25 @@ namespace Yson
 
         bool read(bool& value) const override;
 
-        bool read(int8_t& value) const override;
+        bool read(signed char& value) const override;
 
-        bool read(int16_t& value) const override;
+        bool read(short& value) const override;
 
-        bool read(int32_t& value) const override;
+        bool read(int& value) const override;
 
-        bool read(int64_t& value) const override;
+        bool read(long& value) const override;
 
-        bool read(uint8_t& value) const override;
+        bool read(long long& value) const override;
 
-        bool read(uint16_t& value) const override;
+        bool read(unsigned char& value) const override;
 
-        bool read(uint32_t& value) const override;
+        bool read(unsigned short& value) const override;
 
-        bool read(uint64_t& value) const override;
+        bool read(unsigned int& value) const override;
+
+        bool read(unsigned long& value) const override;
+
+        bool read(unsigned long long& value) const override;
 
         bool read(std::string& value) const override;
 

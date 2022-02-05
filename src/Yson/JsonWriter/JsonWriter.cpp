@@ -195,42 +195,52 @@ namespace Yson
         return writeIntValueImpl(value, "%hhi");
     }
 
-    JsonWriter& JsonWriter::value(int8_t value)
+    JsonWriter& JsonWriter::value(signed char value)
     {
         return writeIntValueImpl(value, "%hhi");
     }
 
-    JsonWriter& JsonWriter::value(int16_t value)
+    JsonWriter& JsonWriter::value(short value)
     {
         return writeIntValueImpl(value, "%hi");
     }
 
-    JsonWriter& JsonWriter::value(int32_t value)
+    JsonWriter& JsonWriter::value(int value)
     {
         return writeIntValueImpl(value, "%i");
     }
 
-    JsonWriter& JsonWriter::value(int64_t value)
+    JsonWriter& JsonWriter::value(long value)
     {
         return writeIntValueImpl(value, "%lli");
     }
 
-    JsonWriter& JsonWriter::value(uint8_t value)
+    JsonWriter& JsonWriter::value(long long value)
+    {
+        return writeIntValueImpl(value, "%lli");
+    }
+
+    JsonWriter& JsonWriter::value(unsigned char value)
     {
         return writeIntValueImpl(value, "%hhu");
     }
 
-    JsonWriter& JsonWriter::value(uint16_t value)
+    JsonWriter& JsonWriter::value(unsigned short value)
     {
         return writeIntValueImpl(value, "%hu");
     }
 
-    JsonWriter& JsonWriter::value(uint32_t value)
+    JsonWriter& JsonWriter::value(unsigned value)
     {
         return writeIntValueImpl(value, "%u");
     }
 
-    JsonWriter& JsonWriter::value(uint64_t value)
+    JsonWriter& JsonWriter::value(unsigned long value)
+    {
+        return writeIntValueImpl(value, "%llu");
+    }
+
+    JsonWriter& JsonWriter::value(unsigned long long value)
     {
         return writeIntValueImpl(value, "%llu");
     }

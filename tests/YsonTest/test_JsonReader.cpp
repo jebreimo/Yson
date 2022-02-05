@@ -168,6 +168,18 @@ namespace
         Y_CALL(assertRead<int64_t>("0x7FFF_FFFF_FFFF_FFFF",
                                    0x7FFFFFFFFFFFFFFF));
         Y_CALL(assertReadFails<int64_t>("0x8000_0000_0000_0000"));
+
+        Y_CALL(assertRead<char>("12", 12));
+        Y_CALL(assertRead<signed char>("12", 12));
+        Y_CALL(assertRead<unsigned char>("12", 12));
+        Y_CALL(assertRead<short>("12", 12));
+        Y_CALL(assertRead<unsigned short>("12", 12));
+        Y_CALL(assertRead<int>("12", 12));
+        Y_CALL(assertRead<unsigned int>("12", 12));
+        Y_CALL(assertRead<long>("12", 12));
+        Y_CALL(assertRead<unsigned long>("12", 12));
+        Y_CALL(assertRead<long long>("12", 12));
+        Y_CALL(assertRead<unsigned long long>("12", 12));
     }
 
     void test_read_floating_point()

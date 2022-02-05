@@ -13,19 +13,23 @@ namespace Yson
 {
     bool parse(std::string_view str, char& value, bool detectBase = false);
 
-    bool parse(std::string_view str, int8_t& value, bool detectBase = false);
+    bool parse(std::string_view str, signed char& value, bool detectBase = false);
 
-    bool parse(std::string_view str, int16_t& value, bool detectBase = false);
+    bool parse(std::string_view str, short& value, bool detectBase = false);
 
-    bool parse(std::string_view str, int32_t& value, bool detectBase = false);
+    bool parse(std::string_view str, int& value, bool detectBase = false);
 
-    bool parse(std::string_view str, int64_t& value, bool detectBase = false);
+    bool parse(std::string_view str, long& value, bool detectBase = false);
 
-    bool parse(std::string_view str, uint8_t& value, bool detectBase = false);
+    bool parse(std::string_view str, long long& value, bool detectBase = false);
 
-    bool parse(std::string_view str, uint16_t& value, bool detectBase = false);
+    bool parse(std::string_view str, unsigned char& value, bool detectBase = false);
 
-    bool parse(std::string_view str, uint32_t& value, bool detectBase = false);
+    bool parse(std::string_view str, unsigned short& value, bool detectBase = false);
 
-    bool parse(std::string_view str, uint64_t& value, bool detectBase = false);
+    bool parse(std::string_view str, unsigned int& value, bool detectBase = false);
+
+    bool parse(std::string_view str, unsigned long& value, bool detectBase = false);
+
+    bool parse(std::string_view str, unsigned long long& value, bool detectBase = false);
 }

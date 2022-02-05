@@ -176,52 +176,65 @@ namespace Yson
         return writeInteger(value);
     }
 
-    UBJsonWriter& UBJsonWriter::value(int8_t value)
+    UBJsonWriter& UBJsonWriter::value(signed char value)
     {
         return writeInteger(value);
     }
 
-    UBJsonWriter& UBJsonWriter::value(int16_t value)
+    UBJsonWriter& UBJsonWriter::value(short value)
     {
         return writeInteger(value);
     }
 
-    UBJsonWriter& UBJsonWriter::value(int32_t value)
+    UBJsonWriter& UBJsonWriter::value(int value)
     {
         return writeInteger(value);
     }
 
-    UBJsonWriter& UBJsonWriter::value(int64_t value)
+    UBJsonWriter& UBJsonWriter::value(long value)
+    {
+        return writeInteger(static_cast<int64_t>(value));
+    }
+
+    UBJsonWriter& UBJsonWriter::value(long long value)
+    {
+        return writeInteger(static_cast<int64_t>(value));
+    }
+
+    UBJsonWriter& UBJsonWriter::value(unsigned char value)
     {
         return writeInteger(value);
     }
 
-    UBJsonWriter& UBJsonWriter::value(uint8_t value)
-    {
-        return writeInteger(value);
-    }
-
-    UBJsonWriter& UBJsonWriter::value(uint16_t value)
+    UBJsonWriter& UBJsonWriter::value(unsigned short value)
     {
         if (value <= INT16_MAX)
-            return writeInteger<int16_t>(value);
+            return writeInteger(static_cast<int16_t>(value));
         else if (!members().strictIntegerSizes)
             return writeInteger<int32_t>(value);
         YSON_THROW("uint16_t value " + std::to_string(value)
                    + " is greater than INT16_MAX");
     }
 
-    UBJsonWriter& UBJsonWriter::value(uint32_t value)
+    UBJsonWriter& UBJsonWriter::value(unsigned value)
     {
         if (value <= INT32_MAX)
-            return writeInteger<int32_t>(value);
+            return writeInteger(static_cast<int32_t>(value));
         else if (!members().strictIntegerSizes)
             return writeInteger<int64_t>(value);
         YSON_THROW("uint32_t value " + std::to_string(value)
                    + " is greater than INT32_MAX");
     }
 
-    UBJsonWriter& UBJsonWriter::value(uint64_t value)
+    UBJsonWriter& UBJsonWriter::value(unsigned long value)
+    {
+        if (value <= INT64_MAX)
+            return writeInteger(static_cast<int64_t>(value));
+        YSON_THROW("uint64_t value " + std::to_string(value)
+                   + " is greater than INT64_MAX");
+    }
+
+    UBJsonWriter& UBJsonWriter::value(unsigned long long value)
     {
         if (value <= INT64_MAX)
             return writeInteger(static_cast<int64_t>(value));

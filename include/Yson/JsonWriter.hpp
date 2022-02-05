@@ -78,21 +78,25 @@ namespace Yson
 
         JsonWriter& value(char value) override;
 
-        JsonWriter& value(int8_t value) override;
+        JsonWriter& value(signed char value) override;
 
-        JsonWriter& value(int16_t value) override;
+        JsonWriter& value(short value) override;
 
-        JsonWriter& value(int32_t value) override;
+        JsonWriter& value(int value) override;
 
-        JsonWriter& value(int64_t value) override;
+        JsonWriter& value(long value) override;
 
-        JsonWriter& value(uint8_t value) override;
+        JsonWriter& value(long long value) override;
 
-        JsonWriter& value(uint16_t value) override;
+        JsonWriter& value(unsigned char value) override;
 
-        JsonWriter& value(uint32_t value) override;
+        JsonWriter& value(unsigned short value) override;
 
-        JsonWriter& value(uint64_t value) override;
+        JsonWriter& value(unsigned value) override;
+
+        JsonWriter& value(unsigned long value) override;
+
+        JsonWriter& value(unsigned long long value) override;
 
         JsonWriter& value(float value) override;
 
