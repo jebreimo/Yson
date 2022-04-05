@@ -42,9 +42,9 @@ namespace Yson
         if (string.empty())
         {
             if (isEndOfFile)
-                return Result(JsonTokenType::END_OF_FILE, unwrap(string.end()), false);
+                return {JsonTokenType::END_OF_FILE, unwrap(string.end()), false};
             else
-                return Result(JsonTokenType::INCOMPLETE_TOKEN, unwrap(string.end()), true);
+                return {JsonTokenType::INCOMPLETE_TOKEN, unwrap(string.end()), true};
         }
 
         switch (string[0])
@@ -56,17 +56,17 @@ namespace Yson
         case '\n':
             return findEndOfNewline(string, isEndOfFile);
         case '[':
-            return Result(JsonTokenType::START_ARRAY, unwrap(string.begin() + 1));
+            return {JsonTokenType::START_ARRAY, unwrap(string.begin() + 1)};
         case ']':
-            return Result(JsonTokenType::END_ARRAY, unwrap(string.begin() + 1));
+            return {JsonTokenType::END_ARRAY, unwrap(string.begin() + 1)};
         case '{':
-            return Result(JsonTokenType::START_OBJECT, unwrap(string.begin() + 1));
+            return {JsonTokenType::START_OBJECT, unwrap(string.begin() + 1)};
         case '}':
-            return Result(JsonTokenType::END_OBJECT, unwrap(string.begin() + 1));
+            return {JsonTokenType::END_OBJECT, unwrap(string.begin() + 1)};
         case ':':
-            return Result(JsonTokenType::COLON, unwrap(string.begin() + 1));
+            return {JsonTokenType::COLON, unwrap(string.begin() + 1)};
         case ',':
-            return Result(JsonTokenType::COMMA, unwrap(string.begin() + 1));
+            return {JsonTokenType::COMMA, unwrap(string.begin() + 1)};
         case '"':
             return nextStringToken(string, isEndOfFile, '"');
         case '\'':
@@ -136,12 +136,12 @@ namespace Yson
         for (auto it = string.begin(); it != string.end(); ++it)
         {
             if (*it == '/' && precededByStar)
-                return Result(JsonTokenType::BLOCK_COMMENT, unwrap(++it));
+                return {JsonTokenType::BLOCK_COMMENT, unwrap(++it)};
             precededByStar = *it == '*';
         }
         if (isEndOfFile)
-            return Result(JsonTokenType::INVALID_TOKEN, unwrap(string.end()));
-        return Result(JsonTokenType::BLOCK_COMMENT, unwrap(string.end()), true);
+            return {JsonTokenType::INVALID_TOKEN, unwrap(string.end())};
+        return {JsonTokenType::BLOCK_COMMENT, unwrap(string.end()), true};
     }
 
     Result findEndOfLineComment(std::string_view string,
@@ -150,9 +150,9 @@ namespace Yson
         for (auto it = string.begin(); it != string.end(); ++it)
         {
             if (*it == '\r' || *it == '\n')
-                return Result(JsonTokenType::COMMENT, unwrap(it));
+                return {JsonTokenType::COMMENT, unwrap(it)};
         }
-        return Result(JsonTokenType::COMMENT, unwrap(string.end()), !isEndOfFile);
+        return {JsonTokenType::COMMENT, unwrap(string.end()), !isEndOfFile};
     }
 
     Result nextCommentToken(std::string_view string, bool isEndOfFile)
@@ -171,9 +171,9 @@ namespace Yson
         if (tokenType == JsonTokenType::INCOMPLETE_TOKEN)
         {
             if (!isEndOfFile)
-                return Result(JsonTokenType::COMMENT, unwrap(string.end()), true);
+                return {JsonTokenType::COMMENT, unwrap(string.end()), true};
             else
-                return Result(JsonTokenType::INVALID_TOKEN, unwrap(string.end()), false);
+                return {JsonTokenType::INVALID_TOKEN, unwrap(string.end()), false};
         }
 
         if (tokenType == JsonTokenType::COMMENT)
@@ -190,12 +190,12 @@ namespace Yson
         for (auto it = string.begin(); it != string.end(); ++it)
         {
             if (*it == '\n')
-                return Result(JsonTokenType::NEWLINE, unwrap(++it));
+                return {JsonTokenType::NEWLINE, unwrap(++it)};
             else if (precededByCr)
-                return Result(JsonTokenType::NEWLINE, unwrap(it));
+                return {JsonTokenType::NEWLINE, unwrap(it)};
             precededByCr = true;
         }
-        return Result(JsonTokenType::NEWLINE, unwrap(string.end()), !isEndOfFile);
+        return {JsonTokenType::NEWLINE, unwrap(string.end()), !isEndOfFile};
     }
 
     Result findEndOfValue(std::string_view string, bool isEndOfFile)
@@ -215,16 +215,16 @@ namespace Yson
             case ']':
             case '{':
             case '}':
-                return Result(JsonTokenType::VALUE, unwrap(it));
+                return {JsonTokenType::VALUE, unwrap(it)};
             case '/':
             case '*':
                 if (it != string.begin() && *(it - 1) == '/')
-                    return Result(JsonTokenType::VALUE, unwrap(it - 1));
+                    return {JsonTokenType::VALUE, unwrap(it - 1)};
             default:
                 break;
             }
         }
-        return Result(JsonTokenType::VALUE, unwrap(string.end()), !isEndOfFile);
+        return {JsonTokenType::VALUE, unwrap(string.end()), !isEndOfFile};
     }
 
     Result findEndOfWhitespace(std::string_view string)
@@ -232,9 +232,9 @@ namespace Yson
         for (auto it = string.begin(); it != string.end(); ++it)
         {
             if (*it != ' ' && *it != '\t')
-                return Result(JsonTokenType::WHITESPACE, unwrap(it));
+                return {JsonTokenType::WHITESPACE, unwrap(it)};
         }
-        return Result(JsonTokenType::WHITESPACE, unwrap(string.end()));
+        return {JsonTokenType::WHITESPACE, unwrap(string.end())};
     }
 
     JsonTokenType determineCommentType(std::string_view string)
@@ -255,14 +255,14 @@ namespace Yson
     std::pair<size_t, size_t> countLinesAndColumns(std::string_view string)
     {
         size_t lines = 0, cols = 0;
-        for (auto it = string.begin(); it != string.end(); ++it)
+        for (char ch : string)
         {
-            if (*it == '\n')
+            if (ch == '\n')
             {
                 ++lines;
                 cols = 1;
             }
-            else if (*it == '\r')
+            else if (ch == '\r')
             {
                 cols = 1;
             }
