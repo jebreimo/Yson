@@ -754,10 +754,10 @@ namespace Yson
             // RAII-class. If so, make sure that we're not already processing
             // another exception before throwing our own.
             if (std::uncaught_exceptions())
-                YSON_THROW(std::string("Incorrect position for '")
-                           + endChar + "'");
-            else
                 return *this;
+
+            YSON_THROW(std::string("Incorrect position for '")
+                       + endChar + "'");
         }
 
         switch (m.state)
