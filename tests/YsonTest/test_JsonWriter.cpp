@@ -185,7 +185,7 @@ namespace
 
     void test_FloatingPointValues()
     {
-        Y_CALL(doTestFloatingPoint(1.0f / 3.0f, 9, "0.333333"));
+        Y_CALL(doTestFloatingPoint(1.0f / 3.0f, 6, "0.333333"));
         Y_CALL(doTestFloatingPoint(1.0 / 3.0, 9, "0.333333333"));
     }
 

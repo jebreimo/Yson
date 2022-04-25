@@ -8,9 +8,9 @@
 #include "Yson/JsonWriter.hpp"
 
 #include <array>
+#include <charconv>
 #include <cmath>
 #include <fstream>
-#include <iostream>
 #include <stack>
 #include <Yconvert/Convert.hpp>
 #include "Yson/YsonException.hpp"
@@ -192,57 +192,57 @@ namespace Yson
 
     JsonWriter& JsonWriter::value(char value)
     {
-        return writeIntValueImpl(value, "%hhi");
+        return writeIntValueImpl(int(value));
     }
 
     JsonWriter& JsonWriter::value(signed char value)
     {
-        return writeIntValueImpl(value, "%hhi");
+        return writeIntValueImpl(int(value));
     }
 
     JsonWriter& JsonWriter::value(short value)
     {
-        return writeIntValueImpl(value, "%hi");
+        return writeIntValueImpl(value);
     }
 
     JsonWriter& JsonWriter::value(int value)
     {
-        return writeIntValueImpl(value, "%i");
+        return writeIntValueImpl(value);
     }
 
     JsonWriter& JsonWriter::value(long value)
     {
-        return writeIntValueImpl(value, "%lli");
+        return writeIntValueImpl(value);
     }
 
     JsonWriter& JsonWriter::value(long long value)
     {
-        return writeIntValueImpl(value, "%lli");
+        return writeIntValueImpl(value);
     }
 
     JsonWriter& JsonWriter::value(unsigned char value)
     {
-        return writeIntValueImpl(value, "%hhu");
+        return writeIntValueImpl(unsigned(value));
     }
 
     JsonWriter& JsonWriter::value(unsigned short value)
     {
-        return writeIntValueImpl(value, "%hu");
+        return writeIntValueImpl(value);
     }
 
     JsonWriter& JsonWriter::value(unsigned value)
     {
-        return writeIntValueImpl(value, "%u");
+        return writeIntValueImpl(value);
     }
 
     JsonWriter& JsonWriter::value(unsigned long value)
     {
-        return writeIntValueImpl(value, "%llu");
+        return writeIntValueImpl(value);
     }
 
     JsonWriter& JsonWriter::value(unsigned long long value)
     {
-        return writeIntValueImpl(value, "%llu");
+        return writeIntValueImpl(value);
     }
 
     JsonWriter& JsonWriter::value(float value)
@@ -524,7 +524,8 @@ namespace Yson
         auto& m = members();
         if (m.stream && !m.buffer.empty())
         {
-            m.stream->write(m.buffer.data(), m.buffer.size());
+            m.stream->write(m.buffer.data(),
+                            std::streamsize(m.buffer.size()));
             m.buffer.clear();
         }
         return *this;
@@ -545,7 +546,7 @@ namespace Yson
         else
         {
             flush();
-            m.stream->write(s, size);
+            m.stream->write(s, std::streamsize(size));
         }
     }
 
@@ -599,7 +600,8 @@ namespace Yson
     {
         if (m_Members)
             return *m_Members;
-        YSON_THROW("The members of this JsonWriter instance have been moved to another instance.");
+        YSON_THROW("The members of this JsonWriter instance have"
+                   " been moved to another instance.");
     }
 
     void JsonWriter::beginValue()
@@ -811,18 +813,20 @@ namespace Yson
     }
 
     template <typename T>
-    JsonWriter& JsonWriter::writeIntValueImpl(T number, const char* format)
+    JsonWriter& JsonWriter::writeIntValueImpl(const T number)
     {
         beginValue();
         auto& m = members();
         auto& buffer = m.sprintfBuffer;
-        auto size = snprintf(buffer.data(), buffer.size(), format, number);
-        if (size > buffer.size())
+        auto result = std::to_chars(buffer.data(),
+                                    buffer.data() + buffer.size(), number);
+        while (result.ec != std::errc())
         {
-            buffer.resize(size + 1);
-            size = snprintf(buffer.data(), buffer.size(), format, number);
+            buffer.resize(buffer.size() * 2);
+            result = std::to_chars(buffer.data(),
+                                   buffer.data() + buffer.size(), number);
         }
-        write(buffer.data(), size);
+        write(buffer.data(), size_t(result.ptr - buffer.data()));
         m.state = AT_END_OF_VALUE;
         return *this;
     }
@@ -835,6 +839,23 @@ namespace Yson
             beginValue();
             auto& m = members();
             auto& buffer = m.sprintfBuffer;
+#ifdef YSON_USE_TO_CHARS_FOR_FLOATS
+            auto result = std::to_chars(buffer.data(),
+                                        buffer.data() + buffer.size(),
+                                        number,
+                                        std::chars_format::general,
+                                        m.floatingPointPrecision);
+            while (result.ec != std::errc())
+            {
+                buffer.resize(buffer.size() * 2);
+                result = std::to_chars(buffer.data(),
+                                       buffer.data() + buffer.size(),
+                                       number,
+                                       std::chars_format::general,
+                                       m.floatingPointPrecision);
+            }
+            write(buffer.data(), size_t(result.ptr - buffer.data()));
+#else
             auto size = snprintf(buffer.data(),
                                  buffer.size(),
                                  format,
@@ -852,6 +873,7 @@ namespace Yson
                                 number);
             }
             write(buffer.data(), size);
+#endif
             m.state = AT_END_OF_VALUE;
         }
         else if (!languageExtension(NON_FINITE_FLOATS))

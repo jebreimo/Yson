@@ -217,7 +217,7 @@ namespace Yson
         void writeIndentationImpl();
 
         template <typename T>
-        JsonWriter& writeIntValueImpl(T number, const char* format);
+        JsonWriter& writeIntValueImpl(T number);
 
         template <typename T>
         JsonWriter& writeFloatValueImpl(T number, const char* format);

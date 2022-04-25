@@ -157,11 +157,6 @@ add_library(Yson
     $<TARGET_OBJECTS:Yson_Yconvert>
     )
 
-target_compile_definitions(Yson
-    PRIVATE
-        Yconvert=Yson_Yconvert
-    )
-
 target_include_directories(Yson BEFORE
     PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
@@ -177,6 +172,8 @@ target_compile_definitions(Yson
         $<$<BOOL:${MSVC}>:_SCL_SECURE_NO_WARNINGS>
         $<$<BOOL:${MSVC}>:_CRT_SECURE_NO_WARNINGS>
         $<$<CXX_COMPILER_ID:MSVC>:YSON_EXPORTS>
+        $<$<CXX_COMPILER_ID:MSVC>:YSON_USE_TO_CHARS_FOR_FLOATS>
+        Yconvert=Yson_Yconvert
     )
 
 set_target_properties(Yson
