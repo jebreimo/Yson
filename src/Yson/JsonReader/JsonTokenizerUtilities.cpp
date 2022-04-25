@@ -14,15 +14,17 @@ namespace Yson
 {
     namespace
     {
-        const char* unwrap(std::string_view::const_iterator it)
+#ifdef _MSC_VER
+        constexpr const char* unwrap(std::string_view::const_iterator it)
         {
-          if constexpr (std::is_pointer_v<std::string_view::const_iterator>)
-            return it;
-#ifdef _WIN32
-          else
             return it._Unwrapped();
-#endif
         }
+#else
+        constexpr const char* unwrap(std::string_view::const_iterator it)
+        {
+            return it;
+        }
+#endif
     }
     Result nextStringToken(std::string_view string, bool isEndOfFile,
                            char quotes);

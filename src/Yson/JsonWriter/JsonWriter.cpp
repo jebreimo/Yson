@@ -68,7 +68,7 @@ namespace Yson
         size_t maxBufferSize = MAX_BUFFER_SIZE;
         State state = AT_START_OF_VALUE_NO_COMMA;
         unsigned indentationWidth = 2;
-        int languagExtensions = 0;
+        int languageExtensions = 0;
         int floatingPointPrecision = 9;
         bool formattingEnabled = true;
         char indentationCharacter = ' ';
@@ -446,12 +446,12 @@ namespace Yson
 
     int JsonWriter::languageExtensions() const
     {
-        return members().languagExtensions;
+        return members().languageExtensions;
     }
 
     JsonWriter& JsonWriter::setLanguageExtensions(int value)
     {
-        members().languagExtensions = value;
+        members().languageExtensions = value;
         return *this;
     }
 
@@ -839,12 +839,15 @@ namespace Yson
             beginValue();
             auto& m = members();
             auto& buffer = m.sprintfBuffer;
+            const auto precision = std::min(m.floatingPointPrecision,
+                                            std::numeric_limits<T>::digits10);
 #ifdef YSON_USE_TO_CHARS_FOR_FLOATS
             auto result = std::to_chars(buffer.data(),
                                         buffer.data() + buffer.size(),
                                         number,
                                         std::chars_format::general,
-                                        m.floatingPointPrecision);
+                                        precision);
+
             while (result.ec != std::errc())
             {
                 buffer.resize(buffer.size() * 2);
@@ -852,25 +855,17 @@ namespace Yson
                                        buffer.data() + buffer.size(),
                                        number,
                                        std::chars_format::general,
-                                       m.floatingPointPrecision);
+                                       precision);
             }
             write(buffer.data(), size_t(result.ptr - buffer.data()));
 #else
-            auto size = snprintf(buffer.data(),
-                                 buffer.size(),
-                                 format,
-                                 std::min(m.floatingPointPrecision,
-                                          std::numeric_limits<T>::digits10),
-                                 number);
+            auto size = snprintf(buffer.data(), buffer.size(),
+                                 format, precision, number);
             if (size > buffer.size())
             {
                 buffer.resize(size + 1);
-                size = snprintf(buffer.data(),
-                                buffer.size(),
-                                format,
-                                std::min(m.floatingPointPrecision,
-                                         std::numeric_limits<T>::digits10),
-                                number);
+                size = snprintf(buffer.data(), buffer.size(),
+                                format, precision, number);
             }
             write(buffer.data(), size);
 #endif
@@ -895,16 +890,16 @@ namespace Yson
 
     bool JsonWriter::languageExtension(LanguageExtensions ext) const
     {
-        return (members().languagExtensions & ext) != 0;
+        return (members().languageExtensions & ext) != 0;
     }
 
     JsonWriter& JsonWriter::setLanguageExtension(LanguageExtensions ext,
                                                  bool value)
     {
         if (value)
-            members().languagExtensions |= ext;
+            members().languageExtensions |= ext;
         else
-            members().languagExtensions &= ~ext;
+            members().languageExtensions &= ~ext;
         return *this;
     }
 }
