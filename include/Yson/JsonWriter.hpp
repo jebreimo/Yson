@@ -143,19 +143,31 @@ namespace Yson
 
         JsonWriter& setLanguageExtensions(int value);
 
-        /** @brief Returns true if special floating point values will be
-          *     written as values.
-          *
-          * When this flag is enabled, the special values not-a-number and
-          * positive and negative infinity are written as "NaN", "Infinity"
-          * and "-Infinity" respectively. If it is disabled, the write
-          * functions will throw an exception if it encounters any of these
-          * values.
-          */
+        /**
+         * @brief Returns true if special floating point values will be
+         *      written as values.
+         *
+         * When this flag is enabled, the special values not-a-number and
+         * positive and negative infinity are written as "NaN", "Infinity"
+         * and "-Infinity" respectively. If it is disabled, the write
+         * functions will throw an exception if it encounters any of these
+         * values.
+         */
         [[nodiscard]]
         bool isNonFiniteFloatsEnabled() const;
 
         JsonWriter& setNonFiniteFloatsEnabled(bool value);
+
+        [[nodiscard]]
+        bool isQuotedNonFiniteFloatsEnabled() const;
+
+        /**
+         * @brief Sets whether or not non-finite floating point values (NaN,
+         *      Infinity) will be surrounded by double-quotes.
+         *
+         * Unquoted (JSON5-compatible) values are the default.
+         */
+        JsonWriter& setQuotedNonFiniteFloatsEnabled(bool value);
 
         [[nodiscard]]
         bool isUnquotedValueNamesEnabled() const;
@@ -225,9 +237,10 @@ namespace Yson
         enum LanguageExtensions
         {
             NON_FINITE_FLOATS = 1,
-            MULTILINE_STRINGS = 2,
-            UNQUOTED_VALUE_NAMES = 4,
-            ESCAPE_NON_ASCII_CHARACTERS = 8
+            QUOTED_NON_FINITE_FLOATS = 2,
+            MULTILINE_STRINGS = 4,
+            UNQUOTED_VALUE_NAMES = 8,
+            ESCAPE_NON_ASCII_CHARACTERS = 16
         };
 
         [[nodiscard]]

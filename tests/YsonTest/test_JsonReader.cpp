@@ -206,7 +206,24 @@ namespace
         Y_CALL(assertReadFails<double>("1.1e-_1"));
         Y_CALL(assertReadFails<double>("1.1e-1_"));
         Y_CALL(assertRead<double>("1.1e-1", 1.1e-1, 1e-15));
-        // TODO: test NaN, infinity and null
+    }
+
+    void test_read_unquoted_infinity()
+    {
+        std::string text = "Infinity";
+        JsonReader reader(text.data(), text.size());
+        Y_ASSERT(reader.nextValue());
+        auto value = read<double>(reader);
+        Y_ASSERT(isinf(value));
+    }
+
+    void test_read_quoted_infinity()
+    {
+        std::string text = "\"Infinity\"";
+        JsonReader reader(text.data(), text.size());
+        Y_ASSERT(reader.nextValue());
+        auto value = read<double>(reader);
+        Y_ASSERT(isinf(value));
     }
 
     void test_LineAndColumnNumbers()
@@ -483,6 +500,8 @@ namespace
            test_readNull,
            test_read_base64,
            test_read_floating_point,
+           test_read_quoted_infinity,
+           test_read_unquoted_infinity,
            test_read_integer,
            test_read_string,
            test_read_single_quoted_string,

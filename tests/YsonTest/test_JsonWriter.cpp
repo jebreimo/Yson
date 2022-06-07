@@ -189,7 +189,7 @@ namespace
         Y_CALL(doTestFloatingPoint(1.0 / 3.0, 9, "0.333333333"));
     }
 
-    void test_FloatingPointInfinity()
+    void test_NonFiniteFloatingPointException()
     {
         std::stringstream ss;
         JsonWriter writer(ss);
@@ -198,6 +198,24 @@ namespace
         writer.setNonFiniteFloatsEnabled(true);
         writer.value(std::numeric_limits<double>::infinity()).flush();
         Y_EQUAL(ss.str(), "Infinity");
+    }
+
+    void test_NonFiniteFloatingPointUnquoted()
+    {
+        std::stringstream ss;
+        JsonWriter writer(ss);
+        writer.setNonFiniteFloatsEnabled(true);
+        writer.value(std::numeric_limits<double>::infinity()).flush();
+        Y_EQUAL(ss.str(), "Infinity");
+    }
+
+    void test_NonFiniteFloatingPointQuoted()
+    {
+        std::stringstream ss;
+        JsonWriter writer(ss);
+        writer.setQuotedNonFiniteFloatsEnabled(true);
+        writer.value(-std::numeric_limits<double>::infinity()).flush();
+        Y_EQUAL(ss.str(), "\"-Infinity\"");
     }
 
     void test_UnquotedValueNames()
@@ -291,7 +309,9 @@ namespace
            test_SimpleObject_NoStream,
            test_Integers,
            test_FloatingPointValues,
-           test_FloatingPointInfinity,
+           test_NonFiniteFloatingPointException,
+           test_NonFiniteFloatingPointUnquoted,
+           test_NonFiniteFloatingPointQuoted,
            test_UnquotedValueNames,
            test_FormatAndFlat,
            test_SpecialValues,

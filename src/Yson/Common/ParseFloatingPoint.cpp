@@ -46,7 +46,9 @@ namespace Yson
             auto value = T(getDigit(str[i]));
             if (value > 9)
             {
-                if (str == "Infinity" || str == "null" || str == "+Infinity")
+                if (str == "null")
+                    return T();
+                if (str == "Infinity" || str == "+Infinity")
                     return std::numeric_limits<T>::infinity();
                 if (str == "-Infinity")
                     return -std::numeric_limits<T>::infinity();

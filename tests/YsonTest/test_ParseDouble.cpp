@@ -84,8 +84,8 @@ namespace
         Y_CALL(failure("1e309"));
         Y_CALL(success("1e-307", 1e-307));
         Y_CALL(success("1e-308", 1e-308));
+        Y_CALL(success("null", 0));
         Y_CALL(isNotANumber("NaN"));
-        Y_CALL(isInfinite("null", false));
         Y_CALL(isInfinite("Infinity", false));
         Y_CALL(isInfinite("+Infinity", false));
         Y_CALL(isInfinite("-Infinity", true));
