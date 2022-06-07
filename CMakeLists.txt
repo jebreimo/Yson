@@ -54,6 +54,7 @@ add_library(Yson
     include/Yson/ValueItem.hpp
     include/Yson/ValueType.hpp
     include/Yson/Writer.hpp
+    include/Yson/Yson.hpp
     include/Yson/YsonDefinitions.hpp
     include/Yson/YsonException.hpp
     include/Yson/YsonReaderException.hpp
