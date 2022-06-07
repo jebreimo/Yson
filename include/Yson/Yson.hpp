@@ -8,7 +8,7 @@
 #pragma once
 
 #include "JsonReader.hpp"
-#include "JsonReader.hpp"
+#include "JsonWriter.hpp"
 #include "ReaderIterators.hpp"
 #include "UBJsonReader.hpp"
 #include "UBJsonWriter.hpp"
