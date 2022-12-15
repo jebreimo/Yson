@@ -7,6 +7,7 @@
 //****************************************************************************
 #include "Escape.hpp"
 
+#include <algorithm>
 #include <iterator>
 #include "Yson/YsonException.hpp"
 
