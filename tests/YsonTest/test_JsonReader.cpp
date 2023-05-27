@@ -215,7 +215,7 @@ namespace
         JsonReader reader(text.data(), text.size());
         Y_ASSERT(reader.nextValue());
         auto value = read<double>(reader);
-        Y_ASSERT(isinf(value));
+        Y_ASSERT(std::isinf(value));
     }
 
     void test_read_quoted_infinity()
@@ -224,7 +224,7 @@ namespace
         JsonReader reader(text.data(), text.size());
         Y_ASSERT(reader.nextValue());
         auto value = read<double>(reader);
-        Y_ASSERT(isinf(value));
+        Y_ASSERT(std::isinf(value));
     }
 
     void test_LineAndColumnNumbers()
