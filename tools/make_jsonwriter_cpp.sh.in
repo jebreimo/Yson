@@ -10,10 +10,7 @@
 "${Python3_EXECUTABLE}" \
   "${CMAKE_CURRENT_SOURCE_DIR}"/tools/mergecpp.py \
   "${CMAKE_CURRENT_SOURCE_DIR}"/src/Yson/JsonWriter/*.cpp \
-  "${CMAKE_CURRENT_SOURCE_DIR}"/external/Ystring/src/Ystring/*.cpp \
-  "${CMAKE_CURRENT_SOURCE_DIR}"/external/Ystring/src/Ystring/Conversion/*.cpp \
-  "${CMAKE_CURRENT_SOURCE_DIR}"/external/Ystring/src/Ystring/Encodings/EncodeUtf8.cpp \
-  "${CMAKE_CURRENT_SOURCE_DIR}"/external/Ystring/src/Ystring/Escape/Escape.cpp \
+  "${CMAKE_CURRENT_SOURCE_DIR}"/external/Yconvert/src/Yconvert/*.cpp \
   "${CMAKE_CURRENT_SOURCE_DIR}"/src/Yson/Common/Base64.cpp \
   "${CMAKE_CURRENT_SOURCE_DIR}"/src/Yson/Common/GetUnicodeFileName.cpp \
   "${CMAKE_CURRENT_SOURCE_DIR}"/src/Yson/Common/IsJavaScriptIdentifier.cpp \
@@ -21,8 +18,8 @@
   -i "${CMAKE_CURRENT_BINARY_DIR}" \
   -i "${CMAKE_CURRENT_SOURCE_DIR}"/include \
   -i "${CMAKE_CURRENT_SOURCE_DIR}"/src \
-  -i "${CMAKE_CURRENT_SOURCE_DIR}"/external/Ystring/src \
-  -i "${CMAKE_CURRENT_SOURCE_DIR}"/external/Ystring/include \
+  -i "${CMAKE_CURRENT_SOURCE_DIR}"/external/Yconvert/src \
+  -i "${CMAKE_CURRENT_SOURCE_DIR}"/external/Yconvert/include \
   -f "${CMAKE_CURRENT_SOURCE_DIR}"/include \
   --no-pragma-once \
   -p '#include "JsonWriterComplete.hpp"
