@@ -7,6 +7,7 @@
 //****************************************************************************
 #include "Yson/JsonReader.hpp"
 
+#include <cmath>
 #include <sstream>
 #include "Ytest/Ytest.hpp"
 
