@@ -6,7 +6,7 @@
 ## License text is included with the source distribution.
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.16)
-project(Yson VERSION 1.4.11 LANGUAGES CXX)
+project(Yson VERSION 1.4.12 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -205,9 +205,6 @@ endif ()
 ##
 
 if (YSON_BUILD_TEST)
-    if (EXISTS "${CMAKE_SOURCE_DIR}/external/Ytest/CMakeLists.txt")
-        add_subdirectory(external/Ytest EXCLUDE_FROM_ALL)
-    endif ()
     enable_testing()
     add_subdirectory(tests/YsonTest)
 endif()

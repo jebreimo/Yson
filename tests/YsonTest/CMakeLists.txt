@@ -7,12 +7,11 @@
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.7)
 
-find_package(Ytest QUIET)
-
-if (NOT TARGET Ytest::Ytest)
-    message(VERBOSE "Ytest not found. Unit tests will not be built or run.")
-    return()
-endif()
+include(FetchContent)
+FetchContent_Declare(ytest
+    GIT_REPOSITORY "https://github.com/jebreimo/Ytest.git"
+    GIT_TAG v0.1.5)
+FetchContent_MakeAvailable(ytest)
 
 add_executable(YsonTest
     main.cpp
@@ -20,7 +19,7 @@ add_executable(YsonTest
     test_GetValueType.cpp
     test_Base64.cpp
     test_GetValueType.cpp
-    $<$<NOT:$<AND:$<BOOL:${BUILD_SHARED_LIBS}>,$<CXX_COMPILER_ID:MSVC>>>:test_IsJavaScriptIdentifier.cpp>
+    test_IsJavaScriptIdentifier.cpp
     test_JsonItem.cpp
     test_JsonReader.cpp
     test_JsonTokenizer.cpp
