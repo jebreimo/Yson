@@ -31,7 +31,18 @@ namespace
         std::stringstream ss;
         JsonWriter(ss)
             .value("\"foo\nbar\t\\x89baz\"").flush();
-        std::string expected = "\"\\\"foo\\nbar\\t\\\\x89baz\\\"\"";
+        std::string expected = R"("\"foo\nbar\t\\x89baz\"")";
+        Y_EQUAL(ss.str(), expected);
+    }
+
+    void test_EscapedKey()
+    {
+        std::stringstream ss;
+        JsonWriter(ss, Yson::JsonFormatting::FLAT)
+            .beginObject()
+            .key("\"\\").value(2)
+            .endObject().flush();
+        std::string expected = R"({"\"\\": 2})";
         Y_EQUAL(ss.str(), expected);
     }
 
@@ -303,6 +314,7 @@ namespace
 
     Y_TEST(test_Basics,
            test_EscapedString,
+           test_EscapedKey,
            test_ManualFormatting,
            test_SemiManualFormatting,
            test_SimpleObject,

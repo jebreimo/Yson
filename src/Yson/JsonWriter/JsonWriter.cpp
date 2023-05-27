@@ -146,7 +146,11 @@ namespace Yson
 
     JsonWriter& JsonWriter::key(std::string key)
     {
-        members().key = move(key);
+        if (!hasUnescapedCharacters(key))
+            members().key = std::move(key);
+        else
+            members().key = escape(key, isEscapeNonAsciiCharactersEnabled());
+
         return *this;
     }
 
