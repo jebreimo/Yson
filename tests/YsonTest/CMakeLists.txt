@@ -41,6 +41,4 @@ target_link_libraries(YsonTest
     Ytest::Ytest
     )
 
-add_test(YsonTest
-    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/YsonTest
-    )
+add_test(NAME YsonTest COMMAND YsonTest)
