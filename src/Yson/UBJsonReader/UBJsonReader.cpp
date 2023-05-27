@@ -702,7 +702,7 @@ namespace Yson
             }
         }
         leave();
-        return JsonItem(std::make_shared<ObjectItem>(move(keys), move(values)));
+        return JsonItem(std::make_shared<ObjectItem>(move(keys), std::move(values)));
     }
 
     template <typename T>

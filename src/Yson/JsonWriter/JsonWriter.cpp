@@ -96,7 +96,7 @@ namespace Yson
                            JsonFormatting formatting)
         : m_Members(new Members)
     {
-        m_Members->streamPtr = move(streamPtr);
+        m_Members->streamPtr = std::move(streamPtr);
         m_Members->stream = m_Members->streamPtr
                             ? m_Members->streamPtr.get()
                             : stream;
@@ -121,7 +121,7 @@ namespace Yson
 
     JsonWriter& JsonWriter::operator=(JsonWriter&& rhs) noexcept
     {
-        m_Members = move(rhs.m_Members);
+        m_Members = std::move(rhs.m_Members);
         return *this;
     }
 

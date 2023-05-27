@@ -460,7 +460,7 @@ namespace Yson
                 values.insert_or_assign(key, JsonItem(JsonValueItem(tokenizer.tokenString(), tType)));
         }
         leave();
-        return JsonItem(std::make_shared<ObjectItem>(move(keys), move(values)));
+        return JsonItem(std::make_shared<ObjectItem>(move(keys), std::move(values)));
     }
 
     JsonItem JsonReader::readItem()

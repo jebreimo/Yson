@@ -70,7 +70,7 @@ namespace Yson
                                std::ostream* stream)
         : m_Members(std::make_unique<Members>())
     {
-        m_Members->streamPtr = move(streamPtr);
+        m_Members->streamPtr = std::move(streamPtr);
         m_Members->stream =  m_Members->streamPtr
                              ? m_Members->streamPtr.get()
                              : stream;
@@ -91,7 +91,7 @@ namespace Yson
 
     UBJsonWriter& UBJsonWriter::operator=(UBJsonWriter&& other) noexcept
     {
-        m_Members = move(other.m_Members);
+        m_Members = std::move(other.m_Members);
         return *this;
     }
 
@@ -116,7 +116,7 @@ namespace Yson
 
     UBJsonWriter& UBJsonWriter::key(std::string key)
     {
-        members().key = move(key);
+        members().key = std::move(key);
         return *this;
     }
 
