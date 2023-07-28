@@ -159,7 +159,7 @@ namespace Yson
         JsonItem readArray(bool expandOptmizedByteArrays);
 
         [[nodiscard]]
-        JsonItem readObject(bool expandOptmizedByteArrays);
+        JsonItem readObject(bool expandOptimizedByteArrays);
 
         template <typename T>
         bool readOptimizedArrayImpl(T* buffer, size_t& size,

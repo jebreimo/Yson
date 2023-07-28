@@ -81,7 +81,7 @@ namespace Yson
     }
 
     UBJsonWriter::UBJsonWriter(UBJsonWriter&& other) noexcept
-        : m_Members(move(other.m_Members))
+        : m_Members(std::move(other.m_Members))
     {}
 
     UBJsonWriter::~UBJsonWriter()

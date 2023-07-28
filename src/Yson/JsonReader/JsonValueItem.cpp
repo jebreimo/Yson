@@ -16,7 +16,7 @@
 namespace Yson
 {
     JsonValueItem::JsonValueItem(std::string value, JsonTokenType type)
-        : m_Value(move(value)),
+        : m_Value(std::move(value)),
           m_Type(type)
     {}
 

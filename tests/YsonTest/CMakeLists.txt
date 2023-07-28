@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.7)
 include(FetchContent)
 FetchContent_Declare(ytest
     GIT_REPOSITORY "https://github.com/jebreimo/Ytest.git"
-    GIT_TAG v0.1.5)
+    GIT_TAG v0.1.6)
 FetchContent_MakeAvailable(ytest)
 
 add_executable(YsonTest

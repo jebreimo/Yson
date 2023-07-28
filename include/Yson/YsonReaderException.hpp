@@ -24,7 +24,7 @@ namespace Yson
                                      size_t column = 0)
             : YsonException(makeLocationString(fileName, line, column)
                             + message, debugLocation),
-              fileName(move(fileName)),
+              fileName(std::move(fileName)),
               line(line),
               column(column)
         {}

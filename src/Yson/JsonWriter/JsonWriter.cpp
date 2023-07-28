@@ -110,7 +110,7 @@ namespace Yson
     }
 
     JsonWriter::JsonWriter(JsonWriter&& rhs) noexcept
-        : m_Members(move(rhs.m_Members))
+        : m_Members(std::move(rhs.m_Members))
     {}
 
     JsonWriter::~JsonWriter()

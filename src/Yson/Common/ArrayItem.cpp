@@ -10,7 +10,7 @@
 namespace Yson
 {
     ArrayItem::ArrayItem(std::vector<JsonItem> values)
-        : m_Values(move(values))
+        : m_Values(std::move(values))
     {}
 
     const std::vector<JsonItem>& ArrayItem::values() const

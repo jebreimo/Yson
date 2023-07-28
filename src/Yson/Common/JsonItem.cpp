@@ -13,7 +13,7 @@
 namespace Yson
 {
     JsonItem::JsonItem(JsonItem::ItemType item)
-        : m_Item(move(item))
+        : m_Item(std::move(item))
     {}
 
     const JsonItem& JsonItem::operator[](size_t index) const

@@ -652,10 +652,10 @@ namespace Yson
             }
         }
         leave();
-        return JsonItem(std::make_shared<ArrayItem>(move(values)));
+        return JsonItem(std::make_shared<ArrayItem>(std::move(values)));
     }
 
-    JsonItem UBJsonReader::readObject(bool expandOptmizedByteArrays)
+    JsonItem UBJsonReader::readObject(bool expandOptimizedByteArrays)
     {
         std::deque<std::string> keys;
         std::unordered_map<std::string_view, JsonItem> values;
@@ -688,11 +688,11 @@ namespace Yson
             {
             case UBJsonTokenType::START_OBJECT_TOKEN:
             case UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN:
-                values.insert_or_assign(key, readObject(expandOptmizedByteArrays));
+                values.insert_or_assign(key, readObject(expandOptimizedByteArrays));
                 break;
             case UBJsonTokenType::START_ARRAY_TOKEN:
             case UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN:
-                values.insert_or_assign(key, readArray(expandOptmizedByteArrays));
+                values.insert_or_assign(key, readArray(expandOptimizedByteArrays));
                 break;
             default:
                 values.insert_or_assign(key,
@@ -702,7 +702,7 @@ namespace Yson
             }
         }
         leave();
-        return JsonItem(std::make_shared<ObjectItem>(move(keys), std::move(values)));
+        return JsonItem(std::make_shared<ObjectItem>(std::move(keys), std::move(values)));
     }
 
     template <typename T>

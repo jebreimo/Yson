@@ -419,7 +419,7 @@ namespace Yson
                 values.emplace_back(JsonValueItem(tokenizer.tokenString(), tType));
         }
         leave();
-        return JsonItem(std::make_shared<ArrayItem>(move(values)));
+        return JsonItem(std::make_shared<ArrayItem>(std::move(values)));
     }
 
     JsonItem JsonReader::readObject()
@@ -460,7 +460,7 @@ namespace Yson
                 values.insert_or_assign(key, JsonItem(JsonValueItem(tokenizer.tokenString(), tType)));
         }
         leave();
-        return JsonItem(std::make_shared<ObjectItem>(move(keys), std::move(values)));
+        return JsonItem(std::make_shared<ObjectItem>(std::move(keys), std::move(values)));
     }
 
     JsonItem JsonReader::readItem()

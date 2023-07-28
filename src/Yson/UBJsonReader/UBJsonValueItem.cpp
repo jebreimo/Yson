@@ -113,7 +113,7 @@ namespace Yson
     }
 
     UBJsonValueItem::UBJsonValueItem(std::string value, UBJsonTokenType type)
-        : m_Value(move(value)),
+        : m_Value(std::move(value)),
           m_Type(type)
     {}
 

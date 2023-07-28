@@ -11,8 +11,8 @@ namespace Yson
 {
     ObjectItem::ObjectItem(std::deque<std::string> keys,
                            std::unordered_map<std::string_view, JsonItem> values)
-        : m_Keys(move(keys)),
-          m_Values(move(values))
+        : m_Keys(std::move(keys)),
+          m_Values(std::move(values))
     {}
 
     const std::deque<std::string>& ObjectItem::keys() const
