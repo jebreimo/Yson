@@ -20,7 +20,7 @@ namespace Yson
     {
         try
         {
-            return Yconvert::convertTo<std::wstring>(
+            return Yconvert::convert_to<std::wstring>(
                     fileName,
                     Yconvert::Encoding::UTF_8,
                     Yconvert::Encoding::UTF_16_NATIVE,
