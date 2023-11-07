@@ -7,6 +7,7 @@
 //****************************************************************************
 #pragma once
 #include "EncoderBase.hpp"
+#include <iterator>
 
 namespace Yconvert
 {
@@ -105,7 +106,7 @@ namespace Yconvert
         size_t encode(const char32_t* src, size_t src_size,
                       std::string& dst) override
         {
-            auto out = std::back_inserter(dst);
+            auto out = back_inserter(dst);
             for (size_t i = 0; i < src_size; ++i)
                 Detail::add_utf16_bytes<SWAP_BYTES>(src[i], out);
             return src_size;
