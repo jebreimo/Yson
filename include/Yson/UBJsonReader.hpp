@@ -137,11 +137,11 @@ namespace Yson
         [[nodiscard]]
         size_t columnNumber() const override;
 
-        ReaderState state() const override;
+        [[nodiscard]] ReaderState state() const override;
 
-        std::string scope() const override;
+        [[nodiscard]] std::string scope() const override;
 
-        bool isExpandOptimizedByteArraysEnabled() const;
+        [[nodiscard]] bool isExpandOptimizedByteArraysEnabled() const;
 
         UBJsonReader& setExpandOptimizedByteArraysEnabled(bool value);
     private:

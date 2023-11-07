@@ -15,8 +15,9 @@ namespace Yson
     class TextFileReader : public TextStreamReader
     {
     public:
-        TextFileReader(const std::string& fileName,
-                       Yconvert::Encoding sourceEncoding = Yconvert::Encoding::UNKNOWN);
+        explicit TextFileReader(
+            const std::string& fileName,
+            Yconvert::Encoding sourceEncoding = Yconvert::Encoding::UNKNOWN);
     private:
         std::ifstream m_FileStream;
     };

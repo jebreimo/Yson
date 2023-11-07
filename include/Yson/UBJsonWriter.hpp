@@ -20,9 +20,9 @@ namespace Yson
     public:
         UBJsonWriter();
 
-        UBJsonWriter(const std::string& fileName);
+        explicit UBJsonWriter(const std::string& fileName);
 
-        UBJsonWriter(std::ostream& stream);
+        explicit UBJsonWriter(std::ostream& stream);
 
         UBJsonWriter(const UBJsonWriter&) = delete;
 
@@ -36,9 +36,9 @@ namespace Yson
 
         std::ostream* stream() override;
 
-        std::pair<const void*, size_t> buffer() const override;
+        [[nodiscard]] std::pair<const void*, size_t> buffer() const override;
 
-        const std::string& key() const override;
+        [[nodiscard]] const std::string& key() const override;
 
         UBJsonWriter& key(std::string key) override;
 
@@ -95,7 +95,7 @@ namespace Yson
 
         UBJsonWriter& noop();
 
-        bool isStrictIntegerSizesEnabled() const;
+        [[nodiscard]] bool isStrictIntegerSizesEnabled() const;
 
         UBJsonWriter& setStrictIntegerSizesEnabled(bool value);
 
@@ -106,7 +106,7 @@ namespace Yson
 
         struct Members;
 
-        Members& members() const;
+        [[nodiscard]] Members& members() const;
 
         UBJsonWriter& beginStructure(UBJsonValueType structureType,
                                      const UBJsonParameters& parameters);

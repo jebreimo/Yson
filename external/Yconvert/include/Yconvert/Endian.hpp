@@ -24,8 +24,8 @@ namespace Yconvert
         #endif
     };
 
-    constexpr bool IsBigEndian = Endianness::NATIVE == Endianness::BIG;
-    constexpr bool IsLittleEndian = !IsBigEndian;
+    constexpr bool IS_BIG_ENDIAN = Endianness::NATIVE == Endianness::BIG;
+    constexpr bool IS_LITTLE_ENDIAN = !IS_BIG_ENDIAN;
 
     /**
      * @brief Returns the system's endianness detected at runtime.
@@ -33,20 +33,20 @@ namespace Yconvert
      * Compared the return value with Endianness::NATIVE to detect
      * inconsistencies.
      */
-    [[nodiscard]] inline Endianness getSystemEndianness()
+    [[nodiscard]] inline Endianness get_system_endianness()
     {
         union U {int16_t i16; int8_t i8;} u{int16_t(0x0201)};
         return u.i8 == 0x01 ? Endianness::LITTLE : Endianness::BIG;
     }
 
     template <typename T, std::enable_if_t<sizeof(T) == 1, int> = 0>
-    [[nodiscard]] constexpr T reverseBytes(T value)
+    [[nodiscard]] constexpr T reverse_bytes(T value)
     {
         return value;
     }
 
     template <typename T, std::enable_if_t<sizeof(T) == 2, int> = 0>
-    [[nodiscard]] constexpr T reverseBytes(T value)
+    [[nodiscard]] constexpr T reverse_bytes(T value)
     {
         union U {T v; int8_t b[2];} u {value};
         auto tmp = u.b[0];
@@ -56,7 +56,7 @@ namespace Yconvert
     }
 
     template <typename T, std::enable_if_t<sizeof(T) == 4, int> = 0>
-    [[nodiscard]] constexpr T reverseBytes(T value)
+    [[nodiscard]] constexpr T reverse_bytes(T value)
     {
         union U
         {
@@ -72,7 +72,7 @@ namespace Yconvert
     }
 
     template <typename T, std::enable_if_t<sizeof(T) == 8, int> = 0>
-    [[nodiscard]] constexpr T reverseBytes(T value)
+    [[nodiscard]] constexpr T reverse_bytes(T value)
     {
         union U
         {
@@ -92,23 +92,23 @@ namespace Yconvert
     }
 
     template <bool SwapBytes, typename T>
-    [[nodiscard]] constexpr T swapEndianness(T value)
+    [[nodiscard]] constexpr T swap_endianness(T value)
     {
         if constexpr (SwapBytes)
-            return reverseBytes(value);
+            return reverse_bytes(value);
         else
             return value;
     }
 
     template <typename T>
-    [[nodiscard]] constexpr T getBigEndian(T value)
+    [[nodiscard]] constexpr T get_big_endian(T value)
     {
-        return swapEndianness<IsLittleEndian>(value);
+        return swap_endianness<IS_LITTLE_ENDIAN>(value);
     }
 
     template <typename T>
-    [[nodiscard]] constexpr T getLittleEndian(T value)
+    [[nodiscard]] constexpr T get_little_endian(T value)
     {
-        return swapEndianness<IsBigEndian>(value);
+        return swap_endianness<IS_BIG_ENDIAN>(value);
     }
 }

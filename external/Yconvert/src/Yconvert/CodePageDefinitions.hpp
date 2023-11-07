@@ -23,8 +23,8 @@ namespace Yconvert
 {
     struct CodePageRange
     {
-        uint16_t startCodePoint;
-        uint8_t startIndex;
+        uint16_t start_code_point;
+        uint8_t start_index;
         uint8_t length;
     };
 
@@ -252,7 +252,7 @@ namespace Yconvert
     };
 
     inline std::pair<const CodePageRange*, size_t>
-    getIsoCodePageRanges(Encoding encoding)
+    get_iso_code_page_ranges(Encoding encoding)
     {
         switch (encoding)
         {
@@ -517,7 +517,7 @@ namespace Yconvert
     };
 
     inline std::pair<const CodePageRange*, size_t>
-    getMacCodePageRanges(Encoding encoding)
+    get_mac_code_page_ranges(Encoding encoding)
     {
         switch (encoding)
         {
@@ -1136,7 +1136,7 @@ namespace Yconvert
     };
 
     inline std::pair<const CodePageRange*, size_t>
-    getDosCodePageRanges(Encoding encoding)
+    get_dos_code_page_ranges(Encoding encoding)
     {
         switch (encoding)
         {
@@ -1367,7 +1367,7 @@ namespace Yconvert
     };
 
     inline std::pair<const CodePageRange*, size_t>
-    getWinCodePageRanges(Encoding encoding)
+    get_win_code_page_ranges(Encoding encoding)
     {
         switch (encoding)
         {

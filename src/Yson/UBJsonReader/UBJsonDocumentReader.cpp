@@ -85,7 +85,7 @@ namespace Yson
             UBJSON_READER_THROW("Invalid state: " + toString(state.state)
                                 + ".",
                                 tokenizer);
-        };
+        }
     }
 
     char UBJsonDocumentReader::scopeType() const

@@ -6,8 +6,8 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "Yconvert/Utf8Encoder.hpp"
-
-#include <catch2/catch.hpp>
+#include "U8Adapter.hpp"
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Test Utf8Encoder to string")
 {
@@ -15,7 +15,7 @@ TEST_CASE("Test Utf8Encoder to string")
     Yconvert::Utf8Encoder encoder;
     std::string result;
     REQUIRE(encoder.encode(str32.data(), str32.size(), result) == 5);
-    REQUIRE(result == u8"AÆΩ F");
+    REQUIRE(result == U8("AÆΩ F"));
 }
 
 TEST_CASE("Test Utf8Encoder to char array")

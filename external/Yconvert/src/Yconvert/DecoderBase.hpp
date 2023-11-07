@@ -22,24 +22,24 @@ namespace Yconvert
         Encoding encoding() const;
 
         [[nodiscard]]
-        ErrorPolicy errorHandlingPolicy() const;
+        ErrorPolicy error_handling_policy() const;
 
-        void setErrorHandlingPolicy(ErrorPolicy value);
+        void set_error_policy(ErrorPolicy policy);
 
         std::pair<size_t, size_t>
-        decode(const void* src, size_t srcSize,
-               char32_t* dst, size_t dstSize) const;
+        decode(const void* src, size_t src_size,
+               char32_t* dst, size_t dst_size) const;
     protected:
         explicit DecoderBase(Encoding encoding);
 
         virtual size_t
-        skipCharacter(const void* src, size_t srcSize) const = 0;
+        skip_character(const void* src, size_t src_size) const = 0;
 
         virtual std::pair<size_t, size_t>
-        doDecode(const void* src, size_t srcSize,
-                 char32_t* dst, size_t dstSize) const = 0;
+        do_decode(const void* src, size_t src_size,
+                  char32_t* dst, size_t dst_size) const = 0;
     private:
-        Encoding m_Encoding;
-        ErrorPolicy m_ErrorHandlingPolicy = ErrorPolicy::THROW;
+        Encoding encoding_;
+        ErrorPolicy error_policy_ = ErrorPolicy::THROW;
     };
 }

@@ -6,12 +6,12 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "Yconvert/Utf8Decoder.hpp"
-
-#include <catch2/catch.hpp>
+#include "U8Adapter.hpp"
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Test Utf8Decoder")
 {
-    std::string s(u8"AÆΩ" "\xE0\x80 F");
+    std::string s(U8("AÆΩ" "\xE0\x80 F"));
     Yconvert::Utf8Decoder decoder;
     std::vector<char32_t> u(6);
     SECTION("Replace")
@@ -23,14 +23,14 @@ TEST_CASE("Test Utf8Decoder")
     }
     SECTION("Skip")
     {
-        decoder.setErrorHandlingPolicy(Yconvert::ErrorPolicy::SKIP);
+        decoder.set_error_policy(Yconvert::ErrorPolicy::SKIP);
         REQUIRE(decoder.decode(s.data(), s.size(), u.data(), u.size())
                 == std::pair<size_t, size_t>(9, 5));
         REQUIRE(u == std::vector<char32_t>{'A', U'Æ', U'Ω', ' ', 'F', 0});
     }
     SECTION("Throw")
     {
-        decoder.setErrorHandlingPolicy(Yconvert::ErrorPolicy::THROW);
+        decoder.set_error_policy(Yconvert::ErrorPolicy::THROW);
         REQUIRE_THROWS(decoder.decode(s.data(), s.size(), u.data(), u.size()));
     }
 }

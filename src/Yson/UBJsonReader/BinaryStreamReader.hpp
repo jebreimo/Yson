@@ -25,11 +25,11 @@ namespace Yson
 
         bool read(size_t size) override;
 
-        char front() const override;
+        [[nodiscard]] char front() const override;
 
-        const void* data() const override;
+        [[nodiscard]] const void* data() const override;
 
-        size_t position() const override;
+        [[nodiscard]] size_t position() const override;
 
         size_t size() override;
 
@@ -43,9 +43,9 @@ namespace Yson
     private:
         bool fillBuffer(size_t size);
 
-        size_t remainingBytesAfterValue() const;
+        [[nodiscard]] size_t remainingBytesAfterValue() const;
 
-        size_t remainingBytesIncludingValue() const;
+        [[nodiscard]] size_t remainingBytesIncludingValue() const;
 
         std::istream* m_Stream;
         std::vector<char> m_Buffer;

@@ -15,13 +15,13 @@ namespace Yconvert
     public:
         Utf8Encoder();
 
-        size_t getEncodedSize(const char32_t* src, size_t srcSize) override;
+        size_t get_encoded_size(const char32_t* src, size_t src_size) override;
 
         std::pair<size_t, size_t>
-        encode(const char32_t* src, size_t srcSize,
-               void* dst, size_t dstSize) override;
+        encode(const char32_t* src, size_t src_size,
+               void* dst, size_t dst_size) override;
 
-        size_t encode(const char32_t* src, size_t srcSize,
+        size_t encode(const char32_t* src, size_t src_size,
                       std::string& dst) override;
     };
 }

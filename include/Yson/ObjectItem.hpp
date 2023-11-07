@@ -26,13 +26,13 @@ namespace Yson
         [[nodiscard]]
         const std::unordered_map<std::string_view, JsonItem>& values() const;
 
-        size_t empty() const;
+        [[nodiscard]] size_t empty() const;
 
-        size_t size() const;
+        [[nodiscard]] size_t size() const;
 
-        iterator begin() const;
+        [[nodiscard]] iterator begin() const;
 
-        iterator end() const;
+        [[nodiscard]] iterator end() const;
     private:
         std::deque<std::string> m_Keys;
         std::unordered_map<std::string_view, JsonItem> m_Values;

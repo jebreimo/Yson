@@ -11,7 +11,7 @@ namespace Yconvert
 {
     namespace Detail
     {
-        char32_t nextUtf8Value(const char*& it, const char* end)
+        char32_t next_utf8_value(const char*& it, const char* end)
         {
             if (it == end)
                 return INVALID_CHAR;
@@ -66,7 +66,7 @@ namespace Yconvert
             return result;
         }
 
-        bool skipNextUtf8Value(const char*& it, const char* end)
+        bool skip_next_utf8_value(const char*& it, const char* end)
         {
             if (it == end)
                 return false;
@@ -97,30 +97,30 @@ namespace Yconvert
         : DecoderBase(Encoding::UTF_8)
     {}
 
-    size_t Utf8Decoder::skipCharacter(const void* src, size_t srcSize) const
+    size_t Utf8Decoder::skip_character(const void* src, size_t src_size) const
     {
-        auto cSrc = static_cast<const char*>(src);
-        auto initialSrc = cSrc;
-        Detail::skipNextUtf8Value(cSrc, cSrc + srcSize);
-        return size_t(cSrc - initialSrc);
+        auto c_src = static_cast<const char*>(src);
+        auto initial_src = c_src;
+        Detail::skip_next_utf8_value(c_src, c_src + src_size);
+        return size_t(c_src - initial_src);
     }
 
     std::pair<size_t, size_t>
-    Utf8Decoder::doDecode(const void* src, size_t srcSize,
-                          char32_t* dst, size_t dstSize) const
+    Utf8Decoder::do_decode(const void* src, size_t src_size,
+                           char32_t* dst, size_t dst_size) const
     {
-        auto cSrc = static_cast<const char*>(src);
-        auto initialSrc = cSrc;
-        auto initialDst = dst;
-        auto srcEnd = cSrc + srcSize;
-        auto dstEnd = dst + dstSize;
-        while (dst != dstEnd)
+        auto c_src = static_cast<const char*>(src);
+        auto initial_src = c_src;
+        auto initial_dst = dst;
+        auto src_end = c_src + src_size;
+        auto dst_end = dst + dst_size;
+        while (dst != dst_end)
         {
-            auto value = Detail::nextUtf8Value(cSrc, srcEnd);
+            auto value = Detail::next_utf8_value(c_src, src_end);
             if (value == INVALID_CHAR)
                 break;
             *dst++ = value;
         }
-        return {size_t(cSrc - initialSrc), size_t(dst - initialDst)};
+        return {size_t(c_src - initial_src), size_t(dst - initial_dst)};
     }
 }

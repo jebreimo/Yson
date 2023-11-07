@@ -51,7 +51,7 @@ namespace Yson
         case UBJsonTokenType::INT64_TOKEN:
             return convertIntegerImpl<T, int64_t>(value);
         case UBJsonTokenType::CHAR_TOKEN:
-            return convertIntegerImpl<T, int64_t>(value);
+            return convertIntegerImpl<T, char>(value);
         default:
             break;
         }

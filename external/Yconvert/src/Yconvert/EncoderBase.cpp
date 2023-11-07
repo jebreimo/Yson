@@ -11,36 +11,33 @@ namespace Yconvert
 {
 
     EncoderBase::EncoderBase(Encoding encoding)
-        : m_Encoding(encoding),
-          m_ErrorHandlingPolicy(),
-          m_ReplacementCharacter(REPLACEMENT_CHARACTER)
-    {}
-
-    EncoderBase::~EncoderBase()
+        : encoding_(encoding),
+          error_policy_(),
+          replacement_character_(REPLACEMENT_CHARACTER)
     {}
 
     Encoding EncoderBase::encoding() const
     {
-        return m_Encoding;
+        return encoding_;
     }
 
-    ErrorPolicy EncoderBase::errorHandlingPolicy() const
+    ErrorPolicy EncoderBase::error_policy() const
     {
-        return m_ErrorHandlingPolicy;
+        return error_policy_;
     }
 
-    void EncoderBase::setErrorHandlingPolicy(ErrorPolicy value)
+    void EncoderBase::set_error_policy(ErrorPolicy policy)
     {
-        m_ErrorHandlingPolicy = value;
+        error_policy_ = policy;
     }
 
-    char32_t EncoderBase::replacementCharacter() const
+    char32_t EncoderBase::replacement_character() const
     {
-        return m_ReplacementCharacter;
+        return replacement_character_;
     }
 
-    void EncoderBase::setReplacementCharacter(char32_t value)
+    void EncoderBase::set_replacement_character(char32_t value)
     {
-        m_ReplacementCharacter = value;
+        replacement_character_ = value;
     }
 }

@@ -23,6 +23,6 @@ namespace Yson
         bool nextDocument(UBJsonTokenizer& tokenizer,
                           UBJsonReaderState& state) override;
 
-        char scopeType() const override;
+        [[nodiscard]] char scopeType() const override;
     };
 }

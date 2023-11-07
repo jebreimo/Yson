@@ -96,7 +96,7 @@ namespace Yson
 
     ObjectKeyIterator ObjectKeyIteratorAdapter::end() const
     {
-        return ObjectKeyIterator();
+        return {};
     }
 
     ArrayIterator::ArrayIterator(Reader& reader)

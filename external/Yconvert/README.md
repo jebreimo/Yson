@@ -19,20 +19,20 @@
 
 int main()
 {
-    std::string textCp1252 = /* ... */;
+    std::string text_cp1252 = /* ... */;
 
-    auto textU8 = Yconvert::convertTo<std::string>(
-        textCp1252,
+    auto textU8 = Yconvert::convert_to<std::string>(
+        text_cp1252,
         Yconvert::Encoding::WIN_CP1252,
         Yconvert::Encoding::UTF_8); 
 
-    auto textU16 = Yconvert::convertTo<std::u16string>(
-        textCp1252,
+    auto textU16 = Yconvert::convert_to<std::u16string>(
+        text_cp1252,
         Yconvert::Encoding::WIN_CP1252,
         Yconvert::Encoding::UTF_16_NATIVE); 
 
-    auto textU32 = Yconvert::convertTo<std::u32string>(
-        textCp1252,
+    auto textU32 = Yconvert::convert_to<std::u32string>(
+        text_cp1252,
         Yconvert::Encoding::WIN_CP1252,
         Yconvert::Encoding::UTF_32_NATIVE);
 

@@ -43,7 +43,8 @@ namespace Yson
     {
         auto initialBufferSize = m_Buffer.size();
         m_Buffer.resize(initialBufferSize + bytes);
-        m_Stream->read(m_Buffer.data() + initialBufferSize, bytes);
+        m_Stream->read(m_Buffer.data() + initialBufferSize,
+                       std::streamsize(bytes));
 
         auto readBytes = static_cast<size_t>(m_Stream->gcount());
         if (readBytes < bytes)
@@ -56,7 +57,7 @@ namespace Yson
         auto bufferSize = m_Buffer.size();
         if (!m_Converter)
         {
-            auto [encoding, offset] = Yconvert::determineEncoding(
+            auto [encoding, offset] = Yconvert::determine_encoding(
                     m_Buffer.data(),
                     std::min<size_t>(bufferSize, 256));
             bufferStart += offset;

@@ -18,11 +18,11 @@ namespace Yson
     class YSON_API JsonTokenizer
     {
     public:
-        JsonTokenizer(std::istream& stream,
-                      const char* buffer = nullptr,
-                      size_t bufferSize = 0);
+        explicit JsonTokenizer(std::istream& stream,
+                               const char* buffer = nullptr,
+                               size_t bufferSize = 0);
 
-        JsonTokenizer(const std::string& fileName);
+        explicit JsonTokenizer(const std::string& fileName);
 
         JsonTokenizer(const char* buffer, size_t bufferSize);
 
@@ -32,19 +32,19 @@ namespace Yson
 
         bool next();
 
-        JsonTokenType tokenType() const;
+        [[nodiscard]] JsonTokenType tokenType() const;
 
-        std::string_view token() const;
+        [[nodiscard]] std::string_view token() const;
 
-        std::string tokenString() const;
+        [[nodiscard]] std::string tokenString() const;
 
-        const std::string& fileName() const;
+        [[nodiscard]] const std::string& fileName() const;
 
-        size_t lineNumber() const;
+        [[nodiscard]] size_t lineNumber() const;
 
-        size_t columnNumber() const;
+        [[nodiscard]] size_t columnNumber() const;
 
-        size_t chunkSize() const;
+        [[nodiscard]] size_t chunkSize() const;
 
         void setChunkSize(size_t value);
     private:

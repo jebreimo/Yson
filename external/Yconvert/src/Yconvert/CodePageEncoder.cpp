@@ -18,16 +18,16 @@ namespace Yconvert
     namespace
     {
         std::optional<char>
-        findChar(const std::vector<CodePointMapRange>& ranges, char32_t c)
+        find_char(const std::vector<CodePointMapRange>& ranges, char32_t c)
         {
             auto it = std::upper_bound(
                 ranges.begin(), ranges.end(),
                 CodePointMapRange{c, 0, 0},
-                [](auto& a, auto& b){return a.codePoint < b.codePoint;});
+                [](auto& a, auto& b){return a.code_point < b.code_point;});
             if (it != ranges.begin())
             {
                 --it;
-                auto offset = c - it->codePoint;
+                auto offset = c - it->code_point;
                 if (offset <= it->length)
                     return char(it->index + offset);
             }
@@ -37,74 +37,74 @@ namespace Yconvert
 
     CodePageEncoder::CodePageEncoder(Encoding encoding,
                                      const CodePageRange* ranges,
-                                     size_t rangesSize)
+                                     size_t ranges_size)
         : EncoderBase(encoding)
     {
-        m_Ranges.reserve(rangesSize);
+        ranges_.reserve(ranges_size);
         char32_t upper = 0;
-        for (size_t i = 0; i < rangesSize; ++i)
+        for (size_t i = 0; i < ranges_size; ++i)
         {
-            if (ranges[i].startIndex != 0xFF || ranges[i].length != 0xFF)
+            if (ranges[i].start_index != 0xFF || ranges[i].length != 0xFF)
             {
-                char32_t cp = upper | ranges[i].startCodePoint;
-                m_Ranges.push_back({cp, ranges[i].startIndex, ranges[i].length});
+                char32_t cp = upper | ranges[i].start_code_point;
+                ranges_.push_back({cp, ranges[i].start_index, ranges[i].length});
                 upper = 0;
             }
             else
             {
-                upper = ranges[i].startCodePoint << 16u;
+                upper = ranges[i].start_code_point << 16u;
             }
         }
-        if (findChar(m_Ranges, REPLACEMENT_CHARACTER))
-            EncoderBase::setReplacementCharacter(REPLACEMENT_CHARACTER);
-        else if (findChar(m_Ranges, '?'))
-            EncoderBase::setReplacementCharacter('?');
-        else if (findChar(m_Ranges, ' '))
-            EncoderBase::setReplacementCharacter(' ');
+        if (find_char(ranges_, REPLACEMENT_CHARACTER))
+            EncoderBase::set_replacement_character(REPLACEMENT_CHARACTER);
+        else if (find_char(ranges_, '?'))
+            EncoderBase::set_replacement_character('?');
+        else if (find_char(ranges_, ' '))
+            EncoderBase::set_replacement_character(' ');
         else
             // Must set it to something. The first code point is a terrible
             // idea as it's most likely 0, but this is a non-issue for all
             // encodings this code will ever encounter.
-            EncoderBase::setReplacementCharacter(ranges[0].startCodePoint);
+            EncoderBase::set_replacement_character(ranges[0].start_code_point);
     }
 
-    void CodePageEncoder::setReplacementCharacter(char32_t value)
+    void CodePageEncoder::set_replacement_character(char32_t value)
     {
-        if (findChar(m_Ranges, value))
-            EncoderBase::setReplacementCharacter(value);
+        if (find_char(ranges_, value))
+            EncoderBase::set_replacement_character(value);
     }
 
-    size_t CodePageEncoder::getEncodedSize(const char32_t* src, size_t srcSize)
+    size_t CodePageEncoder::get_encoded_size(const char32_t* src, size_t src_size)
     {
-        switch (errorHandlingPolicy())
+        switch (error_policy())
         {
         default:
             break;
         case ErrorPolicy::SKIP:
-            return std::count_if(src, src + srcSize,
+            return std::count_if(src, src + src_size,
                                  [this](auto c)
-                                 {return findChar(m_Ranges, c).has_value();});
+                                 {return find_char(ranges_, c).has_value();});
         }
-        return srcSize;
+        return src_size;
     }
 
     std::pair<size_t, size_t>
-    CodePageEncoder::encode(const char32_t* src, size_t srcSize,
-                            void* dst, size_t dstSize)
+    CodePageEncoder::encode(const char32_t* src, size_t src_size,
+                            void* dst, size_t dst_size)
     {
         auto cdst = static_cast<char*>(dst);
-        auto size = std::min(srcSize, dstSize);
+        auto size = std::min(src_size, dst_size);
         for (size_t i = 0; i < size; ++i)
         {
-            if (auto c = findChar(m_Ranges, src[i]))
+            if (auto c = find_char(ranges_, src[i]))
             {
                 *cdst++ = *c;
             }
-            else if (errorHandlingPolicy() == ErrorPolicy::REPLACE)
+            else if (error_policy() == ErrorPolicy::REPLACE)
             {
-                *cdst++ = *findChar(m_Ranges, replacementCharacter());
+                *cdst++ = *find_char(ranges_, replacement_character());
             }
-            else if (errorHandlingPolicy() == ErrorPolicy::THROW)
+            else if (error_policy() == ErrorPolicy::THROW)
             {
                 throw ConversionException(
                     "Encoding does not support the character.", i);
@@ -113,26 +113,26 @@ namespace Yconvert
         return {size, size};
     }
 
-    size_t CodePageEncoder::encode(const char32_t* src, size_t srcSize,
+    size_t CodePageEncoder::encode(const char32_t* src, size_t src_size,
                                    std::string& dst)
     {
-        for (size_t i = 0; i < srcSize; ++i)
+        for (size_t i = 0; i < src_size; ++i)
         {
-            if (auto c = findChar(m_Ranges, src[i]))
+            if (auto c = find_char(ranges_, src[i]))
             {
                 dst.push_back(*c);
             }
-            else if (errorHandlingPolicy() == ErrorPolicy::REPLACE)
+            else if (error_policy() == ErrorPolicy::REPLACE)
             {
-                dst.push_back(*findChar(m_Ranges, replacementCharacter()));
+                dst.push_back(*find_char(ranges_, replacement_character()));
             }
-            else if (errorHandlingPolicy() == ErrorPolicy::THROW)
+            else if (error_policy() == ErrorPolicy::THROW)
             {
                 throw ConversionException(
                     "Encoding does not support the character.", i);
             }
         }
-        return srcSize;
+        return src_size;
     }
 }
 

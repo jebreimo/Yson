@@ -109,7 +109,7 @@ namespace Yson
             memcpy(buffer, m_Start, remainderSize);
         m_End = m_Start += remainderSize;
         m_Stream->read(static_cast<char*>(buffer) + remainderSize,
-                       size - remainderSize);
+                       std::streamsize(size - remainderSize));
         auto readSize = size_t(m_Stream->gcount()) + remainderSize;
         if (readSize != size)
             return false;
@@ -145,7 +145,7 @@ namespace Yson
         m_End = m_Buffer.data() + (m_End - m_Start);
         m_Start = m_Buffer.data();
         m_Stream->read(m_Buffer.data() + remainderSize,
-                       m_Buffer.size() - remainderSize);
+                       std::streamsize(m_Buffer.size() - remainderSize));
         auto contentSize = m_Stream->gcount() + remainderSize;
         if (contentSize < m_Buffer.size())
             m_Buffer.resize(contentSize);

@@ -22,10 +22,11 @@ namespace Yson
     class TextStreamReader : public TextReader
     {
     public:
-        TextStreamReader(std::istream& stream,
-                         const char* buffer = nullptr,
-                         size_t bufferSize = 0,
-                         Yconvert::Encoding sourceEncoding = Yconvert::Encoding::UNKNOWN);
+        explicit TextStreamReader(
+            std::istream& stream,
+            const char* buffer = nullptr,
+            size_t bufferSize = 0,
+            Yconvert::Encoding sourceEncoding = Yconvert::Encoding::UNKNOWN);
 
         ~TextStreamReader() override;
 

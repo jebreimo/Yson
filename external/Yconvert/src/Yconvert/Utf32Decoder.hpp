@@ -12,21 +12,21 @@ namespace Yconvert
 {
     namespace Detail
     {
-        template <bool SwapBytes, typename BiIt>
-        char32_t nextUtf32Word(BiIt& it, BiIt end)
+        template <bool SWAP_BYTES, typename BiIt>
+        char32_t next_utf32_word(BiIt& it, BiIt end)
         {
             union U {char32_t c; uint8_t b[4];} u;
             for (int i = 0; i < 4; ++i)
             {
                 if (it == end)
                     return INVALID_CHAR;
-                u.b[SwapBytes ? 3 - i : i] = uint8_t(*it++);
+                u.b[SWAP_BYTES ? 3 - i : i] = uint8_t(*it++);
             }
             return u.c;
         }
 
         template <typename FwdIt>
-        bool skipNextUtf32CodePoint(FwdIt& it, FwdIt end)
+        bool skip_next_utf32_code_point(FwdIt& it, FwdIt end)
         {
             if (it == end)
                 return false;
@@ -38,56 +38,56 @@ namespace Yconvert
             return true;
         }
 
-        template <bool SwapBytes, typename BiIt>
-        char32_t nextUtf32CodePoint(BiIt& it, BiIt end)
+        template <bool SWAP_BYTES, typename BiIt>
+        char32_t next_utf32_code_point(BiIt& it, BiIt end)
         {
             auto first = it;
-            auto chr = Detail::nextUtf32Word<SwapBytes>(it, end);
+            auto chr = Detail::next_utf32_word<SWAP_BYTES>(it, end);
             if (chr == INVALID_CHAR)
                 it = first;
             return chr;
         }
     }
 
-    template <bool SwapBytes>
+    template <bool SWAP_BYTES>
     class Utf32Decoder : public DecoderBase
     {
     public:
         Utf32Decoder()
-            : DecoderBase(IsBigEndian == SwapBytes
+            : DecoderBase(IS_BIG_ENDIAN == SWAP_BYTES
                           ? Encoding::UTF_32_LE
                           : Encoding::UTF_32_BE)
         {}
 
     protected:
-        size_t skipCharacter(const void* src, size_t srcSize) const final
+        size_t skip_character(const void* src, size_t src_size) const final
         {
-            auto cSrc = static_cast<const char*>(src);
-            auto initialSrc = cSrc;
-            Detail::skipNextUtf32CodePoint(cSrc, cSrc + srcSize);
-            return size_t(cSrc - initialSrc);
+            auto c_src = static_cast<const char*>(src);
+            auto initial_src = c_src;
+            Detail::skip_next_utf32_code_point(c_src, c_src + src_size);
+            return size_t(c_src - initial_src);
         }
 
         std::pair<size_t, size_t>
-        doDecode(const void* src, size_t srcSize,
-                 char32_t* dst, size_t dstSize) const final
+        do_decode(const void* src, size_t src_size,
+                  char32_t* dst, size_t dst_size) const final
         {
-            auto cSrc = static_cast<const char*>(src);
-            auto initialSrc = cSrc;
-            auto initialDst = dst;
-            auto srcEnd = cSrc + srcSize;
-            auto dstEnd = dst + dstSize;
-            while (dst != dstEnd)
+            auto c_src = static_cast<const char*>(src);
+            auto initial_src = c_src;
+            auto initial_dst = dst;
+            auto src_end = c_src + src_size;
+            auto dst_end = dst + dst_size;
+            while (dst != dst_end)
             {
-                auto value = Detail::nextUtf32CodePoint<SwapBytes>(cSrc, srcEnd);
+                auto value = Detail::next_utf32_code_point<SWAP_BYTES>(c_src, src_end);
                 if (value == INVALID_CHAR)
                     break;
                 *dst++ = value;
             }
-            return {size_t(cSrc - initialSrc), size_t(dst - initialDst)};
+            return {size_t(c_src - initial_src), size_t(dst - initial_dst)};
         }
     };
 
-    using Utf32BEDecoder = Utf32Decoder<IsLittleEndian>;
-    using Utf32LEDecoder = Utf32Decoder<IsBigEndian>;
+    using Utf32BEDecoder = Utf32Decoder<IS_LITTLE_ENDIAN>;
+    using Utf32LEDecoder = Utf32Decoder<IS_BIG_ENDIAN>;
 }

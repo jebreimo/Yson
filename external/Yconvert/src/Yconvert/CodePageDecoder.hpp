@@ -19,15 +19,15 @@ namespace Yconvert
     public:
         CodePageDecoder(Encoding encoding,
                         const CodePageRange* ranges,
-                        size_t rangesSize);
+                        size_t ranges_size);
     protected:
-        size_t skipCharacter(const void* src, size_t srcSize) const override;
+        size_t skip_character(const void* src, size_t src_size) const override;
 
         std::pair<size_t, size_t>
-        doDecode(const void* src, size_t srcSize,
-                 char32_t* dst, size_t dstSize) const override;
+        do_decode(const void* src, size_t src_size,
+                  char32_t* dst, size_t dst_size) const override;
     private:
-        char32_t m_Chars[256];
+        char32_t chars_[256];
     };
 }
 

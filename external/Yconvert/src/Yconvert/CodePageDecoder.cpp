@@ -13,39 +13,40 @@ namespace Yconvert
 {
     CodePageDecoder::CodePageDecoder(Encoding encoding,
                                      const CodePageRange* ranges,
-                                     size_t rangesSize)
+                                     size_t ranges_size)
         : DecoderBase(encoding)
     {
-        std::fill(std::begin(m_Chars), std::end(m_Chars), INVALID_CHAR);
+        std::fill(std::begin(chars_), std::end(chars_), INVALID_CHAR);
         char32_t upper = 0;
-        for (size_t i = 0; i < rangesSize; ++i)
+        for (size_t i = 0; i < ranges_size; ++i)
         {
-            if (ranges[i].startIndex != 0xFF || ranges[i].length != 0xFF)
+            if (ranges[i].start_index != 0xFF || ranges[i].length != 0xFF)
             {
-                char32_t ch = upper | ranges[i].startCodePoint;
+                char32_t ch = upper | ranges[i].start_code_point;
                 for (size_t j = 0; j <= ranges[i].length; ++j)
-                    m_Chars[ranges[i].startIndex + j] = ch++;
+                    chars_[ranges[i].start_index + j] = ch++;
                 upper = 0;
             }
             else
             {
-                upper = ranges[i].startCodePoint << 16u;
+                upper = ranges[i].start_code_point << 16u;
             }
         }
     }
 
-    size_t CodePageDecoder::skipCharacter(const void* /*src*/, size_t srcSize) const
+    size_t CodePageDecoder::skip_character(const void*, size_t src_size) const
     {
-        return srcSize ? 1 : 0;
+        return src_size ? 1 : 0;
     }
 
     std::pair<size_t, size_t>
-    CodePageDecoder::doDecode(const void* src, size_t srcSize, char32_t* dst, size_t dstSize) const
+    CodePageDecoder::do_decode(const void* src, size_t src_size,
+                               char32_t* dst, size_t dst_size) const
     {
         auto csrc = static_cast<const uint8_t*>(src);
-        auto count = std::min(srcSize, dstSize);
+        auto count = std::min(src_size, dst_size);
         for (size_t i = 0; i < count; ++i)
-            dst[i] = m_Chars[csrc[i]];
+            dst[i] = chars_[csrc[i]];
         return {count, count};
     }
 }

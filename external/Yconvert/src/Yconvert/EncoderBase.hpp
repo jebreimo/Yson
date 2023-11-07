@@ -16,35 +16,36 @@ namespace Yconvert
     class EncoderBase
     {
     public:
-        virtual ~EncoderBase();
+        virtual ~EncoderBase() = default;
 
         [[nodiscard]]
         Encoding encoding() const;
 
         [[nodiscard]]
-        ErrorPolicy errorHandlingPolicy() const;
+        ErrorPolicy error_policy() const;
 
-        void setErrorHandlingPolicy(ErrorPolicy value);
+        void set_error_policy(ErrorPolicy policy);
 
         [[nodiscard]]
-        virtual char32_t replacementCharacter() const;
+        virtual char32_t replacement_character() const;
 
-        virtual void setReplacementCharacter(char32_t value);
+        virtual void set_replacement_character(char32_t value);
 
+        [[nodiscard]]
         virtual
-        size_t getEncodedSize(const char32_t* src, size_t srcSize) = 0;
+        size_t get_encoded_size(const char32_t* src, size_t src_size) = 0;
 
         virtual std::pair<size_t, size_t>
-        encode(const char32_t* src, size_t srcSize,
-               void* dst, size_t dstSize) = 0;
+        encode(const char32_t* src, size_t src_size,
+               void* dst, size_t dst_size) = 0;
 
-        virtual size_t encode(const char32_t* src, size_t srcSize,
+        virtual size_t encode(const char32_t* src, size_t src_size,
                               std::string& dst) = 0;
     protected:
         explicit EncoderBase(Encoding encoding);
     private:
-        Encoding m_Encoding;
-        ErrorPolicy m_ErrorHandlingPolicy;
-        char32_t m_ReplacementCharacter;
+        Encoding encoding_;
+        ErrorPolicy error_policy_;
+        char32_t replacement_character_;
     };
 }

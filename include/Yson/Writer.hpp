@@ -30,9 +30,9 @@ namespace Yson
          *
          * @return A pointer to the buffer and the buffer's size.
          */
-        virtual std::pair<const void*, size_t> buffer() const = 0;
+        [[nodiscard]] virtual std::pair<const void*, size_t> buffer() const = 0;
 
-        virtual const std::string& key() const = 0;
+        [[nodiscard]] virtual const std::string& key() const = 0;
 
         /**
          * @brief Sets the key (or name) of the next value in an object.

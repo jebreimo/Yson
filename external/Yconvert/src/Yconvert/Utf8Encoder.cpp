@@ -13,7 +13,7 @@ namespace Yconvert
 {
     namespace Detail
     {
-        constexpr size_t getUtf8EncodedLength(char32_t c)
+        constexpr size_t get_utf8_encoded_length(char32_t c)
         {
             if (c < 0x80u)
                 return 1;
@@ -28,23 +28,23 @@ namespace Yconvert
         }
 
         template <typename OutputIt>
-        size_t encodeUtf8(char32_t chr, size_t chrLength, OutputIt& it)
+        size_t encode_utf8(char32_t chr, size_t chr_length, OutputIt& it)
         {
-            if (chrLength == 1)
+            if (chr_length == 1)
             {
                 *it++ = char(chr);
             }
-            else if (chrLength != 0)
+            else if (chr_length != 0)
             {
-                size_t shift = (chrLength - 1) * 6;
-                *it++ = char((0xFFu << (8 - chrLength)) | (chr >> shift));
-                for (size_t i = 1; i < chrLength; i++)
+                size_t shift = (chr_length - 1) * 6;
+                *it++ = char((0xFFu << (8 - chr_length)) | (chr >> shift));
+                for (size_t i = 1; i < chr_length; i++)
                 {
                     shift -= 6;
                     *it++ = char(0x80u | ((chr >> shift) & 0x3Fu));
                 }
             }
-            return chrLength;
+            return chr_length;
         }
     }
 
@@ -52,40 +52,40 @@ namespace Yconvert
         : EncoderBase(Encoding::UTF_8)
     {}
 
-    size_t Utf8Encoder::getEncodedSize(const char32_t* src, size_t srcSize)
+    size_t Utf8Encoder::get_encoded_size(const char32_t* src, size_t src_size)
     {
         size_t result = 0;
-        for (size_t i = 0; i < srcSize; ++i)
-            result += Detail::getUtf8EncodedLength(src[i]);
+        for (size_t i = 0; i < src_size; ++i)
+            result += Detail::get_utf8_encoded_length(src[i]);
         return result;
     }
 
     std::pair<size_t, size_t>
-    Utf8Encoder::encode(const char32_t* src, size_t srcSize,
-                        void* dst, size_t dstSize)
+    Utf8Encoder::encode(const char32_t* src, size_t src_size,
+                        void* dst, size_t dst_size)
     {
         auto cdst = static_cast<char*>(dst);
-        size_t bytesWritten = 0;
-        for (size_t i = 0; i < srcSize; ++i)
+        size_t bytes_written = 0;
+        for (size_t i = 0; i < src_size; ++i)
         {
-            size_t length = Detail::getUtf8EncodedLength(src[i]);
-            if (length > dstSize - bytesWritten)
-                return {i, bytesWritten};
-            Detail::encodeUtf8(src[i], length, cdst);
-            bytesWritten += length;
+            size_t length = Detail::get_utf8_encoded_length(src[i]);
+            if (length > dst_size - bytes_written)
+                return {i, bytes_written};
+            Detail::encode_utf8(src[i], length, cdst);
+            bytes_written += length;
         }
-        return {srcSize, bytesWritten};
+        return {src_size, bytes_written};
     }
 
-    size_t Utf8Encoder::encode(const char32_t* src, size_t srcSize,
+    size_t Utf8Encoder::encode(const char32_t* src, size_t src_size,
                                std::string& dst)
     {
         auto out = back_inserter(dst);
-        for (size_t i = 0; i < srcSize; ++i)
+        for (size_t i = 0; i < src_size; ++i)
         {
-            auto n = Detail::getUtf8EncodedLength(src[i]);
-            Detail::encodeUtf8(src[i], n, out);
+            auto n = Detail::get_utf8_encoded_length(src[i]);
+            Detail::encode_utf8(src[i], n, out);
         }
-        return srcSize;
+        return src_size;
     }
 }

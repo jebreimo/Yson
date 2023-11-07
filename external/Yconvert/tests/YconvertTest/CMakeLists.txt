@@ -10,8 +10,8 @@ cmake_minimum_required(VERSION 3.13)
 include(FetchContent)
 FetchContent_Declare(catch
     GIT_REPOSITORY "https://github.com/catchorg/Catch2.git"
-    GIT_TAG "v2.11.1"
-    )
+    GIT_TAG "v3.4.0"
+)
 FetchContent_GetProperties(catch)
 if (NOT catch_POPULATED)
     FetchContent_Populate(catch)
@@ -19,7 +19,6 @@ if (NOT catch_POPULATED)
 endif ()
 
 add_executable(YconvertTest
-    YconvertTestMain.cpp
     test_Converter.cpp
     test_Endian.cpp
     test_Utf8Decoder.cpp
@@ -32,7 +31,7 @@ add_executable(YconvertTest
 target_link_libraries(YconvertTest
     PRIVATE
         Yconvert::Yconvert
-        Catch2::Catch2
+        Catch2::Catch2WithMain
     )
 
 target_compile_options(YconvertTest

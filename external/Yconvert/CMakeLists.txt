@@ -6,9 +6,9 @@
 ## License text is included with the source distribution.
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.16)
-project(Yconvert VERSION 0.1.4)
+project(Yconvert VERSION 0.2.1)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 # Set YCONVERT_MASTER_PROJECT to ON if Yconvert is the root level project.
 if (NOT DEFINED YCONVERT_MASTER_PROJECT)

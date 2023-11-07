@@ -48,7 +48,7 @@ namespace Yson
         default:
             JSON_READER_THROW("Invalid state: " + toString(state) + ".",
                               tokenizer);
-        };
+        }
     }
 
     std::pair<ReaderState, bool> JsonDocumentReader::nextDocument(

@@ -39,7 +39,7 @@ namespace Yson
             return false;
         if (!m_Converter)
         {
-            auto encoding = Yconvert::determineEncoding(
+            auto encoding = Yconvert::determine_encoding(
                 m_Buffer,
                 std::min<size_t>(m_Size, 256));
             m_Offset = encoding.second;
@@ -48,7 +48,7 @@ namespace Yson
                 Yconvert::Encoding::UTF_8);
         }
 
-        if (m_Converter->sourceEncoding() == Yconvert::Encoding::UTF_8)
+        if (m_Converter->source_encoding() == Yconvert::Encoding::UTF_8)
         {
             if (m_Offset + bytes != m_Size)
                 bytes = sizeWithoutIncompleteFinalCharacter(m_Buffer + m_Offset, bytes);

@@ -12,50 +12,50 @@
 namespace Yconvert
 {
     DecoderBase::DecoderBase(Encoding encoding)
-        : m_Encoding(encoding),
-          m_ErrorHandlingPolicy()
+        : encoding_(encoding),
+          error_policy_()
     {}
 
     Encoding DecoderBase::encoding() const
     {
-        return m_Encoding;
+        return encoding_;
     }
 
-    ErrorPolicy DecoderBase::errorHandlingPolicy() const
+    ErrorPolicy DecoderBase::error_handling_policy() const
     {
-        return m_ErrorHandlingPolicy;
+        return error_policy_;
     }
 
-    void DecoderBase::setErrorHandlingPolicy(ErrorPolicy value)
+    void DecoderBase::set_error_policy(ErrorPolicy policy)
     {
-        m_ErrorHandlingPolicy = value;
+        error_policy_ = policy;
     }
 
     std::pair<size_t, size_t>
-    DecoderBase::decode(const void* src, size_t srcSize,
-                        char32_t* dst, size_t dstSize) const
+    DecoderBase::decode(const void* src, size_t src_size,
+                        char32_t* dst, size_t dst_size) const
     {
-        size_t iSrc = 0, iDst = 0;
-        auto cSrc = static_cast<const char*>(src);
+        size_t i_src = 0, i_dst = 0;
+        auto bytes = static_cast<const char*>(src);
         while (true)
         {
-            auto size = doDecode(cSrc + iSrc, srcSize - iSrc,
-                                 dst + iDst, dstSize - iDst);
-            iSrc += size.first;
-            iDst += size.second;
-            if (iSrc == srcSize || iDst == dstSize)
-                return {iSrc, iDst};
+            auto size = do_decode(bytes + i_src, src_size - i_src,
+                                  dst + i_dst, dst_size - i_dst);
+            i_src += size.first;
+            i_dst += size.second;
+            if (i_src == src_size || i_dst == dst_size)
+                return {i_src, i_dst};
 
-            switch (m_ErrorHandlingPolicy)
+            switch (error_policy_)
             {
             case ErrorPolicy::REPLACE:
-                dst[iDst++] = REPLACEMENT_CHARACTER;
-                iSrc += skipCharacter(cSrc + iSrc, srcSize - iSrc);
+                dst[i_dst++] = REPLACEMENT_CHARACTER;
+                i_src += skip_character(bytes + i_src, src_size - i_src);
                 break;
             case ErrorPolicy::THROW:
-                throw ConversionException("Invalid character in input.", iDst);
+                throw ConversionException("Invalid character in input.", i_dst);
             case ErrorPolicy::SKIP:
-                iSrc += skipCharacter(cSrc, srcSize);
+                i_src += skip_character(bytes, src_size);
                 break;
             }
         }

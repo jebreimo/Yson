@@ -6,11 +6,11 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "Yconvert/Utf16Encoder.hpp"
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 using namespace Yconvert;
 
-void checkAddBytesLE(char32_t c, std::string_view expected)
+void check_add_bytes_le(char32_t c, std::string_view expected)
 {
     std::string s;
     Utf16LEEncoder encoder;
@@ -18,7 +18,7 @@ void checkAddBytesLE(char32_t c, std::string_view expected)
     REQUIRE(s == expected);
 }
 
-void checkAddBytesBE(char32_t c, std::string_view expected)
+void check_add_bytes_be(char32_t c, std::string_view expected)
 {
     std::string s;
     Utf16BEEncoder encoder;
@@ -28,15 +28,15 @@ void checkAddBytesBE(char32_t c, std::string_view expected)
 
 TEST_CASE("Test add UTF-16 LE bytes.")
 {
-    checkAddBytesLE(U'', {"\xFF\xF8", 2});
+    check_add_bytes_le(U'', {"\xFF\xF8", 2});
 }
 
 TEST_CASE("Test add UTF-16 BE bytes.")
 {
-    checkAddBytesBE(U'', {"\xF8\xFF", 2});
+    check_add_bytes_be(U'', {"\xF8\xFF", 2});
 }
 
-void checkEncodeBytesLE(char32_t c, std::string_view expected)
+void check_encode_bytes_le(char32_t c, std::string_view expected)
 {
     char str[4] = {};
     Utf16LEEncoder encoder;
@@ -45,7 +45,7 @@ void checkEncodeBytesLE(char32_t c, std::string_view expected)
         REQUIRE(str[i] == expected[i]);
 }
 
-void checkEncodeBytesBE(char32_t c, std::string_view expected)
+void check_encode_bytes_be(char32_t c, std::string_view expected)
 {
     char str[4] = {};
     Utf16BEEncoder encoder;
@@ -56,6 +56,6 @@ void checkEncodeBytesBE(char32_t c, std::string_view expected)
 
 TEST_CASE("Test encode ASCII")
 {
-    checkEncodeBytesLE(U'A', {"A\0", 2});
-    checkEncodeBytesBE(U'A', {"\0A", 2});
+    check_encode_bytes_le(U'A', {"A\0", 2});
+    check_encode_bytes_be(U'A', {"\0A", 2});
 }

@@ -22,8 +22,8 @@ namespace Yconvert
         UTF_32_LE,
         UTF_32_BE,
         ASCII,
-        UTF_16_NATIVE = IsLittleEndian ? UTF_16_LE : UTF_16_BE,
-        UTF_32_NATIVE = IsLittleEndian ? UTF_32_LE : UTF_32_BE,
+        UTF_16_NATIVE = IS_LITTLE_ENDIAN ? UTF_16_LE : UTF_16_BE,
+        UTF_32_NATIVE = IS_LITTLE_ENDIAN ? UTF_32_LE : UTF_32_BE,
         WSTRING_NATIVE = sizeof(wchar_t) == 2 ? UTF_16_NATIVE : UTF_32_NATIVE,
     #ifdef YCONVERT_ENABLE_ISO_CODE_PAGES
         ISO_8859_1 = 128,
@@ -85,9 +85,9 @@ namespace Yconvert
     {
         Encoding encoding;
         std::string_view name = {};
-        std::string_view byteOrderMark = {};
-        size_t unitSize = 0;
-        size_t maxUnits = 0;
+        std::string_view byte_order_mark = {};
+        size_t unit_size = 0;
+        size_t max_units = 0;
         Endianness endianness = Endianness::UNKNOWN;
     };
 
@@ -95,20 +95,20 @@ namespace Yconvert
      * @brief Return the @a EncdingInfo instance for @a encoding.
      */
     [[nodiscard]]
-    YCONVERT_API const EncodingInfo& getEncodingInfo(Encoding encoding);
+    YCONVERT_API const EncodingInfo& get_encoding_info(Encoding encoding);
 
     [[nodiscard]]
-    YCONVERT_API std::pair<const EncodingInfo*, size_t> getSupportedEncodings();
+    YCONVERT_API std::pair<const EncodingInfo*, size_t> get_supported_encodings();
 
     /** @brief Returns the @a Encoding that corresponds to @a name.
       */
-    YCONVERT_API Encoding encodingFromName(std::string name);
+    YCONVERT_API Encoding encoding_from_name(std::string name);
 
     /** @brief Checks the list of known byte-order marks and returns the one
       *     that matches the start of @a bom.
       */
     [[nodiscard]]
-    YCONVERT_API Encoding determineEncodingFromByteOrderMark(
+    YCONVERT_API Encoding determine_encoding_from_byte_order_mark(
         const char* str, size_t len);
 
 
@@ -116,7 +116,7 @@ namespace Yconvert
       *     most likely to @a str's encoding.
       */
     [[nodiscard]]
-    YCONVERT_API Encoding determineEncodingFromFirstCharacter(
+    YCONVERT_API Encoding determine_encoding_from_first_character(
         const char* str, size_t len);
 
     /** @brief Returns the encoding used in @a stream and the offset the
@@ -127,7 +127,7 @@ namespace Yconvert
       * buffer is analyzed instead.
       */
     [[nodiscard]]
-    YCONVERT_API std::pair<Encoding, size_t> determineEncoding(
+    YCONVERT_API std::pair<Encoding, size_t> determine_encoding(
         const char* buffer, size_t length);
 
     /** @brief Returns the encoding used in @a stream.
@@ -139,5 +139,5 @@ namespace Yconvert
       * guess the encoding, and then reposition the stream back to its
       * original position.
       */
-    YCONVERT_API Encoding determineEncoding(std::istream& stream);
+    YCONVERT_API Encoding determine_encoding(std::istream& stream);
 }

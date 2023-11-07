@@ -6,31 +6,31 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include <Yconvert/Endian.hpp>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 using namespace Yconvert;
 
-TEST_CASE("systemEndianness")
+TEST_CASE("system_endianness")
 {
-    REQUIRE(getSystemEndianness() == Endianness::NATIVE);
+    REQUIRE(get_system_endianness() == Endianness::NATIVE);
 }
 
-TEST_CASE("reverseBytes8")
+TEST_CASE("reverse_bytes8")
 {
-    REQUIRE(reverseBytes<int8_t>(0x10) == 0x10);
+    REQUIRE(reverse_bytes<int8_t>(0x10) == 0x10);
 }
 
-TEST_CASE("reverseBytes16")
+TEST_CASE("reverse_bytes16")
 {
-    REQUIRE(reverseBytes<int16_t>(0x1020) == 0x2010);
+    REQUIRE(reverse_bytes<int16_t>(0x1020) == 0x2010);
 }
 
-TEST_CASE("reverseBytes32")
+TEST_CASE("reverse_bytes32")
 {
-    REQUIRE(reverseBytes<int32_t>(0x10203040) == 0x40302010);
+    REQUIRE(reverse_bytes<int32_t>(0x10203040) == 0x40302010);
 }
 
-TEST_CASE("reverseBytes64")
+TEST_CASE("reverse_bytes64")
 {
-    REQUIRE(reverseBytes(0x1020304050607080LL) == 0x8070605040302010LL);
+    REQUIRE(reverse_bytes(0x1020304050607080LL) == 0x8070605040302010LL);
 }

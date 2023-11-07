@@ -74,7 +74,7 @@ namespace Yson
         m_Members->stream =  m_Members->streamPtr
                              ? m_Members->streamPtr.get()
                              : stream;
-        m_Members->contexts.push(Context());
+        m_Members->contexts.emplace();
         m_Members->buffer.reserve(MAX_BUFFER_SIZE);
         if (!m_Members->stream)
             m_Members->maxBufferSize = SIZE_MAX;
@@ -266,7 +266,7 @@ namespace Yson
 
     UBJsonWriter& UBJsonWriter::value(std::wstring_view text)
     {
-        return value(Yconvert::convertTo<std::string>(
+        return value(Yconvert::convert_to<std::string>(
                 text,
                 Yconvert::Encoding::UTF_16_NATIVE,
                 Yconvert::Encoding::UTF_8));
@@ -274,11 +274,12 @@ namespace Yson
 
     UBJsonWriter& UBJsonWriter::binary(const void* data, size_t size)
     {
-        beginArray(UBJsonParameters(size, UBJsonValueType::UINT_8));
+        auto s_size = ptrdiff_t(size);
+        beginArray(UBJsonParameters(s_size, UBJsonValueType::UINT_8));
         flush();
         auto& m = members();
-        m.stream->write(static_cast<const char*>(data), size);
-        m.contexts.top().index = size;
+        m.stream->write(static_cast<const char*>(data), s_size);
+        m.contexts.top().index = s_size;
         return endArray();
     }
 
@@ -334,9 +335,9 @@ namespace Yson
             m.buffer.push_back('#');
             writeMinimalInteger(m.buffer, int64_t(parameters.size));
         }
-        m.contexts.push(Context(structureType,
-                                 parameters.size,
-                                 parameters.valueType));
+        m.contexts.emplace(structureType,
+                           parameters.size,
+                           parameters.valueType);
         return *this;
     }
 
@@ -399,7 +400,7 @@ namespace Yson
         auto& m = members();
         if (m.stream && !m.buffer.empty())
         {
-            m.stream->write(m.buffer.data(), m.buffer.size());
+            m.stream->write(m.buffer.data(), std::streamsize(m.buffer.size()));
             m.buffer.clear();
         }
         return *this;

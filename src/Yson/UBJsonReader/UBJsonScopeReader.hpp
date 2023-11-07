@@ -15,7 +15,7 @@ namespace Yson
     class UBJsonScopeReader
     {
     public:
-        virtual char scopeType() const = 0;
+        [[nodiscard]] virtual char scopeType() const = 0;
 
         virtual bool nextKey(UBJsonTokenizer& tokenizer,
                              UBJsonReaderState& state) = 0;

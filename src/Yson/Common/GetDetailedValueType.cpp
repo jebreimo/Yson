@@ -294,7 +294,7 @@ namespace Yson
                     continue;
                 return str.substr(i);
             }
-            return std::string_view();
+            return {};
         }
 
         DetailedValueType getBinaryNumberType(std::string_view str,

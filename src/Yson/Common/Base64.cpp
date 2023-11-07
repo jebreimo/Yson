@@ -48,9 +48,9 @@ namespace Yson
 
     uint8_t decodeCharacter(char c)
     {
-        if (c < 0 || DecodingTable[unsigned(c)] == Err)
+        if (c < 0 || DecodingTable[static_cast<unsigned char>(c)] == Err)
             YSON_THROW(std::string("Invalid Base64 character: '") + c + "'");
-        return DecodingTable[unsigned(c)];
+        return DecodingTable[static_cast<unsigned char>(c)];
     }
 
     std::string toBase64(const void* data, size_t size)
@@ -134,7 +134,7 @@ namespace Yson
         {
             uint32_t word = (decodeCharacter(text[i]) << 18)
                             | (decodeCharacter(text[i + 1]) << 12);
-            buffer[j++] = uint8_t(word >> 16);
+            buffer[j++] = char(word >> 16);
         }
         return true;
     }
@@ -171,7 +171,7 @@ namespace Yson
         {
             uint32_t word = (decodeCharacter(text[i]) << 18)
                             | (decodeCharacter(text[i + 1]) << 12);
-            buffer.push_back(uint8_t(word >> 16));
+            buffer.push_back(char(word >> 16));
         }
         return true;
     }

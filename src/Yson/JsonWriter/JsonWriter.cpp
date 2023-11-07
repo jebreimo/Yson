@@ -103,7 +103,7 @@ namespace Yson
         formatting = formatting != JsonFormatting::DEFAULT
                      ? formatting
                      : JsonFormatting::NONE;
-        m_Members->contexts.push(Context('\0', JsonParameters(formatting)));
+        m_Members->contexts.emplace('\0', JsonParameters(formatting));
         m_Members->buffer.reserve(MAX_BUFFER_SIZE);
         if (!m_Members->stream)
             m_Members->maxBufferSize = SIZE_MAX;
@@ -285,10 +285,10 @@ namespace Yson
             converter = std::make_unique<Yconvert::Converter>(
                 Yconvert::Encoding::WSTRING_NATIVE,
                 Yconvert::Encoding::UTF_8);
-            converter->setErrorHandlingPolicy(Yconvert::ErrorPolicy::REPLACE);
+            converter->set_error_policy(Yconvert::ErrorPolicy::REPLACE);
         }
 
-        return JsonWriter::value(Yconvert::convertTo<std::string>(
+        return JsonWriter::value(Yconvert::convert_to<std::string>(
             value, *converter));
     }
 
@@ -755,7 +755,7 @@ namespace Yson
             if (m.contexts.top().parameters.valuesPerLine > 1)
                 parameters.formatting = JsonFormatting::FLAT;
         }
-        m.contexts.push(Context(endChar, parameters));
+        m.contexts.emplace(endChar, parameters);
         if (formatting() == JsonFormatting::FORMAT)
             indent();
         m.state = AT_START_OF_STRUCTURE;

@@ -14,7 +14,7 @@ namespace Yson
     class BinaryFileReader : public BinaryStreamReader
     {
     public:
-        BinaryFileReader(const std::string& fileName);
+        explicit BinaryFileReader(const std::string& fileName);
 
     private:
         std::ifstream m_Stream;

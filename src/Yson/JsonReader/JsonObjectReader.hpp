@@ -23,6 +23,6 @@ namespace Yson
         nextDocument(JsonTokenizer& tokenizer,
                      ReaderState state) override;
 
-        char scopeType() const override;
+        [[nodiscard]] char scopeType() const override;
     };
 }

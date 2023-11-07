@@ -14,7 +14,7 @@ namespace Yson
     class JsonScopeReader
     {
     public:
-        virtual char scopeType() const = 0;
+        [[nodiscard]] virtual char scopeType() const = 0;
 
         virtual std::pair<ReaderState, bool> nextKey(
                 JsonTokenizer& tokenizer,

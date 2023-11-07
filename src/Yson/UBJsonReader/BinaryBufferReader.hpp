@@ -18,11 +18,11 @@ namespace Yson
 
         bool advance(size_t count) override;
 
-        const void* data() const override;
+        [[nodiscard]] const void* data() const override;
 
-        char front() const override;
+        [[nodiscard]] char front() const override;
 
-        size_t position() const override;
+        [[nodiscard]] size_t position() const override;
 
         bool peek(char* value) override;
 

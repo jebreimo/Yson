@@ -38,7 +38,7 @@ namespace Yson
          */
         bool isByteOrderMark(const char* contents, size_t size)
         {
-            auto encInf = Yson_Yconvert::determineEncodingFromByteOrderMark(
+            auto encInf = Yson_Yconvert::determine_encoding_from_byte_order_mark(
                     contents, size);
             switch (encInf)
             {

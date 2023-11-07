@@ -6,9 +6,9 @@
 ## License text is included with the source distribution.
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.16)
-project(Yson VERSION 1.4.13 LANGUAGES CXX)
+project(Yson VERSION 1.4.14 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 # Set YSON_MASTER_PROJECT to ON if Yson is the root level project.
 if (NOT DEFINED YSON_MASTER_PROJECT)

@@ -17,7 +17,7 @@ namespace Yconvert
 {
     struct CodePointMapRange
     {
-        char32_t codePoint;
+        char32_t code_point;
         uint8_t index;
         uint8_t length;
     };
@@ -27,19 +27,22 @@ namespace Yconvert
     public:
         CodePageEncoder(Encoding encoding,
                         const CodePageRange* ranges,
-                        size_t rangesSize);
+                        size_t ranges_size);
 
-        void setReplacementCharacter(char32_t value) override;
+        void set_replacement_character(char32_t value) override;
 
-        size_t getEncodedSize(const char32_t* src, size_t srcSize) override;
+        [[nodiscard]]
+        size_t get_encoded_size(const char32_t* src, size_t src_size) override;
 
         std::pair<size_t, size_t>
-        encode(const char32_t* src, size_t srcSize, void* dst, size_t dstSize) override;
+        encode(const char32_t* src, size_t src_size,
+               void* dst, size_t dst_size) override;
 
-        size_t encode(const char32_t* src, size_t srcSize, std::string& dst) override;
+        size_t encode(const char32_t* src, size_t src_size,
+                      std::string& dst) override;
 
     private:
-        std::vector<CodePointMapRange> m_Ranges;
+        std::vector<CodePointMapRange> ranges_;
     };
 }
 

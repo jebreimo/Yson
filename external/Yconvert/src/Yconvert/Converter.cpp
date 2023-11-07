@@ -27,83 +27,83 @@ namespace Yconvert
     {
         const size_t DEFAULT_BUFFER_SIZE = 256;
 
-        size_t findNthCodePoint(DecoderBase& decoder,
-                                const char* src, size_t srcSize,
-                                std::vector<char32_t>& buf, size_t n)
+        size_t find_nth_code_point(DecoderBase& decoder,
+                                   const char* src, size_t src_size,
+                                   std::vector<char32_t>& buf, size_t n)
         {
             assert(buf.size() >= n);
             if (n == 0)
                 return 0;
-            auto& info = getEncodingInfo(decoder.encoding());
-            if (info.maxUnits == 1)
-                return n * info.unitSize;
-            return decoder.decode(src, srcSize, buf.data(), n).first;
+            auto& info = get_encoding_info(decoder.encoding());
+            if (info.max_units == 1)
+                return n * info.unit_size;
+            return decoder.decode(src, src_size, buf.data(), n).first;
         }
 
 #ifdef YCONVERT_ENABLE_CODE_PAGES
 
         inline std::pair<const CodePageRange*, size_t>
-        getCodePageRanges(Encoding encoding)
+        get_code_page_ranges(Encoding encoding)
         {
             static const CodePageRange ASCII_CHARS = {0x0000, 0, 127};
             if (encoding == Encoding::ASCII)
                 return {&ASCII_CHARS, 1};
             #ifdef YCONVERT_ENABLE_ISO_CODE_PAGES
             if ((unsigned(encoding) & unsigned(Encoding::ISO_8859_1)) != 0)
-                return getIsoCodePageRanges(encoding);
+                return get_iso_code_page_ranges(encoding);
             #endif
             #ifdef YCONVERT_ENABLE_MAC_CODE_PAGES
             if ((unsigned(encoding) & unsigned(Encoding::MAC_CYRILLIC)) != 0)
-                return getIsoCodePageRanges(encoding);
+                return get_iso_code_page_ranges(encoding);
             #endif
             #ifdef YCONVERT_ENABLE_DOS_CODE_PAGES
             if ((unsigned(encoding) & unsigned(Encoding::DOS_CP437)) != 0)
-                return getIsoCodePageRanges(encoding);
+                return get_iso_code_page_ranges(encoding);
             #endif
             #ifdef YCONVERT_ENABLE_WIN_CODE_PAGES
             if ((unsigned(encoding) & unsigned(Encoding::WIN_CP1250)) != 0)
-                return getIsoCodePageRanges(encoding);
+                return get_iso_code_page_ranges(encoding);
             #endif
             return {nullptr, 0};
         }
 
-        std::unique_ptr<DecoderBase> makeCodePageDecoder(Encoding encoding)
+        std::unique_ptr<DecoderBase> make_code_page_decoder(Encoding encoding)
         {
-            auto [ranges, rangesSize] = getCodePageRanges(encoding);
+            auto [ranges, ranges_size] = get_code_page_ranges(encoding);
             if (ranges)
             {
                 return std::unique_ptr<DecoderBase>(new CodePageDecoder(
-                    encoding, ranges, rangesSize));
+                    encoding, ranges, ranges_size));
             }
             return {};
         }
 
-        std::unique_ptr<EncoderBase> makeCodePageEncoder(Encoding encoding)
+        std::unique_ptr<EncoderBase> make_code_page_encoder(Encoding encoding)
         {
-            auto [ranges, rangesSize] = getCodePageRanges(encoding);
+            auto [ranges, ranges_size] = get_code_page_ranges(encoding);
             if (ranges)
             {
                 return std::unique_ptr<EncoderBase>(new CodePageEncoder(
-                    encoding, ranges, rangesSize));
+                    encoding, ranges, ranges_size));
             }
             return {};
         }
 
 #else
 
-        std::unique_ptr<DecoderBase> makeCodePageDecoder(Encoding)
+        std::unique_ptr<DecoderBase> make_code_page_decoder(Encoding)
         {
             return {};
         }
 
-        std::unique_ptr<EncoderBase> makeCodePageEncoder(Encoding)
+        std::unique_ptr<EncoderBase> make_code_page_encoder(Encoding)
         {
             return {};
         }
 
 #endif
 
-        std::unique_ptr<DecoderBase> makeDecoder(Encoding encoding)
+        std::unique_ptr<DecoderBase> make_decoder(Encoding encoding)
         {
             switch (encoding)
             {
@@ -118,16 +118,16 @@ namespace Yconvert
             case Encoding::UTF_32_LE:
                 return std::unique_ptr<DecoderBase>(new Utf32LEDecoder);
             default:
-                if (auto decoder = makeCodePageDecoder(encoding))
+                if (auto decoder = make_code_page_decoder(encoding))
                     return decoder;
                 break;
             }
 
-            const auto& info = getEncodingInfo(encoding);
+            const auto& info = get_encoding_info(encoding);
             YCONVERT_THROW("Unsupported decoder: " + std::string(info.name));
         }
 
-        std::unique_ptr<EncoderBase> makeEncoder(Encoding encoding)
+        std::unique_ptr<EncoderBase> make_encoder(Encoding encoding)
         {
             switch (encoding)
             {
@@ -142,17 +142,18 @@ namespace Yconvert
             case Encoding::UTF_32_LE:
                 return std::unique_ptr<EncoderBase>(new Utf32LEEncoder);
             default:
-                if (auto encoder = makeCodePageEncoder(encoding))
+                if (auto encoder = make_code_page_encoder(encoding))
                     return encoder;
                 break;
             }
 
-            const auto& info = getEncodingInfo(encoding);
+            const auto& info = get_encoding_info(encoding);
             YCONVERT_THROW("Unsupported encoder: " + std::string(info.name));
         }
 
         template <unsigned UNIT_SIZE>
-        size_t endianCopy(const void* src, size_t srcSize, void* dst, size_t dstSize)
+        size_t endian_copy(const void* src, size_t srcSize,
+                           void* dst, size_t dstSize)
         {
             static_assert((UNIT_SIZE & ~UNIT_SIZE) == 0);
             size_t size = std::min(srcSize, dstSize);
@@ -175,10 +176,10 @@ namespace Yconvert
         }
     }
 
-    Converter::Converter(Encoding srcEncoding, Encoding dstEncoding)
-        : m_Decoder(makeDecoder(srcEncoding)),
-          m_Encoder(makeEncoder(dstEncoding)),
-          m_ConversionType(getConversionType(srcEncoding, dstEncoding))
+    Converter::Converter(Encoding src_encoding, Encoding dst_encoding)
+        : decoder_(make_decoder(src_encoding)),
+          encoder_(make_encoder(dst_encoding)),
+          conversion_type_(get_conversion_type(src_encoding, dst_encoding))
     {}
 
     Converter::Converter(Converter&&) noexcept = default;
@@ -187,120 +188,123 @@ namespace Yconvert
 
     Converter& Converter::operator=(Converter&&) noexcept = default;
 
-    size_t Converter::bufferSize() const
+    size_t Converter::buffer_size() const
     {
-        return m_Buffer.empty() ? DEFAULT_BUFFER_SIZE : m_Buffer.size();
+        return buffer_.empty() ? DEFAULT_BUFFER_SIZE : buffer_.size();
     }
 
-    void Converter::setBufferSize(size_t value)
+    void Converter::set_buffer_size(size_t size)
     {
-        m_Buffer.resize(value);
+        buffer_.resize(size);
     }
 
-    void Converter::setErrorHandlingPolicy(ErrorPolicy value)
+    void Converter::set_error_policy(ErrorPolicy policy)
     {
-        m_Decoder->setErrorHandlingPolicy(value);
-        m_Encoder->setErrorHandlingPolicy(value);
+        decoder_->set_error_policy(policy);
+        encoder_->set_error_policy(policy);
     }
 
-    ErrorPolicy Converter::errorHandlingPolicy() const
+    ErrorPolicy Converter::error_policy() const
     {
-        return m_Decoder->errorHandlingPolicy();
+        return decoder_->error_handling_policy();
     }
 
-    char32_t Converter::replacementCharacter() const
+    char32_t Converter::replacement_character() const
     {
-        return m_Encoder->replacementCharacter();
+        return encoder_->replacement_character();
     }
 
-    void Converter::setReplacementCharacter(char32_t value)
+    void Converter::set_replacement_character(char32_t value)
     {
-        m_Encoder->setReplacementCharacter(value);
+        encoder_->set_replacement_character(value);
     }
 
-    Encoding Converter::sourceEncoding() const
+    Encoding Converter::source_encoding() const
     {
-        return m_Decoder->encoding();
+        return decoder_->encoding();
     }
 
-    Encoding Converter::destinationEncoding() const
+    Encoding Converter::destination_encoding() const
     {
-        return m_Encoder->encoding();
+        return encoder_->encoding();
     }
 
-    size_t Converter::getEncodedSize(const void* src, size_t srcSize)
+    size_t Converter::get_encoded_size(const void* src, size_t src_size)
     {
-        if (m_ConversionType != ConversionType::CONVERT)
-            return srcSize;
+        if (conversion_type_ != ConversionType::CONVERT)
+            return src_size;
 
-        if (m_Buffer.empty())
-            m_Buffer.resize(DEFAULT_BUFFER_SIZE);
+        if (buffer_.empty())
+            buffer_.resize(DEFAULT_BUFFER_SIZE);
 
-        const auto& dec = getEncodingInfo(m_Decoder->encoding());
-        const auto& enc = getEncodingInfo(m_Encoder->encoding());
-        if (dec.maxUnits == 1 && enc.maxUnits == 1)
-            return (srcSize / dec.unitSize) * enc.unitSize;
-        auto cSrc = static_cast<const char*>(src);
+        const auto& dec = get_encoding_info(decoder_->encoding());
+        const auto& enc = get_encoding_info(encoder_->encoding());
+        if (dec.max_units == 1 && enc.max_units == 1)
+            return (src_size / dec.unit_size) * enc.unit_size;
+        auto bytes = static_cast<const char*>(src);
         size_t size = 0;
         size_t offset = 0;
         for (;;)
         {
-            auto [n, m] = m_Decoder->decode(cSrc + offset, srcSize - offset,
-                                            m_Buffer.data(), m_Buffer.size());
+            auto [n, m] = decoder_->decode(bytes + offset, src_size - offset,
+                                           buffer_.data(), buffer_.size());
             if (n == 0)
                 break;
             offset += n;
-            size += m_Encoder->getEncodedSize(m_Buffer.data(), m);
+            size += encoder_->get_encoded_size(buffer_.data(), m);
         }
         return size;
     }
 
-    size_t Converter::convert(const void* src, size_t srcSize, std::string& dst)
+    size_t Converter::convert(const void* src, size_t src_size,
+                              std::string& dst)
     {
-        switch (m_ConversionType)
+        switch (conversion_type_)
         {
         case ConversionType::SWAP_ENDIANNESS:
             {
-                auto oldSize = dst.size();
-                dst.resize(oldSize + srcSize);
-                return copyAndSwap(src, srcSize, dst.data() + oldSize, srcSize);
+                auto old_size = dst.size();
+                dst.resize(old_size + src_size);
+                return copy_and_swap(src, src_size,
+                                     dst.data() + old_size, src_size);
             }
         case ConversionType::COPY:
             {
-                auto oldSize = dst.size();
-                dst.resize(oldSize + srcSize);
-                return copy(src, srcSize, dst.data() + oldSize, srcSize);
+                auto old_size = dst.size();
+                dst.resize(old_size + src_size);
+                return copy(src, src_size, dst.data() + old_size, src_size);
             }
         case ConversionType::CONVERT:
-            return doConvert(src, srcSize, dst);
+            return do_convert(src, src_size, dst);
         default:
             return 0;
         }
     }
 
     std::pair<size_t, size_t>
-    Converter::convert(const void* src, size_t srcSize, void* dst, size_t dstSize)
+    Converter::convert(const void* src, size_t src_size,
+                       void* dst, size_t dst_size)
     {
-        switch (m_ConversionType)
+        switch (conversion_type_)
         {
         case ConversionType::SWAP_ENDIANNESS:
         {
-            auto n = copyAndSwap(src, srcSize, dst, dstSize);
+            auto n = copy_and_swap(src, src_size, dst, dst_size);
             return {n, n};
         }
         case ConversionType::COPY:
         {
-            auto n = copy(src, srcSize, dst, dstSize);
+            auto n = copy(src, src_size, dst, dst_size);
             return {n, n};
         }
         case ConversionType::CONVERT:
-            return doConvert(src, srcSize, dst, dstSize);
+            return do_convert(src, src_size, dst, dst_size);
         default:
             return {0, 0};
         }
     }
 
-    Converter::ConversionType Converter::getConversionType(
+    Converter::ConversionType Converter::get_conversion_type(
             Encoding src, Encoding dst)
     {
         if (src == dst)
@@ -315,88 +319,89 @@ namespace Yconvert
         return ConversionType::CONVERT;
     }
 
-    size_t Converter::copy(const void* src, size_t srcSize, void* dst, size_t dstSize)
+    size_t Converter::copy(const void* src, size_t src_size,
+                           void* dst, size_t dst_size)
     {
-        auto unitSize = getEncodingInfo(m_Encoder->encoding()).unitSize;
-        auto minSize = std::min(srcSize, dstSize);
-        minSize -= minSize % unitSize;
-        memcpy(dst, src, minSize);
-        return minSize;
+        auto unit_size = get_encoding_info(encoder_->encoding()).unit_size;
+        auto min_size = std::min(src_size, dst_size);
+        min_size -= min_size % unit_size;
+        memcpy(dst, src, min_size);
+        return min_size;
     }
 
-    size_t Converter::copyAndSwap(const void* src, size_t srcSize,
-                                  void* dst, size_t dstSize)
+    size_t Converter::copy_and_swap(const void* src, size_t src_size,
+                                    void* dst, size_t dst_size)
     {
-        auto unitSize = getEncodingInfo(m_Decoder->encoding()).unitSize;
-        if (unitSize == 2)
-            return endianCopy<2>(src, srcSize, dst, dstSize);
-        else if (unitSize == 4)
-            return endianCopy<4>(src, srcSize, dst, dstSize);
+        auto unit_size = get_encoding_info(decoder_->encoding()).unit_size;
+        if (unit_size == 2)
+            return endian_copy<2>(src, src_size, dst, dst_size);
+        else if (unit_size == 4)
+            return endian_copy<4>(src, src_size, dst, dst_size);
         return 0;
     }
 
-    size_t Converter::doConvert(const void* src, size_t srcSize,
-                                std::string& dst)
+    size_t Converter::do_convert(const void* src, size_t src_size,
+                                 std::string& dst)
     {
-        if (m_Buffer.empty())
-            m_Buffer.resize(DEFAULT_BUFFER_SIZE);
+        if (buffer_.empty())
+            buffer_.resize(DEFAULT_BUFFER_SIZE);
 
-        auto originalSize = srcSize;
+        auto original_size = src_size;
         auto csrc = static_cast<const char*>(src);
-        while (srcSize != 0)
+        while (src_size != 0)
         {
-            auto [m, n] = m_Decoder->decode(csrc, srcSize,
-                                            m_Buffer.data(), m_Buffer.size());
-            auto p = m_Encoder->encode(m_Buffer.data(), n, dst);
+            auto [m, n] = decoder_->decode(csrc, src_size,
+                                           buffer_.data(), buffer_.size());
+            auto p = encoder_->encode(buffer_.data(), n, dst);
             if (n != p)
             {
-                srcSize -= findNthCodePoint(*m_Decoder, csrc, srcSize,
-                                            m_Buffer, p);
+                src_size -= find_nth_code_point(*decoder_, csrc, src_size,
+                                                buffer_, p);
                 break;
             }
             csrc += m;
-            srcSize -= m;
+            src_size -= m;
         }
-        return originalSize - srcSize;
+        return original_size - src_size;
     }
 
     std::pair<size_t, size_t>
-    Converter::doConvert(const void* src, size_t srcSize,
-                         void* dst, size_t dstSize)
+    Converter::do_convert(const void* src, size_t src_size,
+                          void* dst, size_t dst_size)
     {
-        if (m_Buffer.empty())
-            m_Buffer.resize(DEFAULT_BUFFER_SIZE);
+        if (buffer_.empty())
+            buffer_.resize(DEFAULT_BUFFER_SIZE);
 
-        auto srcSize0 = srcSize;
-        auto dstSize0 = dstSize;
+        auto src_size_0 = src_size;
+        auto dst_size_0 = dst_size;
         auto csrc = static_cast<const char*>(src);
         auto cdst = static_cast<char*>(dst);
-        size_t numCodePoints = 0;
+        size_t num_code_points = 0;
         try
         {
-            while (srcSize != 0)
+            while (src_size != 0)
             {
-                auto[m, n] = m_Decoder->decode(csrc, srcSize,
-                                               m_Buffer.data(), m_Buffer.size());
-                auto [p, q] = m_Encoder->encode(m_Buffer.data(), n, cdst, dstSize);
+                auto[m, n] = decoder_->decode(csrc, src_size,
+                                              buffer_.data(), buffer_.size());
+                auto [p, q] = encoder_->encode(buffer_.data(), n, cdst, dst_size);
                 if (n != p)
                 {
-                    srcSize -= findNthCodePoint(*m_Decoder, csrc, srcSize,
-                                                m_Buffer, p);
+                    src_size -= find_nth_code_point(*decoder_, csrc, src_size,
+                                                    buffer_, p);
                     break;
                 }
                 csrc += m;
-                srcSize -= m;
+                src_size -= m;
                 cdst += q;
-                dstSize -= q;
-                numCodePoints += n;
+                dst_size -= q;
+                num_code_points += n;
             }
         }
         catch (ConversionException& ex)
         {
-            ex.codePointIndex += numCodePoints;
+            ex.code_point_index += num_code_points;
             throw;
         }
-        return {srcSize0 - srcSize, dstSize0 - dstSize};
+        return {src_size_0 - src_size, dst_size_0 - dst_size};
     }
 }
