@@ -6,6 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
+#include <cstdint>
 #include <iosfwd>
 #include <string>
 #include "YsonDefinitions.hpp"
