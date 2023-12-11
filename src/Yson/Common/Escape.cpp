@@ -8,6 +8,7 @@
 #include "Escape.hpp"
 
 #include <algorithm>
+#include <cstdint>
 #include <iterator>
 #include "Yson/YsonException.hpp"
 
