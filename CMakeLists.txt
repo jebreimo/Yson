@@ -6,7 +6,7 @@
 ## License text is included with the source distribution.
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.16)
-project(Yson VERSION 1.4.15 LANGUAGES CXX)
+project(Yson VERSION 1.4.16 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -166,6 +166,7 @@ target_include_directories(Yson BEFORE
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/external/Yconvert/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/fast_float
     )
 
 target_compile_definitions(Yson
