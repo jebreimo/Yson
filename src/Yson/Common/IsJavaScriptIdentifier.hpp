@@ -8,8 +8,9 @@
 #pragma once
 
 #include <string_view>
+#include "Yson/YsonDefinitions.hpp"
 
 namespace Yson
 {
-    bool isJavaScriptIdentifier(const std::string_view& str);
+    YSON_API bool isJavaScriptIdentifier(const std::string_view& str);
 }
