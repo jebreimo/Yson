@@ -57,7 +57,6 @@ namespace Yson
                 return {};
             }
 
-            bool underscore = false;
             for (++i; i < str.size(); ++i)
             {
                 auto digit = getDigit(str[i]);
@@ -65,26 +64,17 @@ namespace Yson
                 {
                     value *= 10;
                     value += digit;
-                    underscore = false;
-                }
-                else if (str[i] != '_' || underscore)
-                {
-                    break;
                 }
                 else
                 {
-                    underscore = true;
+                    break;
                 }
             }
-
-            if (underscore)
-                return {};
 
             if (i == str.size())
                 return !negative ? value : -value;
 
             // Get the fraction
-            underscore = true; // Makes underscore after point illegal.
             int decimals = 0;
             T fraction = {};
             if (str[i] == '.')
@@ -96,16 +86,11 @@ namespace Yson
                     {
                         fraction *= 10;
                         fraction += digit;
-                        underscore = false;
                         ++decimals;
-                    }
-                    else if (str[i] != '_' || underscore)
-                    {
-                        break;
                     }
                     else
                     {
-                        underscore = true;
+                        break;
                     }
                 }
             }
@@ -144,15 +129,10 @@ namespace Yson
                     {
                         exponent *= 10;
                         exponent += digit;
-                        underscore = false;
-                    }
-                    else if (str[i] != '_' || underscore)
-                    {
-                        return {};
                     }
                     else
                     {
-                        underscore = true;
+                        return {};
                     }
                     if (exponent > std::numeric_limits<T>::max_exponent10)
                         return {};

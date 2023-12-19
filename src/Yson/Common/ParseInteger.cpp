@@ -103,8 +103,7 @@ namespace Yson
                     value *= Base;
                     value += digit;
                 }
-                else if (str[i] != '_' || i == str.size() - 1
-                         || str[i - 1] == '_')
+                else
                 {
                     return {};
                 }
@@ -133,8 +132,7 @@ namespace Yson
                         value *= Base;
                         value += digit;
                     }
-                    else if (str[i] != '_' || i == str.size() - 1
-                             || str[i - 1] == '_')
+                    else
                     {
                         return {};
                     }

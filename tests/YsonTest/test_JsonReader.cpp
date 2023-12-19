@@ -93,7 +93,7 @@ namespace
 
     void test_EscapedString()
     {
-        std::string doc = "\"AB\\\"\\n\\t\\/\\k\\\\g\\u0123\"";
+        std::string doc = R"("AB\"\n\t\/\k\\g\u0123")";
         std::istringstream ss(doc);
         JsonReader reader(ss);
         Y_ASSERT(reader.nextValue());
@@ -139,36 +139,36 @@ namespace
         Y_CALL(assertRead<int8_t>("067", 67));
         Y_CALL(assertRead<int8_t>("000067", 67));
         Y_CALL(assertRead<int8_t>("-128", -128));
-        Y_CALL(assertRead<int8_t>("1_00", 100));
+        Y_CALL(assertRead<int8_t>("100", 100));
         Y_CALL(assertRead<int8_t>("127", 127));
         Y_CALL(assertReadFails<int8_t>("128"));
 
         Y_CALL(assertReadFails<uint8_t>("-1"));
         Y_CALL(assertRead<uint8_t>("-0", 0));
-        Y_CALL(assertRead<uint8_t>("1_00", 100));
+        Y_CALL(assertRead<uint8_t>("100", 100));
         Y_CALL(assertRead<uint8_t>("255", 255));
         Y_CALL(assertReadFails<uint8_t>("256"));
 
         Y_CALL(assertReadFails<uint8_t>("-0b1"));
         Y_CALL(assertRead<uint8_t>("-0b0000", 0));
         Y_CALL(assertRead<uint8_t>("0b1", 1));
-        Y_CALL(assertRead<uint8_t>("0b0000_0001", 1));
-        Y_CALL(assertRead<uint8_t>("0b1111_1111", 255));
-        Y_CALL(assertReadFails<uint8_t>("0b1_0000_0000"));
+        Y_CALL(assertRead<uint8_t>("0b00000001", 1));
+        Y_CALL(assertRead<uint8_t>("0b11111111", 255));
+        Y_CALL(assertReadFails<uint8_t>("0b100000000"));
 
         Y_CALL(assertReadFails<int16_t>("-32769"));
         Y_CALL(assertRead<int16_t>("-32768", -32768));
-        Y_CALL(assertRead<int16_t>("1_00", 100));
+        Y_CALL(assertRead<int16_t>("100", 100));
         Y_CALL(assertRead<int16_t>("32767", 32767));
         Y_CALL(assertReadFails<int16_t>("32768"));
 
-        Y_CALL(assertReadFails<int64_t>("-0x8000_0000_0000_0001"));
-        Y_CALL(assertRead<int64_t>("-0x8000_0000_0000_0000",
+        Y_CALL(assertReadFails<int64_t>("-0x8000000000000001"));
+        Y_CALL(assertRead<int64_t>("-0x8000000000000000",
                                    -0x8000000000000000));
-        Y_CALL(assertRead<int64_t>("1_00", 100));
-        Y_CALL(assertRead<int64_t>("0x7FFF_FFFF_FFFF_FFFF",
+        Y_CALL(assertRead<int64_t>("100", 100));
+        Y_CALL(assertRead<int64_t>("0x7FFFFFFFFFFFFFFF",
                                    0x7FFFFFFFFFFFFFFF));
-        Y_CALL(assertReadFails<int64_t>("0x8000_0000_0000_0000"));
+        Y_CALL(assertReadFails<int64_t>("0x8000000000000000"));
 
         Y_CALL(assertRead<char>("12", 12));
         Y_CALL(assertRead<signed char>("12", 12));
@@ -190,7 +190,7 @@ namespace
         Y_CALL(assertRead<double>("-100.123", -100.123));
         Y_CALL(assertRead<double>("-100.123e15", -100.123e15));
         Y_CALL(assertRead<double>("-100.123e-15", -100.123e-15, 1e-25));
-        Y_CALL(assertRead<double>("-100_100_100.100_100e+1_2",
+        Y_CALL(assertRead<double>("-100100100.100100e+12",
                                   -100100100.100100e12));
         Y_CALL(assertRead<float>("1e38", 1e38f));
         Y_CALL(assertReadFails<float>("1e39"));
