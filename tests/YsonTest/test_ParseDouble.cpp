@@ -50,12 +50,14 @@ namespace
         Y_CALL(success("1.", 1));
         Y_CALL(failure("0 "));
         Y_CALL(failure(" 0"));
+        Y_CALL(failure("\xBB" "0"));
         Y_CALL(failure("."));
-        Y_CALL(failure(".0"));
+        Y_CALL(success(".0", 0));
+        Y_CALL(success(".45", 0.45));
         Y_CALL(failure("e"));
         Y_CALL(failure("+"));
         Y_CALL(failure("-"));
-        Y_CALL(failure("-.2"));
+        Y_CALL(success("-.2", -0.2));
         Y_CALL(failure("-e2"));
         Y_CALL(success("1.2", 1.2));
         Y_CALL(success("123456.123456", 123456.123456));

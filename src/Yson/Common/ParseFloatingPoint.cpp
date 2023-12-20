@@ -42,37 +42,45 @@ namespace Yson
                     return {};
             }
 
-            // Get the integer value
-            auto value = T(getDigit(str[i]));
-            if (value > 9)
+            T value;
+            if (str[i] == '.' && i + 1 != str.size())
             {
-                if (str == "null")
-                    return T();
-                if (str == "Infinity" || str == "+Infinity")
-                    return std::numeric_limits<T>::infinity();
-                if (str == "-Infinity")
-                    return -std::numeric_limits<T>::infinity();
-                if (str == "NaN")
-                    return std::numeric_limits<T>::quiet_NaN();
-                return {};
+                value = 0;
             }
-
-            for (++i; i < str.size(); ++i)
+            else
             {
-                auto digit = getDigit(str[i]);
-                if (digit <= 9)
+                // Get the integer value
+                value = T(getDigit(str[i]));
+                if (value > 9)
                 {
-                    value *= 10;
-                    value += digit;
+                    if (str == "null")
+                        return T();
+                    if (str == "Infinity" || str == "+Infinity")
+                        return std::numeric_limits<T>::infinity();
+                    if (str == "-Infinity")
+                        return -std::numeric_limits<T>::infinity();
+                    if (str == "NaN")
+                        return std::numeric_limits<T>::quiet_NaN();
+                    return {};
                 }
-                else
-                {
-                    break;
-                }
-            }
 
-            if (i == str.size())
-                return !negative ? value : -value;
+                for (++i; i < str.size(); ++i)
+                {
+                    auto digit = getDigit(str[i]);
+                    if (digit <= 9)
+                    {
+                        value *= 10;
+                        value += digit;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                if (i == str.size())
+                    return !negative ? value : -value;
+            }
 
             // Get the fraction
             int decimals = 0;
