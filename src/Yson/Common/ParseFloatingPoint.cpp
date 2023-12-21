@@ -7,20 +7,15 @@
 //****************************************************************************
 #include "ParseFloatingPoint.hpp"
 
-#include <fast_float.h>
-#include <cstdint>
+#include <cctype>
 #include <limits>
 #include <optional>
+#include <fast_float.h>
 
 namespace Yson
 {
     namespace
     {
-        [[nodiscard]] constexpr int getDigit(char c)
-        {
-            return int(uint8_t(c) ^ 0x30u);
-        }
-
         template <typename T>
         std::optional<T> parseFloatingPoint(std::string_view str)
         {
@@ -40,7 +35,7 @@ namespace Yson
                 return {};
             }
 
-            if (getDigit(str[i]) > 9)
+            if (!isdigit(str[i]))
             {
                 // Get the integer value
                 if (str == "null")
