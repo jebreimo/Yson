@@ -7,7 +7,7 @@
 //****************************************************************************
 #include "ParseFloatingPoint.hpp"
 
-#include <cmath>
+#include <fast_float.h>
 #include <cstdint>
 #include <limits>
 #include <optional>
@@ -16,7 +16,7 @@ namespace Yson
 {
     namespace
     {
-        int getDigit(char c)
+        [[nodiscard]] constexpr int getDigit(char c)
         {
             return int(uint8_t(c) ^ 0x30u);
         }
@@ -29,136 +29,40 @@ namespace Yson
 
             size_t i = 0;
             // Get the sign of the number
-            bool negative = false;
-            if (str[0] == '-')
+            if (str[0] == '+')
             {
-                negative = true;
-                if (++i == str.size())
+                str.remove_prefix(1);
+                if (str.empty())
                     return {};
             }
-            else if (str[0] == '+')
+            else if (str[0] == '-' && ++i == str.size())
             {
-                if (++i == str.size())
-                    return {};
+                return {};
             }
 
-            T value;
-            if (str[i] == '.' && i + 1 != str.size())
-            {
-                value = 0;
-            }
-            else
+            if (getDigit(str[i]) > 9)
             {
                 // Get the integer value
-                value = T(getDigit(str[i]));
-                if (value > 9)
-                {
-                    if (str == "null")
-                        return T();
-                    if (str == "Infinity" || str == "+Infinity")
-                        return std::numeric_limits<T>::infinity();
-                    if (str == "-Infinity")
-                        return -std::numeric_limits<T>::infinity();
-                    if (str == "NaN")
-                        return std::numeric_limits<T>::quiet_NaN();
+                if (str == "null")
+                    return T();
+                if (str == "Infinity" || str == "+Infinity")
+                    return std::numeric_limits<T>::infinity();
+                if (str == "-Infinity")
+                    return -std::numeric_limits<T>::infinity();
+                if (str == "NaN")
+                    return std::numeric_limits<T>::quiet_NaN();
+                if (str[i] != '.')
                     return {};
-                }
-
-                for (++i; i < str.size(); ++i)
-                {
-                    auto digit = getDigit(str[i]);
-                    if (digit <= 9)
-                    {
-                        value *= 10;
-                        value += digit;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                if (i == str.size())
-                    return !negative ? value : -value;
             }
 
-            // Get the fraction
-            int decimals = 0;
-            T fraction = {};
-            if (str[i] == '.')
-            {
-                for (++i; i < str.size(); ++i)
-                {
-                    auto digit = getDigit(str[i]);
-                    if (digit <= 9)
-                    {
-                        fraction *= 10;
-                        fraction += digit;
-                        ++decimals;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
+            auto beg = str.data();
+            auto end = beg + str.size();
 
-            // Get the exponent
-            int exponent = 0;
-            if (i != str.size())
-            {
-                if ((uint8_t(str[i]) & 0xDFu) != 'E')
-                    return {};
-
-                if (++i == str.size())
-                    return {};
-
-                bool negativeExponent = false;
-                if (str[i] == '-')
-                {
-                    negativeExponent = true;
-                    if (++i == str.size())
-                        return {};
-                }
-                else if (str[i] == '+')
-                {
-                    if (++i == str.size())
-                        return {};
-                }
-
-                exponent += getDigit(str[i]);
-                if (exponent > 9)
-                    return {};
-
-                for (++i; i != str.size(); ++i)
-                {
-                    auto digit = getDigit(str[i]);
-                    if (digit <= 9)
-                    {
-                        exponent *= 10;
-                        exponent += digit;
-                    }
-                    else
-                    {
-                        return {};
-                    }
-                    if (exponent > std::numeric_limits<T>::max_exponent10)
-                        return {};
-                }
-                if (negativeExponent)
-                    exponent = -exponent;
-            }
-
-            if (fraction)
-                value += fraction * std::pow(T(10), T(-decimals));
-            if (exponent)
-                value *= std::pow(T(10), T(exponent));
-
-            // Add the sign
-            if (negative)
-                value = -value;
-
-            return value;
+            T value;
+            auto result = fast_float::from_chars(beg, end, value);
+            return result.ec == std::errc() && result.ptr == end
+                   ? value
+                   : std::optional<T>();
         }
 
         template <typename T>

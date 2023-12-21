@@ -166,6 +166,7 @@ target_include_directories(Yson BEFORE
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/external/Yconvert/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/fast_float
     )
 
 target_compile_definitions(Yson
