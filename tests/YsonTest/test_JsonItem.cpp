@@ -17,11 +17,13 @@ namespace
 
     void test_readItem_basics()
     {
-        std::string doc = R"({"foo": "bar", "zap": [1, 2, 3]})";
+        std::string doc = R"({"foo": "bar", "zap": [1, 2, 3], "folderNix": "/path/to/folder", "folderWin": "c:\\path\\to\\folder"})";
         JsonReader reader(doc.data(), doc.size());
         auto item = reader.readItem();
         Y_ASSERT(item.isObject());
         Y_ASSERT(get<std::string>(item["foo"]) == "bar");
+        Y_ASSERT(get<std::string>(item["folderNix"]) == "/path/to/folder");
+        Y_ASSERT(get<std::string>(item["folderWin"]) == "c:\\path\\to\\folder");
         Y_ASSERT(get<int32_t>(item["zap"][2]) == 3);
 
         Y_THROWS(item["bob"], YsonException);

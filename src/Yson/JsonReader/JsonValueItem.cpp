@@ -142,7 +142,7 @@ namespace Yson
     bool JsonValueItem::get(std::string& value) const
     {
         if (hasEscapedCharacters(m_Value))
-            value = unescape(value);
+            value = unescape(m_Value);
         else
             value = m_Value;
         return true;
