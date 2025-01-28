@@ -146,13 +146,13 @@ int main()
 
 ### The following extensions to JSON are supported (most must be explicitly enabled):
 
-* comments, both //... and /*...*/
-* multi-line strings """...."""
-* special integer formats (0x... for hexadecimals, 0o... for octals and 0b... for binary numbers)
+* comments, both `//...` and `/*...*/`
+* multi-line strings `"""...."""`
+* special integer formats (`0x...` for hexadecimals, `0o...` for octals and `0b...` for binary numbers)
 * non-string keys
 * single-word keys without quotes
 * multiple JSON top-level documents in a single file or stream (iterated over with *nextDocument()*).
-* support for the special floating point values NaN and positive and negative inifinity. 
+* support for the special floating point values `NaN` and positive and negative `inifinity`. 
 
 JsonWriter
 ==========
