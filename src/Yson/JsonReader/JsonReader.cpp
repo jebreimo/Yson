@@ -48,14 +48,14 @@ namespace Yson
     {}
 
     JsonReader::JsonReader(const std::string& fileName)
-            : m_Members(new Members(JsonTokenizer(fileName)))
+            : m_Members(std::make_unique<Members>(JsonTokenizer(fileName)))
     {
         m_Members->scopes.emplace_back(&m_Members->documentReader,
                                        ReaderState::INITIAL_STATE);
     }
 
     JsonReader::JsonReader(const char* buffer, size_t bufferSize)
-            : m_Members(new Members(JsonTokenizer(buffer, bufferSize)))
+            : m_Members(std::make_unique<Members>(JsonTokenizer(buffer, bufferSize)))
     {
         m_Members->scopes.emplace_back(&m_Members->documentReader,
                                        ReaderState::INITIAL_STATE);
@@ -64,7 +64,7 @@ namespace Yson
     JsonReader::JsonReader(std::istream& stream,
                            const char* buffer,
                            size_t bufferSize)
-            : m_Members(new Members(JsonTokenizer(stream, buffer, bufferSize)))
+            : m_Members(std::make_unique<Members>(JsonTokenizer(stream, buffer, bufferSize)))
     {
         m_Members->scopes.emplace_back(&m_Members->documentReader,
                                        ReaderState::INITIAL_STATE);
@@ -400,7 +400,7 @@ namespace Yson
         return readBase64(value);
     }
 
-    JsonItem JsonReader::readArray()
+    JsonItem JsonReader::readArray() // NOLINT(*-no-recursion)
     {
         std::vector<JsonItem> values;
         const auto& tokenizer = m_Members->tokenizer;
@@ -422,7 +422,7 @@ namespace Yson
         return JsonItem(std::make_shared<ArrayItem>(std::move(values)));
     }
 
-    JsonItem JsonReader::readObject()
+    JsonItem JsonReader::readObject() // NOLINT(*-no-recursion)
     {
         std::deque<std::string> keys;
         std::unordered_map<std::string_view, JsonItem> values;
@@ -478,10 +478,9 @@ namespace Yson
             auto tType = tokenizer.tokenType();
             if (tType == JsonTokenType::START_OBJECT)
                 return readObject();
-            else if (tType == JsonTokenType::START_ARRAY)
+            if (tType == JsonTokenType::START_ARRAY)
                 return readArray();
-            else
-                return JsonItem(JsonValueItem(tokenizer.tokenString(), tType));
+            return JsonItem(JsonValueItem(tokenizer.tokenString(), tType));
         }
         case ReaderState::AT_KEY:
             return JsonItem(JsonValueItem(tokenizer.tokenString(),

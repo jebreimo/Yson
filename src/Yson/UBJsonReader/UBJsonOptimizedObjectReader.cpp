@@ -19,10 +19,10 @@ namespace Yson
         case ReaderState::AT_KEY:
             if (!readStartOfOptimizedValue(tokenizer, state.valueType))
                 UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer);
-            // [[fallthrough]]
+            [[fallthrough]];
         case ReaderState::AT_VALUE:
             skipValue(tokenizer);
-            // [[fallthrough]]
+            [[fallthrough]];
         case ReaderState::AFTER_VALUE:
         case ReaderState::AT_START:
             if (state.valueIndex == state.valueCount)
@@ -49,7 +49,7 @@ namespace Yson
         {
         case ReaderState::AT_VALUE:
             skipValue(tokenizer);
-            // [[fallthrough]]
+            [[fallthrough]];
         case ReaderState::AFTER_VALUE:
         case ReaderState::AT_START:
             if (state.valueIndex == state.valueCount)
@@ -60,7 +60,7 @@ namespace Yson
             ++state.valueIndex;
             if (!readKey(tokenizer))
                 UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer);
-            // [[fallthrough]]
+            [[fallthrough]];
         case ReaderState::AT_KEY:
             if (readStartOfOptimizedValue(tokenizer, state.valueType))
             {

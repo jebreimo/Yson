@@ -53,15 +53,15 @@ namespace Yson
                                    UBJsonTokenType tokenType)
     {
         if (tokenType != UBJsonTokenType::UNKNOWN_TOKEN)
-        {
             return tokenizer.next(tokenType);
-        }
-        else if (tokenizer.next())
+
+        if (tokenizer.next())
         {
             if (isValueToken(tokenizer.tokenType()))
                 return true;
             UBJSON_READER_UNEXPECTED_TOKEN(tokenizer);
         }
+
         return false;
     }
 
@@ -120,7 +120,7 @@ namespace Yson
         }
     }
 
-    void skipKeysAndComplexValues(UBJsonTokenizer& tokenizer)
+    void skipKeysAndComplexValues(UBJsonTokenizer& tokenizer) // NOLINT(*-no-recursion)
     {
         auto count = tokenizer.contentSize();
         auto contentType = tokenizer.contentType();
@@ -128,7 +128,9 @@ namespace Yson
         {
             if (!tokenizer.skip(UBJsonTokenType::STRING_TOKEN)
                 || !tokenizer.skip(contentType))
+            {
                 UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer);
+            }
             skipValue(tokenizer);
         }
     }
@@ -170,7 +172,8 @@ namespace Yson
     {
         if (!carriesValue(tokenizer.contentType()))
             return;
-        else if (isTrivialValue(tokenizer.contentType()))
+
+        if (isTrivialValue(tokenizer.contentType()))
             skipTrivialValues(tokenizer);
         else
             skipComplexValues(tokenizer);

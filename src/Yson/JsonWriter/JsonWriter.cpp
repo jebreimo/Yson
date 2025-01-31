@@ -5,6 +5,7 @@
 // This file is distributed under the Simplified BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
+// ReSharper disable CppParameterMayBeConst
 #include "Yson/JsonWriter.hpp"
 
 #include <array>
@@ -94,7 +95,7 @@ namespace Yson
     JsonWriter::JsonWriter(std::unique_ptr<std::ostream> streamPtr,
                            std::ostream* stream,
                            JsonFormatting formatting)
-        : m_Members(new Members)
+        : m_Members(std::make_unique<Members>())
     {
         m_Members->streamPtr = std::move(streamPtr);
         m_Members->stream = m_Members->streamPtr
@@ -267,14 +268,10 @@ namespace Yson
     JsonWriter& JsonWriter::value(std::string_view value)
     {
         if (!hasUnescapedCharacters(value))
-        {
             return writeString(value);
-        }
-        else
-        {
-            return writeString(escape(
-                value, isEscapeNonAsciiCharactersEnabled()));
-        }
+
+        return writeString(escape(
+            value, isEscapeNonAsciiCharactersEnabled()));
     }
 
     JsonWriter& JsonWriter::value(std::wstring_view value)
@@ -429,11 +426,11 @@ namespace Yson
         return std::make_pair(m.indentationCharacter, m.indentationWidth);
     }
 
-    JsonWriter& JsonWriter::setIndentation(char character, unsigned count)
+    JsonWriter& JsonWriter::setIndentation(char character, unsigned width)
     {
         auto& m = members();
         m.indentationCharacter = character;
-        m.indentationWidth = count;
+        m.indentationWidth = width;
         return *this;
     }
 

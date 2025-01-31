@@ -255,8 +255,7 @@ namespace Yson
     {
         if (m_Type == UBJsonTokenType::STRING_TOKEN)
             return fromBase64(m_Value, value);
-        else
-            return false;
+        return false;
     }
 
     bool UBJsonValueItem::getBinary(std::vector<char>& value) const

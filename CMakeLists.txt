@@ -6,7 +6,7 @@
 ## License text is included with the source distribution.
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.16)
-project(Yson VERSION 1.4.17 LANGUAGES CXX)
+project(Yson VERSION 1.4.18 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -85,7 +85,6 @@ add_library(Yson
     src/Yson/Common/ReaderIterators.cpp
     src/Yson/Common/ReaderState.cpp
     src/Yson/Common/SelectTypeIf.hpp
-    src/Yson/Common/StringView.hpp
     src/Yson/Common/UBJsonValueType.cpp
     src/Yson/Common/ValueType.cpp
     src/Yson/Common/ValueTypeUtilities.cpp

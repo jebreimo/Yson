@@ -58,13 +58,7 @@ namespace Yson
     namespace Details
     {
         template <typename T>
-        struct DetailedValueTraits
-        {
-            constexpr static DetailedValueType valueType()
-            {
-                return DetailedValueType::UNKNOWN;
-            }
-        };
+        struct DetailedValueTraits;
 
         #define YSON_DETAIL_DETAILEDVALUETRAITS(type, detValueType) \
             template <> \

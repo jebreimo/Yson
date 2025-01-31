@@ -94,6 +94,7 @@ namespace Yson
         return ObjectKeyIterator(*reader);
     }
 
+    // ReSharper disable once CppMemberFunctionMayBeStatic
     ObjectKeyIterator ObjectKeyIteratorAdapter::end() const
     {
         return {};

@@ -98,7 +98,6 @@ namespace Yson
             case DetailedValueType::SINT_64:
                 return 0x61;
             case DetailedValueType::FLOAT_32:
-                return 0x60;
             case DetailedValueType::FLOAT_64:
                 return 0x60;
             case DetailedValueType::BIG_INT:

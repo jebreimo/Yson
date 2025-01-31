@@ -28,8 +28,7 @@ namespace Yson
             Context(UBJsonValueType structureType,
                     ptrdiff_t size,
                     UBJsonValueType valueType = UBJsonValueType::UNKNOWN)
-                    : index(0),
-                      size(size),
+                    : size(size),
                       structureType(structureType),
                       valueType(valueType)
             {}
@@ -198,6 +197,7 @@ namespace Yson
 
     UBJsonWriter& UBJsonWriter::value(long long value)
     {
+        // ReSharper disable once CppRedundantCastExpression
         return writeInteger(static_cast<int64_t>(value));
     }
 
@@ -210,7 +210,7 @@ namespace Yson
     {
         if (value <= INT16_MAX)
             return writeInteger(static_cast<int16_t>(value));
-        else if (!members().strictIntegerSizes)
+        if (!members().strictIntegerSizes)
             return writeInteger<int32_t>(value);
         YSON_THROW("uint16_t value " + std::to_string(value)
                    + " is greater than INT16_MAX");
@@ -220,7 +220,7 @@ namespace Yson
     {
         if (value <= INT32_MAX)
             return writeInteger(static_cast<int32_t>(value));
-        else if (!members().strictIntegerSizes)
+        if (!members().strictIntegerSizes)
             return writeInteger<int64_t>(value);
         YSON_THROW("uint32_t value " + std::to_string(value)
                    + " is greater than INT32_MAX");

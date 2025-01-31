@@ -20,23 +20,21 @@ namespace Yson
         case ReaderState::AT_START:
             if (readKey(tokenizer, JsonTokenType::END_OBJECT))
                 return {ReaderState::AT_KEY, true};
-            else
-                return {ReaderState::AT_END, false};
+            return {ReaderState::AT_END, false};
         case ReaderState::AT_KEY:
             readColon(tokenizer);
             if (!tokenizer.next())
                 JSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer);
-            //[[fallthrough]]
+            [[fallthrough]];
         case ReaderState::AT_VALUE:
             skipValue(tokenizer);
-            //[[fallthrough]]
+            [[fallthrough]];
         case ReaderState::AFTER_VALUE:
             if (!readComma(tokenizer, JsonTokenType::END_OBJECT))
                 return {ReaderState::AT_END, false};
             if (readKey(tokenizer, JsonTokenType::END_OBJECT))
                 return {ReaderState::AT_KEY, true};
-            else
-                return {ReaderState::AT_END, false};
+            return {ReaderState::AT_END, false};
         case ReaderState::AT_END:
             return {ReaderState::AT_END, false};
         default:

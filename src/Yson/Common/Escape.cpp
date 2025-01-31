@@ -20,18 +20,17 @@ namespace Yson
         {
             if (!(c >> 7))
                 return 1;
-            else if (!(c >> 11))
+            if (!(c >> 11))
                 return 2;
-            else if (!(c >> 16))
+            if (!(c >> 16))
                 return 3;
-            else if (!(c >> 21))
+            if (!(c >> 21))
                 return 4;
-            else if (!(c >> 26))
+            if (!(c >> 26))
                 return 5;
-            else if (!(c >> 31))
+            if (!(c >> 31))
                 return 6;
-            else
-                return 7;
+            return 7;
         }
 
         template <typename OutputIt>
@@ -363,8 +362,7 @@ namespace Yson
         auto it = begin(str);
         if (escapeNonAscii)
             return advanceUntil(it, end(str), isEscapableOrNonAscii);
-        else
-            return advanceUntil(it, end(str), isEscapable);
+        return advanceUntil(it, end(str), isEscapable);
     }
 
     std::string unescape(std::string_view str)

@@ -11,7 +11,7 @@
 
 namespace Yson
 {
-    class JsonDocumentReader : public JsonScopeReader
+    class JsonDocumentReader final : public JsonScopeReader
     {
     public:
         std::pair<ReaderState, bool> nextKey(

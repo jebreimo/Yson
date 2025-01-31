@@ -35,7 +35,8 @@ namespace Yson
                 }
                 UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer);
             }
-            else if (tokenizer.next())
+
+            if (tokenizer.next())
             {
                 if (isValueToken(tokenizer.tokenType()))
                 {
@@ -44,13 +45,12 @@ namespace Yson
                 }
                 UBJSON_READER_UNEXPECTED_TOKEN(tokenizer);
             }
+
             UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(tokenizer);
         }
-        else
-        {
-            state.state = ReaderState::AT_END;
-            return false;
-        }
+
+        state.state = ReaderState::AT_END;
+        return false;
     }
 
     bool UBJsonOptimizedArrayReader::nextDocument(UBJsonTokenizer& tokenizer,

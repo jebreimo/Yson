@@ -45,8 +45,8 @@ namespace Yson
         {
             if (isEndOfFile)
                 return {JsonTokenType::END_OF_FILE, unwrap(string.end()), false};
-            else
-                return {JsonTokenType::INCOMPLETE_TOKEN, unwrap(string.end()), true};
+
+            return {JsonTokenType::INCOMPLETE_TOKEN, unwrap(string.end()), true};
         }
 
         switch (string[0])
@@ -127,8 +127,8 @@ namespace Yson
         }
         if (isEndOfFile)
             return {JsonTokenType::INVALID_TOKEN, unwrap(string.end())};
-        else
-            return {tokenType, unwrap(string.end()), true};
+
+        return {tokenType, unwrap(string.end()), true};
     }
 
     Result findEndOfBlockComment(std::string_view string,
@@ -174,14 +174,14 @@ namespace Yson
         {
             if (!isEndOfFile)
                 return {JsonTokenType::COMMENT, unwrap(string.end()), true};
-            else
-                return {JsonTokenType::INVALID_TOKEN, unwrap(string.end()), false};
+
+            return {JsonTokenType::INVALID_TOKEN, unwrap(string.end()), false};
         }
 
         if (tokenType == JsonTokenType::COMMENT)
             return findEndOfLineComment(string.substr(2), isEndOfFile);
-        else
-            return findEndOfBlockComment(string.substr(), isEndOfFile);
+
+        return findEndOfBlockComment(string.substr(), isEndOfFile);
     }
 
     Result findEndOfNewline(std::string_view string, bool isEndOfFile)
@@ -193,7 +193,7 @@ namespace Yson
         {
             if (*it == '\n')
                 return {JsonTokenType::NEWLINE, unwrap(++it)};
-            else if (precededByCr)
+            if (precededByCr)
                 return {JsonTokenType::NEWLINE, unwrap(it)};
             precededByCr = true;
         }
@@ -246,10 +246,9 @@ namespace Yson
         {
             if (string[1] == '*')
                 return JsonTokenType::BLOCK_COMMENT;
-            else if (string[1] == '/')
+            if (string[1] == '/')
                 return JsonTokenType::COMMENT;
-            else
-                return JsonTokenType::VALUE;
+            return JsonTokenType::VALUE;
         }
         return JsonTokenType::INCOMPLETE_TOKEN;
     }

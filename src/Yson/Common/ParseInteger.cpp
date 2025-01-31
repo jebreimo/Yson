@@ -31,9 +31,9 @@ namespace Yson
         template <typename T, T Base>
         constexpr T maxPrecedingValueNegative()
         {
-            if constexpr (std::is_signed<T>::value)
+            if constexpr (std::is_signed_v<T>)
             {
-                using U = typename std::make_unsigned<T>::type;
+                using U = std::make_unsigned_t<T>;
                 return T((U(1) << (sizeof(T) * 8 - 1)) / U(Base));
             }
             else
@@ -45,9 +45,9 @@ namespace Yson
         template <typename T, T Base>
         constexpr T maxFinalDigitNegative()
         {
-            if constexpr (std::is_signed<T>::value)
+            if constexpr (std::is_signed_v<T>)
             {
-                using U = typename std::make_unsigned<T>::type;
+                using U = std::make_unsigned_t<T>;
                 return T((U(1) << (sizeof(T) * 8 - 1)) % U(Base));
             }
             else
@@ -59,9 +59,9 @@ namespace Yson
         template <typename T, T Base>
         constexpr T maxPrecedingValuePositive()
         {
-            if constexpr (std::is_signed<T>::value)
+            if constexpr (std::is_signed_v<T>)
             {
-                using U = typename std::make_unsigned<T>::type;
+                using U = std::make_unsigned_t<T>;
                 return T(U(~(U(1) << (sizeof(T) * 8 - 1))) / U(Base));
             }
             else
@@ -73,9 +73,9 @@ namespace Yson
         template <typename T, T Base>
         constexpr T maxFinalDigitPositive()
         {
-            if constexpr (std::is_signed<T>::value)
+            if constexpr (std::is_signed_v<T>)
             {
-                using U = typename std::make_unsigned<T>::type;
+                using U = std::make_unsigned_t<T>;
                 return T(U(~(U(1) << (sizeof(T) * 8 - 1))) % U(Base));
             }
             else
@@ -114,7 +114,7 @@ namespace Yson
         template <typename IntT, IntT Base>
         std::optional<IntT> parseNegativeIntegerImpl(std::string_view str)
         {
-            if constexpr (std::is_signed<IntT>::value)
+            if constexpr (std::is_signed_v<IntT>)
             {
                 if (str.empty())
                     return {};

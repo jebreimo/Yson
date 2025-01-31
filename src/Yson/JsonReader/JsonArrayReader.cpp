@@ -30,14 +30,13 @@ namespace Yson
             return {ReaderState::AT_VALUE, true};
         case ReaderState::AT_VALUE:
             skipValue(tokenizer);
-            //[[fallthrough]]
+            [[fallthrough]];
         case ReaderState::AFTER_VALUE:
             if (!readComma(tokenizer, JsonTokenType::END_ARRAY))
                 return {ReaderState::AT_END, false};
             if (readStartOfValue(tokenizer, JsonTokenType::END_ARRAY))
                 return {ReaderState::AT_VALUE, true};
-            else
-                return {ReaderState::AT_END, false};
+            return {ReaderState::AT_END, false};
         case ReaderState::AT_END:
             return {ReaderState::AT_END, false};
         default:

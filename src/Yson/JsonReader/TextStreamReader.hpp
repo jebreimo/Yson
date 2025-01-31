@@ -10,7 +10,6 @@
 #include <vector>
 #include <Yconvert/Encoding.hpp>
 #include "TextReader.hpp"
-#include "Yson/YsonDefinitions.hpp"
 
 namespace Yconvert
 {

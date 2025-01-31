@@ -25,7 +25,7 @@ namespace Yson
         {
         case ReaderState::AT_VALUE:
             skipValue(tokenizer);
-            //[[fallthrough]]
+            [[fallthrough]];
         case ReaderState::AT_START:
         case ReaderState::AFTER_VALUE:
             if (readStartOfValue(tokenizer, UBJsonTokenType::END_ARRAY_TOKEN))
@@ -34,7 +34,7 @@ namespace Yson
                 return true;
             }
             state.state = ReaderState::AT_END;
-            //[[fallthrough]]
+            [[fallthrough]];
         default:
             return false;
         }

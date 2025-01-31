@@ -10,7 +10,7 @@
 
 namespace Yson
 {
-    class JsonObjectReader : public JsonScopeReader
+    class JsonObjectReader final : public JsonScopeReader
     {
     public:
         std::pair<ReaderState, bool>

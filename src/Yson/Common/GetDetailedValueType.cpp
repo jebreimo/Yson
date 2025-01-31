@@ -36,6 +36,7 @@ namespace Yson
         auto assumedType = DetailedValueType::UNKNOWN;
         size_t i = 0;
         bool negative = false;
+
         if (str[i] == '-' || str[i] == '+')
         {
             negative = str[i] == '-';
@@ -43,10 +44,12 @@ namespace Yson
                 return DetailedValueType::INVALID;
             assumedType = DetailedValueType::BIG_INT;
         }
+
         if (str[i] == '0')
         {
             if (++i == str.size())
                 return DetailedValueType::UINT_7;
+
             switch (str[i])
             {
             case 'b':
@@ -66,13 +69,13 @@ namespace Yson
                 return getNumberType(str.substr(i), negative);
             }
         }
-        else if (getDigit(str[i]) <= 9)
-        {
+
+        if (getDigit(str[i]) <= 9)
             return getNumberType(str.substr(i), negative);
-        }
 
         if (str.substr(i) == "Infinity")
             return DetailedValueType::FLOAT_64;
+
         if (str == "NaN")
             return DetailedValueType::FLOAT_64;
 
@@ -81,8 +84,10 @@ namespace Yson
 
         if (str == "true")
             return DetailedValueType::BOOLEAN;
+
         if (str == "null")
             return DetailedValueType::NULL_VALUE;
+
         if (str == "false")
             return DetailedValueType::BOOLEAN;
 

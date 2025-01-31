@@ -11,7 +11,7 @@
 
 namespace Yson
 {
-    class JsonArrayReader : public JsonScopeReader
+    class JsonArrayReader final : public JsonScopeReader
     {
     public:
         [[nodiscard]] char scopeType() const override;
@@ -25,8 +25,5 @@ namespace Yson
         std::pair<ReaderState, bool>
         nextDocument(JsonTokenizer& tokenizer,
                      ReaderState state) override;
-
-    public:
-
     };
 }

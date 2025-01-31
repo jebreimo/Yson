@@ -29,7 +29,7 @@ namespace Yson
                 state.state = ReaderState::AT_END_OF_FILE;
                 return false;
             }
-        // [[fallthrough]]
+        [[fallthrough]];
         case ReaderState::AT_START:
             state.state = ReaderState::AT_VALUE;
             return true;

@@ -84,11 +84,11 @@ namespace Yson
             switch (charSize)
             {
             case 2:
-                return ((c & 0xE0) == 0xC0) ? size : size - 2;
+                return (c & 0xE0) == 0xC0 ? size : size - 2;
             case 3:
-                return ((c & 0xF0) == 0xE0) ? size : size - 3;
+                return (c & 0xF0) == 0xE0 ? size : size - 3;
             case 4:
-                return ((c & 0xF8) == 0xF0) ? size : size - 4;
+                return (c & 0xF8) == 0xF0 ? size : size - 4;
             default:
                 return size - charSize;
             }

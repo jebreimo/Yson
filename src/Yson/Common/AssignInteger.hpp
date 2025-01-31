@@ -95,11 +95,11 @@ namespace Yson
     bool assignInteger(T& destination, U source)
     {
         using DifferentSignedness = typename SelectTypeIf<
-                std::is_signed<T>::value,
+                std::is_signed_v<T>,
                 SignedUnsigned,
                 UnsignedSigned>::type;
         using Signedness = typename SelectTypeIf<
-                std::is_signed<T>::value == std::is_signed<U>::value,
+                std::is_signed_v<T> == std::is_signed_v<U>,
                 SameSignedness,
                 DifferentSignedness>::type;
         using SameSignednessSizeType = typename SelectTypeIf<
@@ -115,11 +115,11 @@ namespace Yson
                 DestinationIsGreaterOrEqual,
                 DestinationIsSmaller>::type;
         using DifferentSignednessSizeType = typename SelectTypeIf<
-                std::is_signed<T>::value && std::is_unsigned<U>::value,
+                std::is_signed_v<T> && std::is_unsigned_v<U>,
                 SignedUnsignedSizeType,
                 UnsignedSignedSizeType>::type;
         using SizeType = typename SelectTypeIf<
-                std::is_signed<T>::value == std::is_signed<U>::value,
+                std::is_signed_v<T> == std::is_signed_v<U>,
                 SameSignednessSizeType,
                 DifferentSignednessSizeType>::type;
 

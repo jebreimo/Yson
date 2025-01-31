@@ -32,7 +32,7 @@ namespace Yson
         {
             if (value <= INT8_MAX)
                 writeValueWithMarker(buffer, static_cast<int8_t>(value));
-            else if (0 <= value && value <= UINT8_MAX)
+            else if (value <= UINT8_MAX)
                 writeValueWithMarker(buffer, static_cast<uint8_t>(value));
             else
                 writeValueWithMarker(buffer, value);
@@ -47,7 +47,7 @@ namespace Yson
         {
             if (value <= INT8_MAX)
                 writeValueWithMarker(buffer, static_cast<int8_t>(value));
-            else if (0 <= value && value <= UINT8_MAX)
+            else if (value <= UINT8_MAX)
                 writeValueWithMarker(buffer, static_cast<uint8_t>(value));
             else if (value <= INT16_MAX)
                 writeValueWithMarker(buffer, static_cast<int16_t>(value));
@@ -66,7 +66,7 @@ namespace Yson
         {
             if (value <= INT8_MAX)
                 writeValueWithMarker(buffer, static_cast<int8_t>(value));
-            else if (0 <= value && value <= UINT8_MAX)
+            else if (value <= UINT8_MAX)
                 writeValueWithMarker(buffer, static_cast<uint8_t>(value));
             else if (value <= INT16_MAX)
                 writeValueWithMarker(buffer, static_cast<int16_t>(value));

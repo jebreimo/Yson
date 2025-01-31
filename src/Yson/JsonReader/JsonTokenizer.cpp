@@ -94,13 +94,13 @@ namespace Yson
 
     std::string_view JsonTokenizer::token() const
     {
-        return std::string_view(m_TokenStart, m_TokenEnd - m_TokenStart);
+        return {m_TokenStart, size_t(m_TokenEnd - m_TokenStart)};
     }
 
     std::string JsonTokenizer::tokenString() const
     {
         auto view = token();
-        return std::string(view.begin(), view.end());
+        return {view.begin(), view.end()};
     }
 
     const std::string& JsonTokenizer::fileName() const
@@ -137,6 +137,7 @@ namespace Yson
     {
         if (m_TokenType == JsonTokenType::END_OF_FILE)
             return false;
+
         if (m_NextToken != m_TokenStart)
         {
             m_TokenStart = m_NextToken;
@@ -148,38 +149,30 @@ namespace Yson
                 m_TokenType = token.tokenType;
                 return true;
             }
-            else
+
+            m_TokenType = JsonTokenType::INCOMPLETE_TOKEN;
+            return true;
+        }
+
+        bool isEndOfFile = !fillBuffer();
+        if (!isEndOfFile || !m_Buffer.empty())
+        {
+            auto token = nextToken(
+                std::string_view(m_TokenStart, m_BufferEnd - m_TokenStart),
+                isEndOfFile);
+            if (!token.isIncomplete)
             {
-                m_TokenType = JsonTokenType::INCOMPLETE_TOKEN;
+                m_NextToken = m_TokenEnd = token.endOfToken;
+                m_TokenType = token.tokenType;
                 return true;
             }
+
+            m_TokenType = JsonTokenType::INCOMPLETE_TOKEN;
+            return true;
         }
-        else
-        {
-            bool isEndOfFile = !fillBuffer();
-            if (!isEndOfFile || !m_Buffer.empty())
-            {
-                auto token = nextToken(
-                        std::string_view(m_TokenStart, m_BufferEnd - m_TokenStart),
-                        isEndOfFile);
-                if (!token.isIncomplete)
-                {
-                    m_NextToken = m_TokenEnd = token.endOfToken;
-                    m_TokenType = token.tokenType;
-                    return true;
-                }
-                else
-                {
-                    m_TokenType = JsonTokenType::INCOMPLETE_TOKEN;
-                    return true;
-                }
-            }
-            else
-            {
-                m_TokenType = JsonTokenType::END_OF_FILE;
-                return false;
-            }
-        }
+
+        m_TokenType = JsonTokenType::END_OF_FILE;
+        return false;
     }
 
     bool JsonTokenizer::fillBuffer()

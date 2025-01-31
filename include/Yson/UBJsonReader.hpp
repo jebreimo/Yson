@@ -148,7 +148,7 @@ namespace Yson
         struct Members;
         struct Scope;
 
-        explicit UBJsonReader(Members* members);
+        explicit UBJsonReader(std::unique_ptr<Members> members);
 
         void assertStateIsKeyOrValue() const;
 

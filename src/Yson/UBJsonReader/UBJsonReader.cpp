@@ -68,24 +68,24 @@ namespace Yson
     UBJsonReader::UBJsonReader() = default;
 
     UBJsonReader::UBJsonReader(std::istream& stream)
-        : UBJsonReader(new Members(UBJsonTokenizer(stream)))
+        : UBJsonReader(std::make_unique<Members>(UBJsonTokenizer(stream)))
     {}
 
     UBJsonReader::UBJsonReader(const std::string& fileName)
-        : UBJsonReader(new Members(UBJsonTokenizer(fileName)))
+        : UBJsonReader(std::make_unique<Members>(UBJsonTokenizer(fileName)))
     {}
 
     UBJsonReader::UBJsonReader(const char* buffer, size_t bufferSize)
-        : UBJsonReader(new Members(UBJsonTokenizer(buffer, bufferSize)))
+        : UBJsonReader(std::make_unique<Members>(UBJsonTokenizer(buffer, bufferSize)))
     {}
 
     UBJsonReader::UBJsonReader(std::istream& stream, const char* buffer,
                                size_t bufferSize)
-        : UBJsonReader(new Members(UBJsonTokenizer(stream, buffer, bufferSize)))
+        : UBJsonReader(std::make_unique<Members>(UBJsonTokenizer(stream, buffer, bufferSize)))
     {}
 
-    UBJsonReader::UBJsonReader(UBJsonReader::Members* members)
-        : m_Members(members)
+    UBJsonReader::UBJsonReader(std::unique_ptr<Members> members)
+        : m_Members(std::move(members))
     {
         m_Members->scopes.push_back({&m_Members->documentReader,
                                      UBJsonReaderState()});
@@ -516,8 +516,8 @@ namespace Yson
         assertStateIsKeyOrValue();
         if (m_Members->tokenizer.tokenType() == UBJsonTokenType::STRING_TOKEN)
             return fromBase64(m_Members->tokenizer.token(), value);
-        else
-            return false;
+
+        return false;
     }
 
     JsonItem UBJsonReader::readItem()
@@ -601,7 +601,7 @@ namespace Yson
         YSON_THROW("Uninitialized UBJsonReader.");
     }
 
-    JsonItem UBJsonReader::readArray(bool expandOptmizedByteArrays)
+    JsonItem UBJsonReader::readArray(bool expandOptmizedByteArrays) // NOLINT(*-no-recursion)
     {
         std::vector<JsonItem> values;
         const auto& tokenizer = m_Members->tokenizer;
@@ -655,7 +655,7 @@ namespace Yson
         return JsonItem(std::make_shared<ArrayItem>(std::move(values)));
     }
 
-    JsonItem UBJsonReader::readObject(bool expandOptimizedByteArrays)
+    JsonItem UBJsonReader::readObject(bool expandOptimizedByteArrays) // NOLINT(*-no-recursion)
     {
         std::deque<std::string> keys;
         std::unordered_map<std::string_view, JsonItem> values;
