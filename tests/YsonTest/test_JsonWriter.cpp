@@ -9,7 +9,6 @@
 
 #include <limits>
 #include <sstream>
-#include <unistd.h>
 
 #include "Ytest/Ytest.hpp"
 
