@@ -750,8 +750,13 @@ namespace Yson
         {
             parameters.formatting = m.contexts.top().parameters.formatting;
             if (m.contexts.top().parameters.valuesPerLine > 1)
-                parameters.formatting = JsonFormatting::FLAT;
+                parameters.formatting = std::min(parameters.formatting, JsonFormatting::FLAT);
         }
+        else if (m.contexts.top().parameters.formatting < parameters.formatting)
+        {
+              parameters.formatting = m.contexts.top().parameters.formatting;
+        }
+
         m.contexts.emplace(endChar, parameters);
         if (formatting() == JsonFormatting::FORMAT)
             indent();

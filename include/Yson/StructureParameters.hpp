@@ -11,10 +11,26 @@
 
 namespace Yson
 {
+    /**
+     * @brief Defines the formatting of JSON and UBJSON output.
+     *
+     * Each array and object can have its own formatting, but the formatting
+     * of a child can not be "greater" than the formatting of its parent.
+     * For instance, if the parent object has JsonFormatting::FLAT formatting,
+     * its children can not have JsonFormatting::FORMAT formatting.
+     */
     enum class JsonFormatting
     {
-        DEFAULT, NONE, FLAT, FORMAT
+        DEFAULT, ///< Use the same formatting as the parent object or array.
+        NONE, ///< No formatting, everything on a single line, no whitespace.
+        FLAT, ///< No line breaks, but use spaces between values.
+        FORMAT ///< Use line breaks and indentation.
     };
+
+    constexpr bool operator<(JsonFormatting a, JsonFormatting b) noexcept
+    {
+        return static_cast<int>(a) < static_cast<int>(b);
+    }
 
     struct JsonParameters
     {
