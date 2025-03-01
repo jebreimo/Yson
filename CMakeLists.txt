@@ -185,6 +185,8 @@ set_target_properties(Yson
 
 add_library(Yson::Yson ALIAS Yson)
 
+add_subdirectory(docs/doxygen EXCLUDE_FROM_ALL)
+
 if (UPDATE_SINGLE_SRC)
     find_package(Python3 COMPONENTS Interpreter REQUIRED)
     configure_file(
