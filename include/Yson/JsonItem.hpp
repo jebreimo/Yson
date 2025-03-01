@@ -16,6 +16,13 @@ namespace Yson
     class ArrayItem;
     class ObjectItem;
 
+    /**
+     * @brief A class that can hold any type of JSON item (object, array,
+     *  value).
+     *
+     * Instances of JsonItem are created by Reader::readItem() in addition
+     * to JsonItem itself.
+     */
     class YSON_API JsonItem
     {
     public:

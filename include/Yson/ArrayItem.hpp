@@ -10,6 +10,11 @@
 
 namespace Yson
 {
+    /**
+     * ArrayItem provides read access to an array in a JSON or UBJSON
+     * document. It is returned by JsonItem::array() if the JsonItem is an
+     * array.
+     */
     class YSON_API ArrayItem
     {
     public:

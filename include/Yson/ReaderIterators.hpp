@@ -15,6 +15,12 @@ namespace Yson
         YSON_API bool initialize(Reader& reader);
     }
 
+    /**
+     * Provides an input iterator for iterating over the keys in an object.
+     * It automatically skips the object's opening brace and stops after the
+     * closing brace. Access to the actual values is done through the Reader
+     * object.
+     */
     class YSON_API ObjectKeyIterator
     {
     public:
@@ -53,11 +59,24 @@ namespace Yson
     YSON_API bool operator!=(const ObjectKeyIterator& a,
                              const ObjectKeyIterator& b);
 
+    /**
+     * A convenience function for creating an ObjectKeyIterator.
+     *
+     * @param reader An instance of Reader positioned at the opening brace of
+     *  an object.
+     * @return A new ObjectKeyIterator.
+     */
     inline ObjectKeyIterator keys(Reader& reader)
     {
         return ObjectKeyIterator(reader);
     }
 
+    /**
+     * Provides an input iterator for iterating over the values in an array.
+     * It automatically skips the array's opening bracket and stops after
+     * the closing bracket. Access to the actual values is done through
+     * the Reader object.
+     */
     class YSON_API ArrayIterator
     {
     public:
@@ -69,6 +88,12 @@ namespace Yson
         int m_State;
     };
 
+    /**
+     * Provides an input iterator for iterating over the values in an array.
+     * It automatically skips the array's opening bracket and stops after
+     * the closing bracket.
+     * @tparam T The type of the values in the array.
+     */
     template <typename T>
     class ArrayValueIterator
     {
@@ -151,6 +176,14 @@ namespace Yson
         bool m_AtEnd;
     };
 
+    /**
+     * A convenience function for creating an ArrayValueIterator.
+     *
+     * @tparam T the type of the values in the array.
+     * @param reader an instance of Reader positioned at the opening bracket
+     *  of an array.
+     * @return A new ArrayValueIterator.
+     */
     template <typename T>
     ArrayValueIterator<T> arrayValues(Reader& reader)
     {

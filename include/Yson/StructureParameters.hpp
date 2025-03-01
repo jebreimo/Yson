@@ -27,11 +27,17 @@ namespace Yson
         FORMAT ///< Use line breaks and indentation.
     };
 
+    /**
+     * @brief Compares two JsonFormatting values.
+     */
     constexpr bool operator<(JsonFormatting a, JsonFormatting b) noexcept
     {
         return static_cast<int>(a) < static_cast<int>(b);
     }
 
+    /**
+     * Provides parameters for formatting JSON output.
+     */
     struct JsonParameters
     {
         constexpr JsonParameters() noexcept = default;
@@ -51,6 +57,9 @@ namespace Yson
         JsonFormatting formatting = JsonFormatting::DEFAULT;
     };
 
+    /**
+     * Provides parameters for formatting UBJSON output.
+     */
     struct UBJsonParameters
     {
         constexpr UBJsonParameters() noexcept = default;
