@@ -38,6 +38,12 @@ namespace Yson
 
         friend bool operator==(const ObjectKeyIterator& a,
                                const ObjectKeyIterator& b);
+
+        [[nodiscard]]
+        ObjectKeyIterator& begin();
+
+        [[nodiscard]]
+        static ObjectKeyIterator end();
     private:
         Reader* m_Reader;
         std::string m_Key;
@@ -47,23 +53,9 @@ namespace Yson
     YSON_API bool operator!=(const ObjectKeyIterator& a,
                              const ObjectKeyIterator& b);
 
-    class YSON_API ObjectKeyIteratorAdapter
+    inline ObjectKeyIterator keys(Reader& reader)
     {
-    public:
-        explicit ObjectKeyIteratorAdapter(Reader& reader);
-
-        [[nodiscard]]
-        ObjectKeyIterator begin();
-
-        [[nodiscard]]
-        ObjectKeyIterator end() const;
-    private:
-        Reader* m_Reader;
-    };
-
-    inline ObjectKeyIteratorAdapter keys(Reader& reader)
-    {
-        return ObjectKeyIteratorAdapter(reader);
+        return ObjectKeyIterator(reader);
     }
 
     class YSON_API ArrayIterator
@@ -143,6 +135,16 @@ namespace Yson
         {
             return !(a == b);
         }
+
+        ArrayValueIterator& begin()
+        {
+            return *this;
+        }
+
+        static ArrayValueIterator end()
+        {
+            return {};
+        }
     private:
         Reader* m_Reader;
         T m_Value;
@@ -150,38 +152,8 @@ namespace Yson
     };
 
     template <typename T>
-    class ArrayValueIteratorAdapter
+    ArrayValueIterator<T> arrayValues(Reader& reader)
     {
-    public:
-        explicit ArrayValueIteratorAdapter(Reader& reader)
-            : m_Reader(&reader)
-        {}
-
-        [[nodiscard]]
-        ArrayValueIterator<T> begin()
-        {
-            if (!m_Reader)
-            {
-                YSON_THROW("begin() can only be called once.");
-            }
-
-            auto* reader = m_Reader;
-            m_Reader = nullptr;
-            return ArrayValueIterator<T>(*reader);
-        }
-
-        [[nodiscard]]
-        ArrayValueIterator<T> end() const
-        {
-            return {};
-        }
-    private:
-        Reader* m_Reader;
-    };
-
-    template <typename T>
-    ArrayValueIteratorAdapter<T> arrayValues(Reader& reader)
-    {
-        return ArrayValueIteratorAdapter<T>(reader);
+        return ArrayValueIterator<T>(reader);
     }
 }

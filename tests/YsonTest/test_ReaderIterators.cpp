@@ -21,9 +21,13 @@ namespace
         {
             Y_EQUAL(key, keys1.at(i++));
             if (key == "foo")
+            {
                 Y_EQUAL(Yson::read<std::string>(*reader), "bar");
-            if (key == "val")
+            }
+            else if (key == "val")
+            {
                 Y_EQUAL(Yson::read<int32_t>(*reader), 123);
+            }
             else if (key == "zap")
             {
                 std::vector<std::string> keys2 = {"a", "b"};

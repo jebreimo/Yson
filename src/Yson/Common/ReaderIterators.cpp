@@ -31,7 +31,7 @@ namespace Yson
           m_AtEnd(true)
     {}
 
-    ObjectKeyIterator::ObjectKeyIterator(Reader & reader)
+    ObjectKeyIterator::ObjectKeyIterator(Reader& reader)
         : m_Reader(&reader),
           m_AtEnd(!detail::initialize(*m_Reader))
     {
@@ -68,36 +68,25 @@ namespace Yson
         return *this;
     }
 
+    ObjectKeyIterator& ObjectKeyIterator::begin()
+    {
+        return *this;
+    }
+
+    ObjectKeyIterator ObjectKeyIterator::end()
+    {
+        return {};
+    }
+
     bool operator==(const ObjectKeyIterator& a,
                     const ObjectKeyIterator& b)
     {
         return &a == &b || (a.m_AtEnd && b.m_AtEnd);
     }
 
-    bool operator!=(const ObjectKeyIterator& a,
-                    const ObjectKeyIterator& b)
+    bool operator!=(const ObjectKeyIterator& a, const ObjectKeyIterator& b)
     {
         return !(a == b);
-    }
-
-    ObjectKeyIteratorAdapter::ObjectKeyIteratorAdapter(Reader& reader)
-        : m_Reader(&reader)
-    {}
-
-    ObjectKeyIterator ObjectKeyIteratorAdapter::begin()
-    {
-        if (!m_Reader)
-            YSON_THROW("begin() can only be called once.");
-
-        auto* reader = m_Reader;
-        m_Reader = nullptr;
-        return ObjectKeyIterator(*reader);
-    }
-
-    // ReSharper disable once CppMemberFunctionMayBeStatic
-    ObjectKeyIterator ObjectKeyIteratorAdapter::end() const
-    {
-        return {};
     }
 
     ArrayIterator::ArrayIterator(Reader& reader)
