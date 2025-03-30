@@ -257,6 +257,14 @@ namespace Yson
         [[nodiscard]]
         std::pair<const void*, size_t> buffer() const override;
 
+        /**
+         * @brief Returns the current buffer as a string.
+         *
+         * This function returns an empty string if the writer writes to a
+         * stream.
+         */
+        [[nodiscard]]
+        const std::string& str() const;
 
         /**
          * @brief Flushes the internal buffer to the stream if there

@@ -26,6 +26,7 @@ namespace Yson
     namespace
     {
         constexpr size_t MAX_BUFFER_SIZE = 64 * 1024;
+        const std::string EMPTY_STRING;
 
         struct Context
         {
@@ -138,6 +139,14 @@ namespace Yson
         if (m.stream)
             return {nullptr, 0};
         return {m.buffer.data(), m.buffer.size()};
+    }
+
+    const std::string& JsonWriter::str() const
+    {
+        auto& m = members();
+        if (m.stream)
+            return EMPTY_STRING;
+        return m.buffer;
     }
 
     const std::string& JsonWriter::key() const

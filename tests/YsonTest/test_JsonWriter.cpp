@@ -296,11 +296,10 @@ namespace
 
     void test_EscapeNonAsciiCharacters()
     {
-        std::stringstream ss;
-        JsonWriter writer(ss);
+        JsonWriter writer;
         writer.setEscapeNonAsciiCharactersEnabled(true);
         writer.value("ABC\"\360\220\220\267\"DEF").flush();
-        Y_EQUAL(ss.str(), "\"ABC\\\"\\uD801\\uDC37\\\"DEF\"");
+        Y_EQUAL(writer.str(), "\"ABC\\\"\\uD801\\uDC37\\\"DEF\"");
     }
 
     void test_LongWstring()
