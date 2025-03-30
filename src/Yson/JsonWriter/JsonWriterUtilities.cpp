@@ -40,7 +40,7 @@ namespace Yson
         return suggestedPos;
     }
 
-    size_t getCurrentLineWidth(const std::vector<char>& buffer,
+    size_t getCurrentLineWidth(const std::string& buffer,
                                size_t maxLineWidth)
     {
         auto maxOffset = std::min(buffer.size(), maxLineWidth);

@@ -65,7 +65,7 @@ namespace Yson
         std::string indentation;
         std::string key;
         std::vector<char> sprintfBuffer = std::vector<char>(32);
-        std::vector<char> buffer;
+        std::string buffer;
         size_t maxBufferSize = MAX_BUFFER_SIZE;
         State state = AT_START_OF_VALUE_NO_COMMA;
         unsigned indentationWidth = 2;
@@ -325,7 +325,7 @@ namespace Yson
         auto& m = members();
         if (m.indentation.size() < m.indentationWidth)
             YSON_THROW("Can't outdent, indentation level is 0.");
-        auto newSize = m.indentation.size() - m.indentationWidth;
+        const auto newSize = m.indentation.size() - m.indentationWidth;
         m.indentation.resize(newSize);
         return *this;
     }
@@ -564,29 +564,28 @@ namespace Yson
 
     void JsonWriter::writeMultiLine(std::string_view s)
     {
-        auto maxWidth = size_t(m_Members->maximumLineWidth);
+        const auto maxWidth = size_t(m_Members->maximumLineWidth);
         if (s.size() <= maxWidth / 2)
         {
             write(s.data(), s.size());
         }
         else
         {
-            auto n = maxWidth - getCurrentLineWidth(m_Members->buffer,
-                                                    maxWidth);
             size_t from = 0;
+            const auto n = maxWidth - getCurrentLineWidth(m_Members->buffer,
+                                                          maxWidth);
             if (n > 2)
             {
-                auto to = findSplitPos(s, n - 1);
+                const auto to = findSplitPos(s, n - 1);
                 write(s.data(), to);
                 from = to;
             }
             while (true)
             {
-                auto to = findSplitPos(s, from + maxWidth - 1);
+                const auto to = findSplitPos(s, from + maxWidth - 1);
                 if (from == to)
                     break;
-                m_Members->buffer.push_back('\\');
-                m_Members->buffer.push_back('\n');
+                m_Members->buffer.append("\\\n");
                 write(s.data() + from, to - from);
                 from = to;
             }
@@ -635,23 +634,20 @@ namespace Yson
                 m.buffer.push_back(',');
                 break;
             case JsonFormatting::FLAT:
-                m.buffer.push_back(',');
-                m.buffer.push_back(' ');
+                m.buffer.append(", ");
                 break;
             case JsonFormatting::FORMAT:
                 {
-                    auto& c = m.contexts.top();
+                    const auto& c = m.contexts.top();
                     if (c.parameters.valuesPerLine <= 1
                         || c.valueIndex >= c.parameters.valuesPerLine)
                     {
-                        m.buffer.push_back(',');
-                        m.buffer.push_back('\n');
+                        m.buffer.append(",\n");
                         writeIndentationImpl();
                     }
                     else
                     {
-                        m.buffer.push_back(',');
-                        m.buffer.push_back(' ');
+                        m.buffer.append(", ");
                     }
                 }
                 break;
