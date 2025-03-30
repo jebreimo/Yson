@@ -12,6 +12,12 @@ namespace Yson
 {
     enum class JsonTokenType;
 
+    /**
+     * @brief A class holding JSON values, as opposed to objects and arrays.
+     *
+     * This is one of the four types of items that are the constituents of
+     * JsonItem.
+     */
     class YSON_API JsonValueItem : public ValueItem
     {
     public:

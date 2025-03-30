@@ -15,6 +15,17 @@
 
 namespace Yson
 {
+    /**
+     * @brief A class for reading JSON data.
+     *
+     * Provides a recursive iterator for reading JSON data. With `nextKey`and
+     * `nextValue` you can iterate over the keys and values of an object or
+     * array. With `enter` and `leave` you can enter and leave objects and
+     * arrays.
+     *
+     * In addition to JSON itself, JsonReader supports parts of JSON5,
+     * including comments, unquoted keys, and special floating point values.
+     */
     class YSON_API JsonReader : public Reader
     {
     public:
