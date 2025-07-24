@@ -47,7 +47,7 @@ namespace Yson
             : JsonReader(stream, nullptr, 0)
     {}
 
-    JsonReader::JsonReader(const std::string& fileName)
+    JsonReader::JsonReader(const std::filesystem::path& fileName)
             : m_Members(std::make_unique<Members>(JsonTokenizer(fileName)))
     {
         m_Members->scopes.emplace_back(&m_Members->documentReader,

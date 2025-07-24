@@ -6,10 +6,9 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
+#include <filesystem>
 #include <iosfwd>
 #include <memory>
-#include <stack>
-#include <vector>
 #include "Writer.hpp"
 #include "YsonDefinitions.hpp"
 
@@ -20,7 +19,7 @@ namespace Yson
     public:
         UBJsonWriter();
 
-        explicit UBJsonWriter(const std::string& fileName);
+        explicit UBJsonWriter(const std::filesystem::path& fileName);
 
         explicit UBJsonWriter(std::ostream& stream);
 

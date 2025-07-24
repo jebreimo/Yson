@@ -12,7 +12,6 @@
   "${CMAKE_CURRENT_SOURCE_DIR}"/src/Yson/JsonWriter/*.cpp \
   "${CMAKE_CURRENT_SOURCE_DIR}"/external/Yconvert/src/Yconvert/*.cpp \
   "${CMAKE_CURRENT_SOURCE_DIR}"/src/Yson/Common/Base64.cpp \
-  "${CMAKE_CURRENT_SOURCE_DIR}"/src/Yson/Common/GetUnicodeFileName.cpp \
   "${CMAKE_CURRENT_SOURCE_DIR}"/src/Yson/Common/IsJavaScriptIdentifier.cpp \
   "${CMAKE_CURRENT_SOURCE_DIR}"/src/Yson/Common/ValueTypeUtilities.cpp \
   -i "${CMAKE_CURRENT_BINARY_DIR}" \

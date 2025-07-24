@@ -24,9 +24,9 @@ namespace Yson
           m_ChunkSize(getDefaultBufferSize())
     {}
 
-    JsonTokenizer::JsonTokenizer(const std::string& fileName)
+    JsonTokenizer::JsonTokenizer(const std::filesystem::path& fileName)
         : m_TextReader(new TextFileReader(fileName)),
-          m_FileName(fileName),
+          m_FileName(fileName.string()),
           m_ChunkSize(getDefaultBufferSize())
     {}
 

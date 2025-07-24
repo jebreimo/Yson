@@ -21,13 +21,13 @@ namespace Yson
         : m_Reader(new BinaryStreamReader(stream, buffer, bufferSize))
     {}
 
-    UBJsonTokenizer::UBJsonTokenizer(const std::string& fileName)
-            : m_Reader(new BinaryFileReader(fileName)),
-              m_FileName(fileName)
+    UBJsonTokenizer::UBJsonTokenizer(const std::filesystem::path& fileName)
+        : m_Reader(new BinaryFileReader(fileName)),
+          m_FileName(fileName.string())
     {}
 
     UBJsonTokenizer::UBJsonTokenizer(const char* buffer, size_t bufferSize)
-            : m_Reader(new BinaryBufferReader(buffer, bufferSize))
+        : m_Reader(new BinaryBufferReader(buffer, bufferSize))
     {}
 
     size_t UBJsonTokenizer::contentSize() const
@@ -45,7 +45,7 @@ namespace Yson
         return m_FileName;
     }
 
-    bool UBJsonTokenizer::next()
+    bool UBJsonTokenizer::next() // NOLINT(*-no-recursion)
     {
         while (true)
         {
@@ -56,10 +56,10 @@ namespace Yson
         }
     }
 
-    bool UBJsonTokenizer::next(UBJsonTokenType tokenType)
+    bool UBJsonTokenizer::next(UBJsonTokenType tokenType) // NOLINT(*-no-recursion)
     {
         m_TokenType = tokenType;
-        m_ContentSize =  0;
+        m_ContentSize = 0;
         switch (tokenType)
         {
         case UBJsonTokenType::INT8_TOKEN:
@@ -127,15 +127,15 @@ namespace Yson
                     auto data = static_cast<const char*>(m_Reader->data());
                     if (data[2] != '#')
                         UBJSON_READER_THROW(
-                                "Optimized object or array doesn't specify length.",
-                                *this);
+                        "Optimized object or array doesn't specify length.",
+                        *this);
                     m_ContentType = static_cast<UBJsonTokenType>(data[1]);
                     if (!next())
                         UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
                     m_ContentSize = convertInteger<size_t>(m_TokenType,
                                                            m_Reader->data());
                     m_TokenType =
-                            tokenType == UBJsonTokenType::START_ARRAY_TOKEN
+                        tokenType == UBJsonTokenType::START_ARRAY_TOKEN
                             ? UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN
                             : UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN;
                 }
@@ -148,7 +148,7 @@ namespace Yson
                     m_ContentSize = convertInteger<size_t>(m_TokenType,
                                                            m_Reader->data());
                     m_TokenType =
-                            tokenType == UBJsonTokenType::START_ARRAY_TOKEN
+                        tokenType == UBJsonTokenType::START_ARRAY_TOKEN
                             ? UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN
                             : UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN;
                 }
@@ -216,7 +216,7 @@ namespace Yson
     bool UBJsonTokenizer::skip(UBJsonTokenType tokenType)
     {
         m_TokenType = tokenType;
-        m_ContentSize =  0;
+        m_ContentSize = 0;
         switch (tokenType)
         {
         case UBJsonTokenType::INT8_TOKEN:
@@ -284,15 +284,15 @@ namespace Yson
                     auto data = static_cast<const char*>(m_Reader->data());
                     if (data[2] != '#')
                         UBJSON_READER_THROW(
-                                "Optimized object or array doesn't specify length.",
-                                *this);
+                        "Optimized object or array doesn't specify length.",
+                        *this);
                     m_ContentType = static_cast<UBJsonTokenType>(data[1]);
                     if (!next())
                         UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);
                     m_ContentSize = convertInteger<size_t>(m_TokenType,
                                                            m_Reader->data());
                     m_TokenType =
-                            tokenType == UBJsonTokenType::START_ARRAY_TOKEN
+                        tokenType == UBJsonTokenType::START_ARRAY_TOKEN
                             ? UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN
                             : UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN;
                 }
@@ -305,7 +305,7 @@ namespace Yson
                     m_ContentSize = convertInteger<size_t>(m_TokenType,
                                                            m_Reader->data());
                     m_TokenType =
-                            tokenType == UBJsonTokenType::START_ARRAY_TOKEN
+                        tokenType == UBJsonTokenType::START_ARRAY_TOKEN
                             ? UBJsonTokenType::START_OPTIMIZED_ARRAY_TOKEN
                             : UBJsonTokenType::START_OPTIMIZED_OBJECT_TOKEN;
                 }
@@ -327,8 +327,10 @@ namespace Yson
 
     std::string_view UBJsonTokenizer::token() const
     {
-        return std::string_view((const char*)m_Reader->data(),
-                                m_Reader->size());
+        return {
+            static_cast<const char*>(m_Reader->data()),
+            m_Reader->size()
+        };
     }
 
     const void* UBJsonTokenizer::tokenData() const
@@ -346,7 +348,7 @@ namespace Yson
         return m_TokenType;
     }
 
-    void UBJsonTokenizer::readSizedToken()
+    void UBJsonTokenizer::readSizedToken() // NOLINT(*-no-recursion)
     {
         if (!next())
             UBJSON_READER_UNEXPECTED_END_OF_DOCUMENT(*this);

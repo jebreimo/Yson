@@ -7,6 +7,7 @@
 //****************************************************************************
 #pragma once
 
+#include <filesystem>
 #include <fstream>
 #include "TextStreamReader.hpp"
 
@@ -16,7 +17,7 @@ namespace Yson
     {
     public:
         explicit TextFileReader(
-            const std::string& fileName,
+            const std::filesystem::path& fileName,
             Yconvert::Encoding sourceEncoding = Yconvert::Encoding::UNKNOWN);
     private:
         std::ifstream m_FileStream;

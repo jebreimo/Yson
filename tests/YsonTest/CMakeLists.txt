@@ -5,7 +5,7 @@
 ## This file is distributed under the Zero-Clause BSD License.
 ## License text is included with the source distribution.
 ##****************************************************************************
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.16)
 
 include(FetchContent)
 FetchContent_Declare(ytest

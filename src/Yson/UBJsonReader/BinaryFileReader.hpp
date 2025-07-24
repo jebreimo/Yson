@@ -7,6 +7,7 @@
 //****************************************************************************
 #pragma once
 #include "BinaryStreamReader.hpp"
+#include <filesystem>
 #include <fstream>
 
 namespace Yson
@@ -14,7 +15,7 @@ namespace Yson
     class BinaryFileReader : public BinaryStreamReader
     {
     public:
-        explicit BinaryFileReader(const std::string& fileName);
+        explicit BinaryFileReader(const std::filesystem::path& fileName);
 
     private:
         std::ifstream m_Stream;

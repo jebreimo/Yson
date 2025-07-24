@@ -7,6 +7,7 @@
 //****************************************************************************
 #pragma once
 
+#include <filesystem>
 #include <memory>
 #include <string_view>
 #include "Yson/YsonDefinitions.hpp"
@@ -22,7 +23,7 @@ namespace Yson
                                const char* buffer = nullptr,
                                size_t bufferSize = 0);
 
-        explicit JsonTokenizer(const std::string& fileName);
+        explicit JsonTokenizer(const std::filesystem::path& fileName);
 
         JsonTokenizer(const char* buffer, size_t bufferSize);
 

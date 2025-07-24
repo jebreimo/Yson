@@ -7,7 +7,6 @@
 //****************************************************************************
 #include "Yson/UBJsonReader.hpp"
 
-#include <stack>
 #include "Yson/ArrayItem.hpp"
 #include "Yson/ObjectItem.hpp"
 #include "Yson/Common/Base64.hpp"
@@ -71,7 +70,7 @@ namespace Yson
         : UBJsonReader(std::make_unique<Members>(UBJsonTokenizer(stream)))
     {}
 
-    UBJsonReader::UBJsonReader(const std::string& fileName)
+    UBJsonReader::UBJsonReader(const std::filesystem::path& fileName)
         : UBJsonReader(std::make_unique<Members>(UBJsonTokenizer(fileName)))
     {}
 

@@ -11,7 +11,6 @@
 #include "Yson/JsonReader.hpp"
 #include "Yson/UBJsonReader.hpp"
 #include "Yson/YsonException.hpp"
-#include "GetUnicodeFileName.hpp"
 
 namespace Yson
 {
@@ -24,8 +23,8 @@ namespace Yson
             UBJSON
         };
 
-        const char JSON_CHARACTERS[] = "\0\t\r\n \"/0123456789fnt";
-        const char UBJSON_CHARACTERS[] = "#$CDFHILNSTUZdil";
+        constexpr char JSON_CHARACTERS[] = "\0\t\r\n \"/0123456789fnt";
+        constexpr char UBJSON_CHARACTERS[] = "#$CDFHILNSTUZdil";
 
         /**
          * @brief Checks if @a contents appears to start with a BOM.
@@ -38,7 +37,7 @@ namespace Yson
          */
         bool isByteOrderMark(const char* contents, size_t size)
         {
-            auto encInf = Yson_Yconvert::determine_encoding_from_byte_order_mark(
+            const auto encInf = Yson_Yconvert::determine_encoding_from_byte_order_mark(
                     contents, size);
             switch (encInf)
             {
@@ -101,44 +100,45 @@ namespace Yson
         stream.read(buffer.data(),
                     static_cast<std::streamsize>(buffer.size()));
         buffer.resize(stream.gcount());
-        auto contentType = identifyFile(buffer.data(), buffer.size());
+        const auto contentType = identifyFile(buffer.data(), buffer.size());
         if (contentType == ContentType::JSON)
             return std::make_unique<JsonReader>(stream, buffer.data(),
                                                 buffer.size());
-        else if (contentType == ContentType::UBJSON)
+        if (contentType == ContentType::UBJSON)
             return std::make_unique<UBJsonReader>(stream, buffer.data(),
                                                   buffer.size());
-        else
-            YSON_THROW("Stream contents appear to be neither JSON nor UBJSON.");
+
+        YSON_THROW("Stream contents appear to be neither JSON nor UBJSON.");
     }
 
-    std::unique_ptr<Reader> makeReader(const std::string& fileName)
+    std::unique_ptr<Reader> makeReader(const std::filesystem::path& fileName)
     {
-        std::ifstream file(getUnicodeFileName(fileName),
-                           std::ios_base::binary);
+        std::ifstream file(fileName, std::ios_base::binary);
         if (!file)
-            YSON_THROW("File not found: " + fileName);
+            YSON_THROW("File not found: " + fileName.string());
         std::vector<char> buffer(1024);
         file.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
         buffer.resize(file.gcount());
         file.close();
-        auto contentType = identifyFile(buffer.data(), buffer.size());
+        const auto contentType = identifyFile(buffer.data(), buffer.size());
         if (contentType == ContentType::JSON)
             return std::make_unique<JsonReader>(fileName);
-        else if (contentType == ContentType::UBJSON)
+
+        if (contentType == ContentType::UBJSON)
             return std::make_unique<UBJsonReader>(fileName);
-        else
-            YSON_THROW("File contents appear to be neither JSON nor UBJSON.");
+
+        YSON_THROW("File contents appear to be neither JSON nor UBJSON.");
     }
 
     std::unique_ptr<Reader> makeReader(const char* buffer, size_t bufferSize)
     {
-        auto contentType = identifyFile(buffer, bufferSize);
+        const auto contentType = identifyFile(buffer, bufferSize);
         if (contentType == ContentType::JSON)
             return std::make_unique<JsonReader>(buffer, bufferSize);
-        else if (contentType == ContentType::UBJSON)
+
+        if (contentType == ContentType::UBJSON)
             return std::make_unique<UBJsonReader>(buffer, bufferSize);
-        else
-            YSON_THROW("Buffer contents appear to be neither JSON nor UBJSON.");
+
+        YSON_THROW("Buffer contents appear to be neither JSON nor UBJSON.");
     }
 }

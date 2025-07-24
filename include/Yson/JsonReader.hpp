@@ -33,7 +33,7 @@ namespace Yson
 
         explicit JsonReader(std::istream& stream);
 
-        explicit JsonReader(const std::string& fileName);
+        explicit JsonReader(const std::filesystem::path& fileName);
 
         JsonReader(const char* buffer, size_t bufferSize);
 

@@ -7,6 +7,7 @@
 //****************************************************************************
 #pragma once
 
+#include <filesystem>
 #include <iosfwd>
 #include <memory>
 #include <string>
@@ -35,7 +36,7 @@ namespace Yson
          * @param fileName The UTF-8 encoded name of the file.
          * @param formatting the automatic formatting that will be used.
          */
-        explicit JsonWriter(const std::string& fileName,
+        explicit JsonWriter(const std::filesystem::path& fileName,
                             JsonFormatting formatting = JsonFormatting::FORMAT);
 
         /**

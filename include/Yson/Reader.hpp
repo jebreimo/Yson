@@ -7,6 +7,7 @@
 //****************************************************************************
 #pragma once
 #include <cstdint>
+#include <filesystem>
 #include <memory>
 #include <vector>
 #include <string>
@@ -150,7 +151,8 @@ namespace Yson
      * @return an instance of either JsonReader or UBJsonReader.
      * @throws YsonException if @a stream contains neither JSON nor UBJSON.
      */
-    YSON_API std::unique_ptr<Reader> makeReader(std::istream& stream);
+    YSON_API std::unique_ptr<Reader>
+    makeReader(std::istream& stream);
 
     /**
      * @brief Auto-detects whether @a fileName has JSON or UBJSON contents and
@@ -160,8 +162,9 @@ namespace Yson
      * @throws YsonException if the given file contains neither JSON
      *      nor UBJSON.
      */
-    YSON_API std::unique_ptr<Reader> makeReader(const std::string& fileName);
+    YSON_API std::unique_ptr<Reader>
+    makeReader(const std::filesystem::path& fileName);
 
-    YSON_API std::unique_ptr<Reader> makeReader(const char* buffer,
-                                                size_t bufferSize);
+    YSON_API std::unique_ptr<Reader>
+    makeReader(const char* buffer, size_t bufferSize);
 }

@@ -7,17 +7,16 @@
 //****************************************************************************
 #include "TextFileReader.hpp"
 #include "Yson/YsonException.hpp"
-#include "Yson/Common/GetUnicodeFileName.hpp"
 
 namespace Yson
 {
     TextFileReader::TextFileReader(
-            const std::string& fileName,
+            const std::filesystem::path& fileName,
             Yconvert::Encoding sourceEncoding)
-        : m_FileStream(getUnicodeFileName(fileName), std::ios_base::binary)
+        : m_FileStream(fileName, std::ios_base::binary)
     {
         if (!m_FileStream)
-            YSON_THROW("Unable to open file: " + fileName);
+            YSON_THROW("Unable to open file: " + fileName.string());
         init(m_FileStream, sourceEncoding);
     }
 }

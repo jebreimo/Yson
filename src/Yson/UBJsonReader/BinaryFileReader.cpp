@@ -7,15 +7,14 @@
 //****************************************************************************
 #include "BinaryFileReader.hpp"
 #include "Yson/YsonException.hpp"
-#include "Yson/Common/GetUnicodeFileName.hpp"
 
 namespace Yson
 {
-    BinaryFileReader::BinaryFileReader(const std::string& fileName)
-        : m_Stream(getUnicodeFileName(fileName), std::ios_base::binary)
+    BinaryFileReader::BinaryFileReader(const std::filesystem::path& fileName)
+        : m_Stream(fileName, std::ios_base::binary)
     {
         if (!m_Stream)
-            YSON_THROW("Unable to open file: " + fileName);
+            YSON_THROW("Unable to open file: " + fileName.string());
         setStream(&m_Stream);
     }
 }

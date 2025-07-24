@@ -17,7 +17,6 @@
 #include "Yson/YsonException.hpp"
 #include "Yson/Common/Base64.hpp"
 #include "Yson/Common/Escape.hpp"
-#include "Yson/Common/GetUnicodeFileName.hpp"
 #include "Yson/Common/IsJavaScriptIdentifier.hpp"
 #include "JsonWriterUtilities.hpp"
 
@@ -82,9 +81,9 @@ namespace Yson
         : JsonWriter(std::unique_ptr<std::ostream>(), nullptr, formatting)
     {}
 
-    JsonWriter::JsonWriter(const std::string& fileName,
+    JsonWriter::JsonWriter(const std::filesystem::path& fileName,
                            JsonFormatting formatting)
-        : JsonWriter(std::make_unique<std::ofstream>(getUnicodeFileName(fileName)),
+        : JsonWriter(std::make_unique<std::ofstream>(fileName),
                      nullptr,
                      formatting)
     {}
@@ -100,11 +99,11 @@ namespace Yson
     {
         m_Members->streamPtr = std::move(streamPtr);
         m_Members->stream = m_Members->streamPtr
-                            ? m_Members->streamPtr.get()
-                            : stream;
+                                ? m_Members->streamPtr.get()
+                                : stream;
         formatting = formatting != JsonFormatting::DEFAULT
-                     ? formatting
-                     : JsonFormatting::NONE;
+                         ? formatting
+                         : JsonFormatting::NONE;
         m_Members->contexts.emplace('\0', JsonParameters(formatting));
         m_Members->buffer.reserve(MAX_BUFFER_SIZE);
         if (!m_Members->stream)
@@ -181,7 +180,7 @@ namespace Yson
 
     JsonWriter& JsonWriter::beginObject()
     {
-      return beginStructure('{', '}');
+        return beginStructure('{', '}');
     }
 
     JsonWriter& JsonWriter::beginObject(const StructureParameters& parameters)
@@ -480,7 +479,7 @@ namespace Yson
         return languageExtension(QUOTED_NON_FINITE_FLOATS);
     }
 
-    JsonWriter &JsonWriter::setQuotedNonFiniteFloatsEnabled(bool value)
+    JsonWriter& JsonWriter::setQuotedNonFiniteFloatsEnabled(bool value)
     {
         setNonFiniteFloatsEnabled(true);
         return setLanguageExtension(QUOTED_NON_FINITE_FLOATS, value);
@@ -613,7 +612,6 @@ namespace Yson
         m.buffer.push_back('"');
         m.state = AT_END_OF_VALUE;
         return *this;
-
     }
 
     JsonWriter::Members& JsonWriter::members() const
@@ -621,7 +619,7 @@ namespace Yson
         if (m_Members)
             return *m_Members;
         YSON_THROW("The members of this JsonWriter instance have"
-                   " been moved to another instance.");
+            " been moved to another instance.");
     }
 
     void JsonWriter::beginValue()
@@ -759,7 +757,7 @@ namespace Yson
         }
         else if (m.contexts.top().parameters.formatting < parameters.formatting)
         {
-              parameters.formatting = m.contexts.top().parameters.formatting;
+            parameters.formatting = m.contexts.top().parameters.formatting;
         }
 
         m.contexts.emplace(endChar, parameters);
@@ -781,7 +779,7 @@ namespace Yson
                 return *this;
 
             YSON_THROW(std::string("Incorrect position for '")
-                       + endChar + "'");
+                + endChar + "'");
         }
 
         switch (m.state)
@@ -819,7 +817,7 @@ namespace Yson
             break;
         default:
             YSON_THROW(std::string("Incorrect position for '")
-                       + endChar + "'");
+                + endChar + "'");
         }
 
         m.buffer.push_back(endChar);
@@ -896,7 +894,7 @@ namespace Yson
         else if (!languageExtension(NON_FINITE_FLOATS))
         {
             YSON_THROW(std::string("Illegal floating point value '")
-                       + std::to_string(number) + "'");
+                + std::to_string(number) + "'");
         }
         else if (!languageExtension(QUOTED_NON_FINITE_FLOATS))
         {

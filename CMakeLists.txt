@@ -6,7 +6,7 @@
 ## License text is included with the source distribution.
 ##****************************************************************************
 cmake_minimum_required(VERSION 3.16)
-project(Yson VERSION 1.4.19 LANGUAGES CXX)
+project(Yson VERSION 1.5.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -69,19 +69,17 @@ add_library(Yson
     src/Yson/Common/Escape.hpp
     src/Yson/Common/GetDetailedValueType.cpp
     src/Yson/Common/GetDetailedValueType.hpp
-    src/Yson/Common/GetUnicodeFileName.cpp
-    src/Yson/Common/GetUnicodeFileName.hpp
     src/Yson/Common/GetValueType.cpp
     src/Yson/Common/GetValueType.hpp
     src/Yson/Common/IsJavaScriptIdentifier.cpp
     src/Yson/Common/IsJavaScriptIdentifier.hpp
     src/Yson/Common/JsonItem.cpp
-    src/Yson/Common/MakeReader.cpp
     src/Yson/Common/ObjectItem.cpp
     src/Yson/Common/ParseFloatingPoint.cpp
     src/Yson/Common/ParseFloatingPoint.hpp
     src/Yson/Common/ParseInteger.cpp
     src/Yson/Common/ParseInteger.hpp
+    src/Yson/Common/Reader.cpp
     src/Yson/Common/ReaderIterators.cpp
     src/Yson/Common/ReaderState.cpp
     src/Yson/Common/SelectTypeIf.hpp

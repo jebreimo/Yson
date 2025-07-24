@@ -7,6 +7,7 @@
 //****************************************************************************
 #pragma once
 #include <cstddef>
+#include <filesystem>
 #include <iosfwd>
 #include <memory>
 #include <string>
@@ -25,7 +26,7 @@ namespace Yson
                                  const char* buffer = nullptr,
                                  size_t bufferSize = 0);
 
-        explicit UBJsonTokenizer(const std::string& fileName);
+        explicit UBJsonTokenizer(const std::filesystem::path& fileName);
 
         UBJsonTokenizer(const char* buffer, size_t bufferSize);
 
