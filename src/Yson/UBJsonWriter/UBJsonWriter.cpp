@@ -6,9 +6,11 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "Yson/UBJsonWriter.hpp"
+
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <stack>
 #include <Yconvert/Convert.hpp>
 #include "Yson/YsonException.hpp"
 #include "Yson/Common/Base64.hpp"
@@ -101,7 +103,7 @@ namespace Yson
 
     std::pair<const void*, size_t> UBJsonWriter::buffer() const
     {
-        auto& m = members();
+        const auto& m = members();
         if (m.stream)
             return {nullptr, 0};
         return {m.buffer.data(), m.buffer.size()};
@@ -255,7 +257,7 @@ namespace Yson
     {
         beginValue();
         auto& m = members();
-        auto& context = m.contexts.top();
+        const auto& context = m.contexts.top();
         if (context.valueType == UBJsonValueType::UNKNOWN)
             m.buffer.push_back('S');
         writeMinimalInteger(m.buffer, text.size());
@@ -273,7 +275,7 @@ namespace Yson
 
     UBJsonWriter& UBJsonWriter::binary(const void* data, size_t size)
     {
-        auto s_size = ptrdiff_t(size);
+        const auto s_size = ptrdiff_t(size);
         beginArray(UBJsonParameters(s_size, UBJsonValueType::UINT_8));
         flush();
         auto& m = members();
@@ -322,7 +324,7 @@ namespace Yson
 
         beginValue();
         auto& m = members();
-        auto& context = m.contexts.top();
+        const auto& context = m.contexts.top();
         if (context.valueType == UBJsonValueType::UNKNOWN)
             m.buffer.push_back(char(structureType));
         if (parameters.size >= 0)
@@ -343,9 +345,9 @@ namespace Yson
 
     UBJsonWriter& UBJsonWriter::endStructure(UBJsonValueType structureType)
     {
-        auto endChar = structureType == UBJsonValueType::OBJECT ? '}' : ']';
+        const auto endChar = structureType == UBJsonValueType::OBJECT ? '}' : ']';
         auto& m = members();
-        auto& context = m.contexts.top();
+        const auto& context = m.contexts.top();
         if (context.structureType == structureType)
         {
             if (context.size == -1)
@@ -397,7 +399,7 @@ namespace Yson
 
     UBJsonWriter& UBJsonWriter::flush()
     {
-        auto& m = members();
+        const auto& m = members();
         if (m.stream && !m.buffer.empty())
         {
             m.stream->write(m.buffer.data(), std::streamsize(m.buffer.size()));
